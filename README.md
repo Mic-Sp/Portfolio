@@ -23,6 +23,26 @@ npm run format     # format source and configuration
 npm run format:check
 ```
 
+## Direct message uplink
+
+The Dossier's **Direct Transmission** form and console `msg <return_email> <message...>` command (aliases: `transmit`, `send`) share `ContactSchema` and `POST /api/contact`. Run `msg` for clickable console/form shortcuts. Messages and return addresses are excluded from console history and command echoes; drafts are not saved to browser storage.
+
+The Hero's **Direct Message** pill opens the drawer directly to the form. `openDossierToSection("transmission")` waits for the slide to settle before scrolling, focusing Name, and briefly highlighting the form. `"top"` and `"thm"` target the overview and live badge. Reduced motion uses instant scrolling without the decorative pulse. Scroll and focus stay inside the drawer.
+
+With Playwright available and a local server running, `node tests/browser/dossier-message.mjs` checks the actual Hero/CLI triggers, focus timing, drawer motion, responsive layout, and reduced motion. Set `PORTFOLIO_BASE_URL` for a different server URL, or `PLAYWRIGHT_MODULE` to the entry file of an external Playwright installation.
+
+Copy `.env.example` to `.env.local` for development, or set its variables in Vercel project settings and redeploy:
+
+- `RESEND_API_KEY`: server-only Resend API key with sending access. Never use a `NEXT_PUBLIC_` variable.
+- `CONTACT_FROM_EMAIL`: sender on a [verified Resend domain](https://resend.com/docs/send-with-nextjs). The default `Portfolio Uplink <onboarding@resend.dev>` is for Resend's restricted test-sender flow; configure a verified sender for production.
+- `CONTACT_TO_EMAIL`: fixed server-controlled destination, default `mic.sprague@gmail.com`. Visitors cannot override the recipient or sender.
+
+Without a key the route returns a clean `503 RELAY_UNAVAILABLE`; the site still builds. A successful submission means Resend accepted the message for delivery, rather than proving inbox delivery. The provider request times out after ten seconds. Private payloads and provider errors are never logged, and the client never automatically retries a submission with an uncertain outcome.
+
+The route limits both advertised and actual bodies to 16 KB, rejects unknown fields, returns structured validation errors, strips script/control text and escapes all email HTML, and silently drops valid honeypot submissions. It allows three attempts per client IP in a sliding ten-minute window and returns `Retry-After` on `429`. Trust `x-forwarded-for` only behind Vercel or a proxy that overwrites client-supplied forwarding headers. The bounded in-memory limiter is **per running instance** and resets on cold starts; add a shared limiter or Vercel WAF rule if deployment-wide enforcement is needed. No distributed guarantee is implied.
+
+`npm test` exercises schema boundaries, honeypot handling, byte limits, IP windows, mocked provider success/failure, client requests, and CLI privacy/progress without sending live emails.
+
 ## Add a project or pillar
 
 Add one `ProjectNode` to `src/data/projects.registry.ts`. Give it a unique slug `id`, an `order`, a pillar name and compact label, and one of the six accents: `cyan`, `emerald`, `violet`, `amber`, `rose`, or `blue`.

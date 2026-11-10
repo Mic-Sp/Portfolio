@@ -90,7 +90,7 @@ test("whois and stack expose the complete shared dossier profile", async () => {
   assert.ok(whois.includes(PROFILE_CONFIG.executiveBio));
   assert.match(
     whois,
-    /intelligent automated workflows, production web applications, and custom developer tools—engineered from the ground up with an application-security mindset\./,
+    /intelligent automated workflows, production web applications, and custom developer tools, engineered from the ground up with an application-security mindset\./,
   );
   assert.match(whois, /Holy Cross College \(Notre Dame, IN\)/);
   assert.match(whois, /Summa Cum Laude \(3\.98 GPA\)/);

@@ -14,10 +14,12 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHud } from "@/context/HudContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
+import { activateDossierSection } from "@/lib/dossier-navigation";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { CommsUplink } from "./CommsUplink";
 import "./operator-dossier.css";
 
@@ -137,7 +139,9 @@ export function OperatorDossierDrawer() {
 }
 
 function DossierPanel() {
-  const { dossierSection, closeDossier, isTerminalOpen } = useHud();
+  const { dossierSection, dossierRequestId, closeDossier, isTerminalOpen } =
+    useHud();
+  const reducedMotion = useMotionPreference();
   const isPresent = useIsPresent();
   const [isSettled, setIsSettled] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -175,14 +179,15 @@ function DossierPanel() {
     };
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const scroll = body.current;
-    const anchor = scroll?.querySelector<HTMLElement>(
-      `[data-dossier-anchor="${dossierSection}"]`,
-    );
-    // The positioned scroller is the anchors' offset parent; measure only once.
-    if (scroll && anchor) scroll.scrollTop = anchor.offsetTop;
-  }, [dossierSection]);
+    if (!scroll) return;
+    return activateDossierSection(scroll, dossierSection, {
+      isSettled,
+      isPresent,
+      reducedMotion,
+    });
+  }, [dossierSection, dossierRequestId, isSettled, isPresent, reducedMotion]);
 
   return (
     <dialog

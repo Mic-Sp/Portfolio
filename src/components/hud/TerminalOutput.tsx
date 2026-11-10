@@ -1,6 +1,6 @@
 "use client";
 
-import type { CliLine } from "@/lib/cli-commands";
+import type { CliAction, CliLine } from "@/lib/cli-commands";
 
 export interface TerminalEntry {
   id: number;
@@ -8,7 +8,13 @@ export interface TerminalEntry {
   lines: CliLine[];
 }
 
-export function TerminalOutput({ entries }: { entries: TerminalEntry[] }) {
+export function TerminalOutput({
+  entries,
+  onAction,
+}: {
+  entries: TerminalEntry[];
+  onAction: (action: CliAction) => void;
+}) {
   return entries.map((entry) => (
     <div key={entry.id} className="terminal-entry">
       {entry.prompt && (
@@ -41,6 +47,16 @@ export function TerminalOutput({ entries }: { entries: TerminalEntry[] }) {
                 </span>
               ),
             )}
+            {line.actions?.map((action) => (
+              <button
+                type="button"
+                key={action.kind}
+                className="terminal-inline-action"
+                onClick={() => onAction(action)}
+              >
+                {action.label}
+              </button>
+            ))}
           </div>
         ))}
       </div>

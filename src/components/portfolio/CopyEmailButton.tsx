@@ -41,11 +41,15 @@ export function CopyEmailButton({ compact = false }: { compact?: boolean }) {
       )}
       <span aria-live="polite" aria-atomic="true">
         {status === "copied"
-          ? `COPIED: ${address} // OK`
+          ? compact
+            ? "COPIED ✓"
+            : `COPIED: ${address} // OK`
           : status === "error"
-            ? "COPY UNAVAILABLE // USE EMAIL LINK"
+            ? compact
+              ? "COPY FAILED"
+              : "COPY UNAVAILABLE // USE EMAIL LINK"
             : compact
-              ? `EMAIL // ${address} (COPY)`
+              ? "EMAIL"
               : "COPY EMAIL"}
       </span>
     </button>

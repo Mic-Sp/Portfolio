@@ -184,6 +184,9 @@ function TerminalPanel({
           window.open(href, "_blank", "noopener,noreferrer");
         },
         signal: controller.signal,
+        onProgress: (lines) => {
+          if (!controller.signal.aborted) updateEntry(id, lines);
+        },
       });
       if (controller.signal.aborted) return;
       if (output.action === "clear") clear();
@@ -245,6 +248,7 @@ function TerminalPanel({
     "whois",
     "stack",
     "contact",
+    "msg",
     "thm",
     ...(first ? [`inspect ${first.id}`] : []),
     "entropy correct-horse-battery-staple",
@@ -291,10 +295,19 @@ function TerminalPanel({
         aria-relevant="additions text"
         tabIndex={0}
       >
-        <TerminalOutput entries={entries} />
+        <TerminalOutput
+          entries={entries}
+          onAction={(action) => {
+            if (action.kind === "contact") hud.openDossier("contact");
+            else {
+              setInput(action.value);
+              inputRef.current?.focus({ preventScroll: true });
+            }
+          }}
+        />
         {busy && (
           <p className="terminal-busy" role="status">
-            PROCESSING // local audit + bounded range request…
+            PROCESSING // awaiting command response…
           </p>
         )}
       </div>

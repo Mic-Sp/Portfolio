@@ -1,4 +1,10 @@
-import { ArrowUpRight, Fingerprint, GitFork, Network } from "lucide-react";
+import {
+  ArrowUpRight,
+  Fingerprint,
+  GitFork,
+  Network,
+  Send,
+} from "lucide-react";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { CopyEmailButton } from "./CopyEmailButton";
 import { DossierTrigger } from "./DossierTrigger";
@@ -31,6 +37,13 @@ export function HeroUplinks() {
         <ArrowUpRight size={13} aria-hidden="true" />
       </a>
       <CopyEmailButton compact />
+      <DossierTrigger
+        className="hero-uplink-pill direct-message-pill"
+        target="transmission"
+        label="Direct message: open transmission form"
+      >
+        <Send size={13} aria-hidden="true" /> DIRECT MESSAGE
+      </DossierTrigger>
       <a
         className="hero-uplink-pill thm-quick-link"
         href={thmTelemetry.profileUrl}

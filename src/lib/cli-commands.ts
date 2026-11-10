@@ -6,6 +6,12 @@ import {
   type EntropyAudit,
 } from "./crypto-auditor.ts";
 import type { ProjectNode } from "../types/portfolio.ts";
+import { ContactSchema, contactFieldErrors } from "./schemas/contact.schema.ts";
+import { transmitContact } from "./contact-client.ts";
+
+export type CliAction =
+  | { label: string; kind: "prefill"; value: string }
+  | { label: string; kind: "contact" };
 
 export interface CliLink {
   label: string;
@@ -16,6 +22,7 @@ export interface CliLine {
   tone?: "muted" | "success" | "warning" | "error" | "accent";
   links?: CliLink[];
   nowrap?: boolean;
+  actions?: CliAction[];
 }
 export interface CliResult {
   lines: CliLine[];
@@ -32,6 +39,8 @@ export interface CliContext {
   openLink?: (href: string) => void;
   signal?: AbortSignal;
   auditPassword?: typeof checkHibpKAnonymity;
+  sendContact?: typeof transmitContact;
+  onProgress?: (lines: CliLine[]) => void;
 }
 export interface CliCommand {
   name: string;
@@ -59,6 +68,17 @@ const findProject = (id: string, nodes: readonly ProjectNode[]) =>
   nodes.find((node) => node.id === id || node.cliMeta?.commandAlias === id);
 
 export function parseCommand(input: string): { name: string; args: string[] } {
+  // Messages are natural prose, not shell code: apostrophes in "let's" are literal.
+  const message = input.match(
+    /^\s*(msg|transmit|send)(?:\s+(\S+)(?:\s+([\s\S]*))?)?\s*$/i,
+  );
+  if (message) {
+    const prose = message[3]?.trim().replace(/^(["'])([\s\S]*)\1$/, "$2");
+    return {
+      name: message[1].toLowerCase(),
+      args: message[2] ? [message[2], ...(prose ? [prose] : [])] : [],
+    };
+  }
   const tokens: string[] = [];
   let token = "",
     quote: string | null = null,
@@ -100,9 +120,15 @@ export function parseCommand(input: string): { name: string; args: string[] } {
 
 export function isSensitiveCommand(input: string) {
   try {
-    return ["entropy", "pwnd"].includes(parseCommand(input).name);
+    const { name, args } = parseCommand(input);
+    return (
+      ["entropy", "pwnd"].includes(name) ||
+      (["msg", "transmit", "send"].includes(name) && args.length > 0)
+    );
   } catch {
-    return /^\s*['"]?(entropy|pwnd)(?:['"]?\s|['"]?$)/i.test(input);
+    return /^\s*['"]?(entropy|pwnd|msg|transmit|send)(?:['"]?\s|['"]?$)/i.test(
+      input,
+    );
   }
 }
 export function getCommandEcho(input: string) {
@@ -111,7 +137,10 @@ export function getCommandEcho(input: string) {
   try {
     name = parseCommand(input).name;
   } catch {
-    if (/pwnd/i.test(input.slice(0, 12))) name = "pwnd";
+    name =
+      input
+        .match(/^\s*['"]?(entropy|pwnd|msg|transmit|send)/i)?.[1]
+        ?.toLowerCase() ?? "private-command";
   }
   return `${name} [REDACTED]`;
 }
@@ -196,7 +225,7 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
           ),
         ),
         text(
-          "Quote strings or pillar names containing spaces. Password inputs are redacted and excluded from history.",
+          "Quote strings or pillar names containing spaces. Passwords and message payloads are redacted and excluded from history.",
           "muted",
         ),
       ),
@@ -383,6 +412,79 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
             { label: thmTelemetry.handle, href: thmTelemetry.profileUrl },
           ],
         },
+      );
+    },
+  },
+  {
+    name: "msg",
+    aliases: ["transmit", "send"],
+    syntax: "msg <return_email> <message...>",
+    description: "Send a private message through the guarded email relay",
+    execute: async (args, context) => {
+      if (!args.length)
+        return result(
+          text("DIRECT TRANSMISSION // POST /api/contact", "accent"),
+          text("Usage: msg <return_email> <message...>"),
+          text(
+            "Example: msg recruiter@company.com Loved the 3D deck and Q-Split architecture, let's chat!",
+          ),
+          text(
+            "Message: 10–2000 characters. Your email and message are excluded from terminal history.",
+            "muted",
+          ),
+          {
+            text: "CHOOSE AN UPLINK // ",
+            actions: [
+              { label: "TYPE MSG IN CONSOLE", kind: "prefill", value: "msg " },
+              { label: "OPEN DOSSIER MESSAGE FORM", kind: "contact" },
+            ],
+          },
+        );
+      const parsed = ContactSchema.safeParse({
+        senderEmail: args[0],
+        message: args.slice(1).join(" "),
+        origin: "CLI_TERMINAL",
+      });
+      if (!parsed.success)
+        return result(
+          text("[1/3] ZOD SCHEMA VALIDATION: REJECTED", "error"),
+          ...Object.entries(contactFieldErrors(parsed.error)).map(
+            ([field, errors]) =>
+              text(`${field}: ${errors?.join(" ")}`, "error"),
+          ),
+          text("Usage: msg <return_email> <message...>", "muted"),
+        );
+      const lines = [
+        text("[1/3] ZOD SCHEMA VALIDATION: PASS", "success"),
+        text("[2/3] DISPATCHING VIA RESEND RELAY...", "accent"),
+      ];
+      context.onProgress?.(lines);
+      const transmission = await (context.sendContact ?? transmitContact)(
+        parsed.data,
+        { signal: context.signal },
+      );
+      if (!transmission.ok)
+        return result(
+          ...lines,
+          text(
+            `[3/3] ${transmission.code} // ${transmission.message}`,
+            "error",
+          ),
+          ...Object.entries(transmission.fieldErrors ?? {}).map(
+            ([field, errors]) =>
+              text(`${field}: ${errors?.join(" ")}`, "error"),
+          ),
+        );
+      return result(
+        ...lines,
+        text("[3/3] 200 OK // TRANSMISSION CONFIRMED", "success"),
+        text(
+          `PAYLOAD ACCEPTED FOR DELIVERY TO ${PROFILE_CONFIG.commsAndTelemetry.directChannels.email.address.toUpperCase()}`,
+        ),
+        text(
+          "Resend accepted the message; inbox delivery is not yet verified.",
+          "muted",
+        ),
       );
     },
   },

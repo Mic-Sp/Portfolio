@@ -80,7 +80,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     status: "CLIENT PROD",
     accent: "violet",
     tagline:
-      "Production Web Platform for Clinical Counseling & Consulting (PLLC)",
+      "Production Web Platform for Clinical Counseling & Consulting (LLC)",
     description:
       "Custom production web platform engineered for Huddle & Heal Counseling & Consulting, PLLC, featuring build-time WCAG accessibility contrast verification, clinical copy boundary guardrails, automated GitHub-to-Cloudflare Pages deployment, and streamlined client intake routing.",
     architectureHighlights: [

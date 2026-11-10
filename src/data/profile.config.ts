@@ -92,7 +92,7 @@ export const PROFILE_CONFIG = {
   systemStatus: "STATUS: BUILDING // OPEN TO ROLES",
   timeZone: "America/Chicago",
   executiveBio:
-    "AI & Full-Stack Software Engineer building intelligent automated workflows, production web applications, and custom developer tools—engineered from the ground up with an application-security mindset.",
+    "AI & Full-Stack Software Engineer building intelligent automated workflows, production web applications, and custom developer tools, engineered from the ground up with an application-security mindset.",
   education: EDUCATION,
   commsAndTelemetry: COMMS_AND_TELEMETRY,
   specializations: [

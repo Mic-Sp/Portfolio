@@ -51,6 +51,17 @@
     border-color: #6ee7b780;
     background: #10b98112;
   }
+  .direct-message-pill {
+    color: #a5f3fc;
+    border-color: #22d3ee80;
+    background: #164e6333;
+  }
+  .direct-message-pill:hover,
+  .direct-message-pill:focus-visible {
+    color: #d1fae5;
+    border-color: #6ee7b7;
+    box-shadow: 0 0 12px #22d3ee26;
+  }
   .copy-email-button[data-copy-status="error"] {
     color: #fcd34d;
   }

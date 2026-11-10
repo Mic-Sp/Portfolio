@@ -11,6 +11,7 @@ import {
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { CopyEmailButton } from "./CopyEmailButton";
 import { TryHackMeBadge } from "./TryHackMeBadge";
+import { ContactTransmission } from "./ContactTransmission";
 import "./comms-uplink.css";
 
 export function CommsUplink({
@@ -63,7 +64,8 @@ export function CommsUplink({
           <CopyEmailButton />
         </div>
       </div>
-      <article className="thm-telemetry-card">
+      <ContactTransmission prefix={prefix} />
+      <article className="thm-telemetry-card" data-dossier-anchor="thm">
         <header className="thm-telemetry-heading">
           <h4>
             <ShieldCheck size={17} aria-hidden="true" /> TRYHACKME {"//"} LIVE

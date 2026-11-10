@@ -14,9 +14,11 @@ import {
 } from "@/data/projects.registry";
 import { useHudKeyboard } from "@/hooks/useHudKeyboard";
 import type { PillarCategory, ProjectNode } from "@/types/portfolio";
+import type { DossierSection, DossierTarget } from "@/lib/dossier-navigation";
+
+export type { DossierSection, DossierTarget } from "@/lib/dossier-navigation";
 
 type ViewMode = "spatial" | "grid";
-export type DossierSection = "overview" | "credentials" | "stack";
 interface HudContextValue {
   projects: readonly ProjectNode[];
   pillarCategories: PillarCategory[];
@@ -35,7 +37,9 @@ interface HudContextValue {
   closeTerminal: () => void;
   isDossierOpen: boolean;
   dossierSection: DossierSection;
+  dossierRequestId: number;
   openDossier: (section?: DossierSection) => void;
+  openDossierToSection: (target: DossierTarget) => void;
   closeDossier: () => void;
   godMode: boolean;
   setGodMode: (enabled: boolean) => void;
@@ -62,6 +66,7 @@ export function HudProvider({
   const [isDossierOpen, setDossierOpen] = useState(false);
   const [dossierSection, setDossierSection] =
     useState<DossierSection>("overview");
+  const [dossierRequestId, setDossierRequestId] = useState(0);
   const [godMode, setGodMode] = useState(false);
 
   const selectProject = useCallback(
@@ -93,8 +98,15 @@ export function HudProvider({
   const openDossier = useCallback((section: DossierSection = "overview") => {
     setTerminalOpen(false);
     setDossierSection(section);
+    setDossierRequestId((id) => id + 1);
     setDossierOpen(true);
   }, []);
+  const openDossierToSection = useCallback(
+    (target: DossierTarget) => {
+      openDossier(target === "top" ? "overview" : target);
+    },
+    [openDossier],
+  );
   const closeDossier = useCallback(() => setDossierOpen(false), []);
   const setViewMode = useCallback(
     (mode: ViewMode) => {
@@ -155,7 +167,9 @@ export function HudProvider({
         closeTerminal,
         isDossierOpen,
         dossierSection,
+        dossierRequestId,
         openDossier,
+        openDossierToSection,
         closeDossier,
         godMode,
         setGodMode,
