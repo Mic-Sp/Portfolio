@@ -2,7 +2,7 @@
 
 import { useHud } from "@/context/HudContext";
 import { ProjectCard } from "./ProjectCard";
-import { ProjectViewToggle } from "./ProjectViewToggle";
+import { ProjectShowcaseToolbar } from "./ProjectShowcaseToolbar";
 
 export function ProjectGridPreview() {
   const {
@@ -25,29 +25,15 @@ export function ProjectGridPreview() {
       className="project-registry"
       aria-labelledby="registry-heading"
     >
-      <div className="registry-heading">
-        <div className="registry-title">
-          <span className="section-index">01 /</span>
-          <h2 id="registry-heading">
-            Selected systems
-            <span className="registry-count">
-              {projects.length.toString().padStart(2, "0")}
-            </span>
-          </h2>
-        </div>
-        <ProjectViewToggle />
-      </div>
-      <div className="registry-meta">
-        <span>
-          {activePillarFilter !== "ALL"
+      <ProjectShowcaseToolbar
+        headingId="registry-heading"
+        detail={
+          activePillarFilter !== "ALL"
             ? activePillarFilter
-            : "INDEPENDENT BUILDS. CONNECTED DISCIPLINES."}
-        </span>
-        <span>
-          {visibleProjects.length.toString().padStart(2, "0")} /{" "}
-          {projects.length.toString().padStart(2, "0")} NODES VISIBLE
-        </span>
-      </div>
+            : "INDEPENDENT BUILDS. CONNECTED DISCIPLINES."
+        }
+        counter={`${visibleProjects.length.toString().padStart(2, "0")} / ${projects.length.toString().padStart(2, "0")} NODES VISIBLE`}
+      />
       <div className="project-grid">
         {visibleProjects.map(({ project, index }) => (
           <ProjectCard

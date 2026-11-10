@@ -6,7 +6,7 @@ import {
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
-import { ArrowLeft, ArrowRight, MoveHorizontal, ScanLine } from "lucide-react";
+import { ArrowLeft, ArrowRight, MoveHorizontal } from "lucide-react";
 import { useEffect, useRef, type PointerEvent } from "react";
 import { useHud } from "@/context/HudContext";
 import { useDeckViewport } from "@/hooks/useDeckViewport";
@@ -17,7 +17,7 @@ import {
 } from "@/lib/spatial-math";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { ProjectCard } from "./ProjectCard";
-import { ProjectViewToggle } from "./ProjectViewToggle";
+import { ProjectShowcaseToolbar } from "./ProjectShowcaseToolbar";
 import "./spatial-deck.css";
 
 const DECK_SPRING = {
@@ -101,31 +101,17 @@ export function SpatialProjectDeck() {
       data-motion={reducedMotion ? "reduced" : "spatial"}
       data-god-mode={godMode}
     >
-      <div className="registry-heading">
-        <div className="registry-title">
-          <span className="section-index">01 /</span>
-          <h2 id="spatial-heading">
-            Selected systems
-            <span className="registry-count">
-              {formatNumber(totalProjects)}
-            </span>
-          </h2>
-        </div>
-        <ProjectViewToggle />
-      </div>
-      <div className="registry-meta">
-        <span className="flex items-center gap-2">
-          <ScanLine size={11} aria-hidden="true" />
-          {godMode
+      <ProjectShowcaseToolbar
+        headingId="spatial-heading"
+        detail={
+          godMode
             ? "GODMODE // UNLIMITED TELEMETRY"
             : reducedMotion
               ? "FOCUS VIEW // REDUCED MOTION"
-              : "SPATIAL EXPLORER // PERSPECTIVE 1400"}
-        </span>
-        <span>
-          {formatNumber(position)} / {formatNumber(totalProjects)} IN FOCUS
-        </span>
-      </div>
+              : "SPATIAL EXPLORER // PERSPECTIVE 1400"
+        }
+        counter={`${formatNumber(position)} / ${formatNumber(totalProjects)} IN FOCUS`}
+      />
 
       {totalProjects > 0 ? (
         <>

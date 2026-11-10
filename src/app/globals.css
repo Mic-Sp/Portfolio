@@ -97,8 +97,8 @@
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 24px;
-    min-height: 100px;
-    padding: 18px 32px;
+    min-height: 80px;
+    padding: 14px 32px;
     border-bottom: 1px solid #47556980;
   }
   .location-block {
@@ -276,39 +276,21 @@
     padding: 0 48px 180px;
   }
   .hero-identity {
-    padding-top: 28px;
+    padding: 16px 0 20px;
   }
-  .hero-topline,
   .identity-eyebrow,
-  .hero-baseline,
-  .scope-coordinate,
-  .registry-meta,
   .registry-end {
     font:
       500 var(--type-label)/1.65 var(--font-mono),
       monospace;
     letter-spacing: 0.04em;
   }
-  .hero-topline {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 12px 24px;
-    color: #cbd5e1;
-  }
-  .small-cross {
-    padding-right: 8px;
-    color: #67e8f9;
-  }
-  .hero-session {
-    color: #cbd5e1;
-  }
   .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-columns: minmax(0, 1fr) 128px;
     align-items: center;
-    gap: 64px;
-    padding: 56px 0 44px;
+    gap: 24px;
+    padding: 0;
   }
   .identity-eyebrow {
     display: flex;
@@ -316,7 +298,8 @@
     align-items: center;
     gap: 12px;
     color: #e2e8f0;
-    margin-bottom: 24px;
+    margin-bottom: 6px;
+    line-height: 1.5;
   }
   .identity-rule {
     height: 1px;
@@ -324,86 +307,44 @@
     background: #67e8f9;
   }
   h1 {
-    font-size: clamp(48px, 5.2vw, 80px);
-    font-weight: 500;
-    letter-spacing: -0.055em;
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
     line-height: 1.05;
-  }
-  h1 > span {
-    color: #cbd5e1;
   }
   .name-period {
     color: #67e8f9;
   }
   .hero-headline {
-    margin-top: 28px;
-    max-width: 850px;
-    font-size: 24px;
-    line-height: 1.55;
+    margin-top: 6px;
+    max-width: none;
+    font-size: 20px;
+    line-height: 1.4;
     color: #f1f5f9;
     letter-spacing: -0.015em;
   }
   .hero-credentials {
-    max-width: 850px;
-    margin-top: 16px;
+    max-width: none;
+    margin-top: 4px;
     font-size: 16px;
-    line-height: 1.8;
+    line-height: 1.5;
     color: #cbd5e1;
   }
   .identity-scope {
     color: #67e8f9;
     position: relative;
-    padding: 14px 0;
+    padding: 0;
+    width: 128px;
+    height: 128px;
   }
   .identity-scope > svg {
     width: 100%;
-    height: auto;
+    height: 100%;
     opacity: 0.8;
   }
-  .scope-coordinate {
-    color: #cbd5e1;
-    text-align: center;
-  }
-  .scope-coordinate-top {
-    margin-bottom: 12px;
-  }
-  .scope-coordinate-bottom {
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .hero-baseline {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px 24px;
-    border-block: 1px solid #47556980;
-    padding: 18px 0;
-    color: #cbd5e1;
-  }
-  .hero-baseline > a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 36px;
-    color: #e2e8f0;
-  }
-  .hero-baseline > a:hover {
-    color: #a5f3fc;
-  }
   .project-registry {
-    padding-top: 40px;
+    padding-top: 0;
     scroll-margin-top: 10px;
-  }
-  .registry-heading {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px 24px;
   }
   .registry-title {
     display: flex;
@@ -436,15 +377,6 @@
     border: 1px solid #64748b99;
     padding: 4px 7px;
     letter-spacing: 0;
-  }
-  .registry-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px 24px;
-    margin: 18px 0 24px;
-    color: #cbd5e1;
   }
   .project-grid {
     display: grid;
@@ -799,11 +731,13 @@
       padding-inline: 32px;
     }
     .hero-layout {
-      grid-template-columns: minmax(0, 1fr) 220px;
-      gap: 36px;
+      grid-template-columns: minmax(0, 1fr) 128px;
+      gap: 24px;
     }
-    .hero-session {
-      display: none;
+  }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    h1 {
+      font-size: 36px;
     }
   }
   @media (max-width: 767px) {
@@ -870,11 +804,11 @@
       display: none !important;
     }
     .hero-identity {
-      padding-top: 24px;
+      padding: 12px 0 16px;
     }
     .hero-layout {
       grid-template-columns: minmax(0, 1fr);
-      padding: 36px 0;
+      padding: 0;
     }
     .identity-scope {
       display: none;
@@ -883,20 +817,17 @@
       gap: 10px;
     }
     h1 {
-      font-size: clamp(44px, 10vw, 64px);
+      font-size: 36px;
     }
     .hero-headline {
-      font-size: 20px;
-      margin-top: 24px;
+      font-size: 18px;
+      margin-top: 6px;
     }
     .hero-credentials {
       font-size: 14px;
     }
-    .hero-baseline {
-      padding-block: 16px;
-    }
     .project-registry {
-      padding-top: 32px;
+      padding-top: 0;
     }
     .registry-title {
       gap: 12px;

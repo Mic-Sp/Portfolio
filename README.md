@@ -95,3 +95,11 @@ Readable labels use a 12px minimum. Desktop HUD controls, project badges, schema
 The main shell spans up to 1440px, with 620px spatial cards and 32px desktop card padding. On mobile, cards retain 24px padding and readable labels; the schematic's decorative bus is hidden to give its text room to wrap. The existing ring offsets and spring physics are preserved, with exposed wing surfaces verified at desktop and mobile widths.
 
 The console starts at 62dvh, with a 440px minimum and 720px maximum, each bounded by the available viewport below the measured HUD. Its 1360px shell provides 1280px of desktop content space. Tables scroll inside the console, while prose wraps. HUD rows and controls wrap or scroll within their own containers instead of shrinking their text. Browser calibration covers 1440×1080, 1920×1080, and 390×844 at normal zoom.
+
+## Compact first viewport
+
+The hero omits the pre-header and bottom ribbons. Desktop identity uses a single-line 48px name, a 20px role, 16px credentials, and a 128px reticle without caption rows. Mobile retains a 36px name, 18px role, and 14px credentials. The HUD keeps its calibrated font sizes with tighter vertical padding.
+
+`ProjectShowcaseToolbar` shares the heading, mode detail, count, and view toggle between spatial and grid modes. Desktop places them in one 61px toolbar; narrower screens wrap the same content without reducing the 12px label minimum. The active card begins 14px below that toolbar, including its bottom margin.
+
+With fonts loaded at 100% zoom and `scrollY === 0`, the active card starts at approximately y=327px on both 1440×900 and 1920×1080. At 1440×900, 59% of the card and its full architecture schematic are visible above the fixed footer. The 620px card width, card typography, deck physics, and console controls remain unchanged.

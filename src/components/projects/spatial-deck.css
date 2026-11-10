@@ -1,6 +1,57 @@
 @layer theme, base, components, utilities;
 
 @layer components {
+  .project-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #47556980;
+  }
+  .project-toolbar-detail,
+  .project-toolbar-counter {
+    font:
+      500 var(--type-label)/1.5 var(--font-mono),
+      monospace;
+    color: #cbd5e1;
+  }
+  .project-toolbar-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .project-toolbar-detail svg {
+    flex-shrink: 0;
+  }
+  .project-toolbar-counter {
+    white-space: nowrap;
+  }
+  @media (max-width: 1100px) {
+    .project-toolbar {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px 20px;
+    }
+    .project-toolbar .registry-title {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .project-toolbar .showcase-view-toggle {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .project-toolbar-detail {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .project-toolbar-counter {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: end;
+    }
+  }
   .showcase-view-toggle {
     min-height: 44px;
     display: inline-flex;
@@ -34,7 +85,7 @@
     justify-items: center;
     align-items: stretch;
     position: relative;
-    padding: 40px 0 80px;
+    padding: 6px 0 80px;
     perspective: 1400px;
     transform-style: preserve-3d;
     cursor: grab;
@@ -253,6 +304,21 @@
     }
   }
   @media (max-width: 767px) {
+    .project-toolbar .registry-title {
+      grid-column: 1 / -1;
+    }
+    .project-toolbar-detail {
+      grid-column: 1 / -1;
+    }
+    .project-toolbar-counter {
+      grid-column: 1;
+      grid-row: 3;
+      justify-self: start;
+    }
+    .project-toolbar .showcase-view-toggle {
+      grid-column: 2;
+      grid-row: 3;
+    }
     .showcase-view-toggle {
       font-size: 12px;
       padding: 10px 12px;
@@ -266,7 +332,7 @@
       padding-inline: 12px;
     }
     .spatial-stage {
-      padding-top: 28px;
+      padding-top: 6px;
       padding-bottom: 56px;
     }
     .spatial-card-slot {
