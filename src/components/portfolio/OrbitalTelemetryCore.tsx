@@ -1,9 +1,10 @@
 "use client";
 
-import { useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 import { useHud } from "@/context/HudContext";
 import { useDeckViewport } from "@/hooks/useDeckViewport";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
+import { getPointerPosition } from "@/lib/pointer-math";
 import {
   getCubeWireframePath,
   getOrbitalImpulse,
@@ -17,25 +18,9 @@ const INITIAL_PATH = getCubeWireframePath(
   INITIAL_CUBE_ANGLES.y,
   INITIAL_CUBE_ANGLES.z,
 );
-const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-function subscribeToMotion(onChange: () => void) {
-  const media = window.matchMedia(MOTION_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-}
-const readMotionPreference = () => window.matchMedia(MOTION_QUERY).matches;
-const serverMotionPreference = () => null;
-
 export function OrbitalTelemetryCore() {
   const { activeIndex, activeProject, godMode } = useHud();
-  const initialReducedMotion = useReducedMotion();
-  // Also observe live changes: the installed Motion hook retains its initial preference.
-  const liveReducedMotion = useSyncExternalStore(
-    subscribeToMotion,
-    readMotionPreference,
-    serverMotionPreference,
-  );
-  const reducedMotion = liveReducedMotion ?? initialReducedMotion ?? true;
+  const reducedMotion = useMotionPreference();
   const viewport = useDeckViewport();
   const enabled = viewport === "wide" && !reducedMotion;
   const root = useRef<HTMLDivElement>(null);
@@ -44,10 +29,48 @@ export function OrbitalTelemetryCore() {
   const cube = useRef<SVGPathElement>(null);
   const coreDot = useRef<SVGCircleElement>(null);
   const brackets = useRef<SVGGElement>(null);
+  const trackingReticle = useRef<SVGGElement>(null);
   const hovered = useRef(false);
+  const pointer = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
+  const previousPointer = useRef<{ x: number; y: number; time: number } | null>(
+    null,
+  );
   const impulseStarted = useRef<number | null>(null);
   const previousHud = useRef({ activeIndex, godMode });
   const accent = activeProject?.accent ?? "cyan";
+
+  function trackPointer(event: PointerEvent<HTMLDivElement>) {
+    if (!enabled || event.pointerType === "touch") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const point = getPointerPosition(
+      event.clientX - rect.left,
+      event.clientY - rect.top,
+      rect.width,
+      rect.height,
+    );
+    const now = performance.now();
+    const previous = previousPointer.current;
+    const seconds = previous ? Math.max(8, now - previous.time) / 1000 : 1;
+    const clampVelocity = (value: number) => Math.max(-3, Math.min(3, value));
+    pointer.current = {
+      x: point.x,
+      y: point.y,
+      vx: previous
+        ? clampVelocity((event.clientX - previous.x) / rect.width / seconds)
+        : 0,
+      vy: previous
+        ? clampVelocity((event.clientY - previous.y) / rect.height / seconds)
+        : 0,
+    };
+    previousPointer.current = { x: event.clientX, y: event.clientY, time: now };
+    hovered.current = true;
+  }
+
+  function releasePointer() {
+    hovered.current = false;
+    pointer.current = { x: 0, y: 0, vx: 0, vy: 0 };
+    previousPointer.current = null;
+  }
 
   useEffect(() => {
     if (
@@ -66,6 +89,7 @@ export function OrbitalTelemetryCore() {
     const cubePath = cube.current;
     const dot = coreDot.current;
     const bracketGroup = brackets.current;
+    const trackingGroup = trackingReticle.current;
     if (
       !emblem ||
       !sweepGroup ||
@@ -84,6 +108,8 @@ export function OrbitalTelemetryCore() {
       dot!.setAttribute("opacity", "0.75");
       bracketGroup!.removeAttribute("transform");
       bracketGroup!.setAttribute("opacity", "0.45");
+      trackingGroup?.setAttribute("opacity", "0");
+      releasePointer();
     }
     if (!enabled) {
       reset();
@@ -98,6 +124,8 @@ export function OrbitalTelemetryCore() {
       radarAngle = 0,
       orbitSpeed = 1,
       cubeSpeed = 1;
+    let steerX = 0,
+      steerY = 0;
     let angleX: number = INITIAL_CUBE_ANGLES.x,
       angleY: number = INITIAL_CUBE_ANGLES.y,
       angleZ: number = INITIAL_CUBE_ANGLES.z;
@@ -112,14 +140,27 @@ export function OrbitalTelemetryCore() {
           : getOrbitalImpulse(now - impulseStarted.current);
       const hover = hovered.current ? 1 : 0;
       const follow = 1 - Math.exp(-dt / 160);
-      orbitSpeed += (1 + pulse * 1.5 - orbitSpeed) * follow;
-      cubeSpeed += (1 + hover * 0.45 + pulse * 1.8 - cubeSpeed) * follow;
+      const control = pointer.current;
+      const hoverSpeed =
+        2.5 + Math.min(1, Math.hypot(control.vx, control.vy) / 2);
+      orbitSpeed +=
+        ((hover ? hoverSpeed : 1 + pulse * 1.5) - orbitSpeed) * follow;
+      cubeSpeed +=
+        ((hover ? hoverSpeed : 1 + pulse * 1.8) - cubeSpeed) * follow;
+      steerX += (-control.y * 0.65 * hover - steerX) * follow;
+      steerY += (control.x * 0.9 * hover - steerY) * follow;
       orbitAngle = (orbitAngle + ((dt * 360) / 14000) * orbitSpeed) % 360;
       radarAngle = (radarAngle - (dt * 360) / 22000) % 360;
       angleX =
         (angleX + ((dt * Math.PI * 2) / 18000) * cubeSpeed) % (Math.PI * 2);
       angleY =
         (angleY + ((dt * Math.PI * 2) / 14000) * cubeSpeed) % (Math.PI * 2);
+      // Movement adds angular momentum; position supplies a bounded axis offset.
+      angleX -= control.vy * (dt / 1000) * 0.45 * hover;
+      angleY += control.vx * (dt / 1000) * 0.7 * hover;
+      const velocityDecay = Math.exp(-dt / 100);
+      control.vx *= velocityDecay;
+      control.vy *= velocityDecay;
       angleZ =
         (angleZ + ((dt * Math.PI * 2) / 48000) * cubeSpeed) % (Math.PI * 2);
       sweepGroup!.setAttribute(
@@ -130,7 +171,15 @@ export function OrbitalTelemetryCore() {
         "transform",
         `rotate(${radarAngle.toFixed(3)} 64 64)`,
       );
-      cubePath!.setAttribute("d", getCubeWireframePath(angleX, angleY, angleZ));
+      cubePath!.setAttribute(
+        "d",
+        getCubeWireframePath(angleX + steerX, angleY + steerY, angleZ),
+      );
+      trackingGroup?.setAttribute(
+        "transform",
+        `translate(${64 + control.x * 100} ${64 + control.y * 100})`,
+      );
+      trackingGroup?.setAttribute("opacity", hover ? "0.65" : "0");
       const corePulse = 0.5 - 0.5 * Math.cos((elapsed * Math.PI * 2) / 3000);
       dot!.setAttribute(
         "transform",
@@ -180,13 +229,14 @@ export function OrbitalTelemetryCore() {
       data-active-index={activeIndex}
       data-motion={enabled ? "kinetic" : "static"}
       aria-hidden="true"
-      onPointerEnter={() => {
-        hovered.current = true;
-        impulseStarted.current = performance.now();
+      onPointerEnter={(event) => {
+        trackPointer(event);
+        if (enabled && event.pointerType !== "touch")
+          impulseStarted.current = performance.now();
       }}
-      onPointerLeave={() => {
-        hovered.current = false;
-      }}
+      onPointerMove={trackPointer}
+      onPointerLeave={releasePointer}
+      onPointerCancel={releasePointer}
     >
       <svg viewBox="0 0 128 128" fill="none" focusable="false">
         <path
@@ -257,6 +307,18 @@ export function OrbitalTelemetryCore() {
             strokeWidth=".8"
             strokeLinecap="round"
           />
+        </g>
+        <g
+          ref={trackingReticle}
+          className="orbital-pointer-reticle"
+          opacity="0"
+        >
+          <path
+            d="M-7 0h4m6 0h4M0-7v4m0 6v4"
+            stroke="currentColor"
+            strokeLinecap="round"
+          />
+          <circle r="2" stroke="currentColor" strokeWidth=".75" />
         </g>
       </svg>
     </div>

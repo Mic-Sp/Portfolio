@@ -5,6 +5,13 @@
     color: var(--accent, #67e8f9);
     transition: color 0.45s ease;
   }
+  .orbital-core[data-motion="kinetic"] {
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .orbital-core[data-motion="kinetic"]:active {
+    cursor: grabbing;
+  }
   .identity-scope.orbital-core > svg {
     display: block;
     overflow: visible;
@@ -16,6 +23,11 @@
   }
   .orbital-cube {
     opacity: 0.85;
+    transition: filter 0.3s ease;
+  }
+  .orbital-core[data-motion="kinetic"]:hover .orbital-cube,
+  .orbital-pointer-reticle {
+    filter: drop-shadow(0 0 3px currentColor);
   }
   .orbital-core-dot {
     filter: drop-shadow(0 0 3px currentColor);
@@ -38,6 +50,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .orbital-core,
+    .orbital-cube,
     .orbital-crosshair {
       transition: none;
     }

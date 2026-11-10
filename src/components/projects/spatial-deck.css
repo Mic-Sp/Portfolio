@@ -107,6 +107,23 @@
   .spatial-card-content {
     height: 100%;
   }
+  .spatial-hover-surface {
+    position: relative;
+    height: 100%;
+  }
+  .spatial-card-glare {
+    position: absolute;
+    inset: 1px;
+    pointer-events: none;
+  }
+  .spatial-card-slot[data-offset="0"]
+    .spatial-hover-surface[data-pointer-hovered="true"]
+    .project-card {
+    border-color: var(--accent);
+    box-shadow:
+      0 24px 65px -24px #000d,
+      0 0 38px -16px rgba(var(--accent-rgb), 0.65);
+  }
   .spatial-card-slot .project-card {
     height: 100%;
     background: linear-gradient(135deg, #0b1425fa, #070e1cfa);

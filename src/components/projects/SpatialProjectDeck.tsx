@@ -1,31 +1,16 @@
 "use client";
 
-import {
-  motion,
-  useDragControls,
-  useReducedMotion,
-  type PanInfo,
-} from "framer-motion";
+import { motion, useDragControls, type PanInfo } from "framer-motion";
 import { ArrowLeft, ArrowRight, MoveHorizontal } from "lucide-react";
-import { useEffect, useRef, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useHud } from "@/context/HudContext";
 import { useDeckViewport } from "@/hooks/useDeckViewport";
-import {
-  getCircularOffset,
-  getSpatialTargets,
-  getSwipeDirection,
-} from "@/lib/spatial-math";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
+import { getCircularOffset, getSwipeDirection } from "@/lib/spatial-math";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
-import { ProjectCard } from "./ProjectCard";
+import { SpatialProjectNode } from "./SpatialProjectNode";
 import { ProjectShowcaseToolbar } from "./ProjectShowcaseToolbar";
 import "./spatial-deck.css";
-
-const DECK_SPRING = {
-  type: "spring",
-  stiffness: 260,
-  damping: 28,
-  mass: 0.9,
-} as const;
 
 export function SpatialProjectDeck() {
   const {
@@ -39,11 +24,12 @@ export function SpatialProjectDeck() {
     isTerminalOpen,
     godMode,
   } = useHud();
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useMotionPreference();
   const viewport = useDeckViewport();
   const reducedMotion = viewport === "pending" || prefersReducedMotion === true;
   const dragControls = useDragControls();
   const dragged = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
   const radar = useRef<HTMLElement>(null);
   const canNavigate = totalProjects > 1 && !isTerminalOpen;
   const canDrag = canNavigate && !reducedMotion;
@@ -82,6 +68,7 @@ export function SpatialProjectDeck() {
     _event: MouseEvent | TouchEvent | globalThis.PointerEvent,
     info: PanInfo,
   ) {
+    setIsDragging(false);
     if (!canDrag) return;
     const direction = getSwipeDirection(
       info.offset.x,
@@ -118,6 +105,7 @@ export function SpatialProjectDeck() {
           <div
             className={cn("spatial-viewport", activeTheme?.scope)}
             onPointerDown={startDrag}
+            onPointerCancel={() => setIsDragging(false)}
             onClickCapture={(event) => {
               if (dragged.current && event.detail > 0) {
                 event.preventDefault();
@@ -144,77 +132,25 @@ export function SpatialProjectDeck() {
               dragTransition={{ bounceStiffness: 260, bounceDamping: 28 }}
               onDragStart={() => {
                 dragged.current = true;
+                setIsDragging(true);
               }}
               onDragEnd={finishDrag}
               style={{ touchAction: canDrag ? "pan-y" : "auto" }}
             >
-              {projects.map((project, index) => {
-                const offset = getCircularOffset(
-                  index,
-                  activeIndex,
-                  totalProjects,
-                );
-                const selected = offset === 0;
-                const { zIndex, pointerEvents, ...targets } = getSpatialTargets(
-                  offset,
-                  totalProjects,
-                  { narrow: viewport === "narrow", reducedMotion },
-                );
-                const hidden = targets.opacity === 0;
-                return (
-                  <motion.div
-                    key={project.id}
-                    className={cn(
-                      "spatial-card-slot",
-                      getProjectAccent(project.accent).scope,
-                    )}
-                    data-offset={offset}
-                    data-node-id={project.id}
-                    role="group"
-                    aria-roledescription="slide"
-                    aria-label={`${index + 1} of ${totalProjects}: ${project.title}`}
-                    aria-hidden={hidden}
-                    inert={hidden}
-                    initial={false}
-                    animate={targets}
-                    transition={reducedMotion ? { duration: 0 } : DECK_SPRING}
-                    style={{
-                      zIndex,
-                      pointerEvents,
-                    }}
-                  >
-                    <div
-                      className="spatial-card-content"
-                      inert={!selected}
-                      aria-hidden={!selected}
-                    >
-                      <ProjectCard
-                        project={project}
-                        index={index}
-                        selected={selected}
-                        onSelect={() => selectProject(index)}
-                        interactive={selected}
-                      />
-                    </div>
-                    {!selected && !hidden && (
-                      <button
-                        type="button"
-                        className="spatial-card-select"
-                        data-deck-select
-                        tabIndex={-1}
-                        aria-label={`Focus ${project.title}`}
-                        disabled={isTerminalOpen}
-                        onClick={() => selectProject(index)}
-                      >
-                        <span>
-                          FOCUS NODE {formatNumber(index + 1)}{" "}
-                          <ArrowRight size={11} aria-hidden="true" />
-                        </span>
-                      </button>
-                    )}
-                  </motion.div>
-                );
-              })}
+              {projects.map((project, index) => (
+                <SpatialProjectNode
+                  key={project.id}
+                  project={project}
+                  index={index}
+                  offset={getCircularOffset(index, activeIndex, totalProjects)}
+                  total={totalProjects}
+                  narrow={viewport === "narrow"}
+                  reducedMotion={reducedMotion}
+                  disabled={isDragging || isTerminalOpen}
+                  terminalOpen={isTerminalOpen}
+                  onSelect={() => selectProject(index)}
+                />
+              ))}
             </motion.div>
           </div>
 
