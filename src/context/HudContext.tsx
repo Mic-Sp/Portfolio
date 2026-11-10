@@ -1,0 +1,137 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  getActiveProjects,
+  getPillarCategories,
+} from "@/data/projects.registry";
+import { useHudKeyboard } from "@/hooks/useHudKeyboard";
+import type { PillarCategory, ProjectNode } from "@/types/portfolio";
+
+type ViewMode = "spatial" | "grid";
+interface HudContextValue {
+  projects: readonly ProjectNode[];
+  pillarCategories: PillarCategory[];
+  activeIndex: number;
+  activeProject: ProjectNode | undefined;
+  totalProjects: number;
+  selectProject: (index: number) => void;
+  nextProject: () => void;
+  prevProject: () => void;
+  activePillarFilter: string | "ALL";
+  setActivePillarFilter: (pillar: string) => void;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+  isTerminalOpen: boolean;
+  toggleTerminal: () => void;
+  godMode: boolean;
+  setGodMode: (enabled: boolean) => void;
+}
+
+const DEFAULT_PROJECTS = getActiveProjects();
+const HudContext = createContext<HudContextValue | null>(null);
+const wrapIndex = (index: number, total: number) =>
+  total > 0 ? ((index % total) + total) % total : 0;
+
+export function HudProvider({
+  children,
+  projects = DEFAULT_PROJECTS,
+}: {
+  children: ReactNode;
+  projects?: readonly ProjectNode[];
+}) {
+  const totalProjects = projects.length;
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const activeIndex = wrapIndex(selectedIndex, totalProjects);
+  const [activePillarFilter, setPillarFilter] = useState<string | "ALL">("ALL");
+  const [viewMode, setViewMode] = useState<ViewMode>("spatial");
+  const [isTerminalOpen, setTerminalOpen] = useState(false);
+  const [godMode, setGodMode] = useState(false);
+
+  const selectProject = useCallback(
+    (index: number) => {
+      if (Number.isInteger(index))
+        setSelectedIndex(wrapIndex(index, totalProjects));
+    },
+    [totalProjects],
+  );
+  const nextProject = useCallback(() => {
+    setSelectedIndex((index) =>
+      totalProjects > 0
+        ? (wrapIndex(index, totalProjects) + 1) % totalProjects
+        : 0,
+    );
+  }, [totalProjects]);
+  const prevProject = useCallback(() => {
+    setSelectedIndex((index) =>
+      totalProjects > 0
+        ? (wrapIndex(index, totalProjects) - 1 + totalProjects) % totalProjects
+        : 0,
+    );
+  }, [totalProjects]);
+  const toggleTerminal = useCallback(
+    () => setTerminalOpen((open) => !open),
+    [],
+  );
+  const setActivePillarFilter = useCallback(
+    (pillar: string) => {
+      const firstIndex = projects.findIndex(
+        (project) => project.pillar === pillar,
+      );
+      if (pillar !== "ALL" && firstIndex < 0) return;
+      setPillarFilter(pillar);
+      if (firstIndex >= 0) setSelectedIndex(firstIndex);
+    },
+    [projects],
+  );
+  const pillarCategories = useMemo(
+    () => getPillarCategories(projects),
+    [projects],
+  );
+
+  useHudKeyboard({
+    viewMode,
+    isTerminalOpen,
+    toggleTerminal,
+    nextProject,
+    prevProject,
+  });
+
+  return (
+    <HudContext.Provider
+      value={{
+        projects,
+        pillarCategories,
+        activeIndex,
+        activeProject: projects[activeIndex],
+        totalProjects,
+        selectProject,
+        nextProject,
+        prevProject,
+        activePillarFilter,
+        setActivePillarFilter,
+        viewMode,
+        setViewMode,
+        isTerminalOpen,
+        toggleTerminal,
+        godMode,
+        setGodMode,
+      }}
+    >
+      {children}
+    </HudContext.Provider>
+  );
+}
+
+export function useHud() {
+  const context = useContext(HudContext);
+  if (!context) throw new Error("useHud must be used within a HudProvider");
+  return context;
+}
