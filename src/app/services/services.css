@@ -1,7 +1,7 @@
 @layer theme, base, components, utilities;
 
 @layer components {
-  /* Tokens and color-scheme stay inside this page; the portfolio/HUD stay dark. */
+  /* Page tokens stay local; the shared provider also updates the Services HUD. */
   .services-page {
     color-scheme: dark;
     --services-border: #1e293b;

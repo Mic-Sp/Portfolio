@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { useServicesTheme } from "@/context/ServicesThemeContext";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -73,31 +74,9 @@ const engagementSteps = [
 const fieldClassName = "services-input mt-2 w-full rounded-lg border px-4 py-3";
 
 export default function ServicesPage() {
-  const [isLight, setIsLight] = useState(false);
+  const { isLight, toggleTheme } = useServicesTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState("");
-
-  useEffect(() => {
-    // Match the dark server render, then restore this page's preference after hydration.
-    const frame = requestAnimationFrame(() => {
-      try {
-        setIsLight(localStorage.getItem("services-theme") === "light");
-      } catch {
-        // The toggle still works in memory when browser storage is unavailable.
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  function toggleTheme() {
-    const next = !isLight;
-    setIsLight(next);
-    try {
-      localStorage.setItem("services-theme", next ? "light" : "dark");
-    } catch {
-      // Storage restrictions should not prevent a local theme change.
-    }
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

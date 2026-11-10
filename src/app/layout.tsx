@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { TelemetryFrame } from "@/components/hud/TelemetryFrame";
 import { HudProvider } from "@/context/HudContext";
+import { ServicesThemeProvider } from "@/context/ServicesThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import "./globals.css";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     >
       <body className="antialiased">
         <HudProvider>
-          <TelemetryFrame>{children}</TelemetryFrame>
+          <ServicesThemeProvider>
+            <TelemetryFrame>{children}</TelemetryFrame>
+          </ServicesThemeProvider>
         </HudProvider>
       </body>
     </html>

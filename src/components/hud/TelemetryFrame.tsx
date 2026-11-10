@@ -12,17 +12,21 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { useHud } from "@/context/HudContext";
+import { useServicesTheme } from "@/context/ServicesThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { TelemetryClock } from "./TelemetryClock";
 import { DropDownTerminal } from "./DropDownTerminal";
 import { DossierTrigger } from "@/components/portfolio/DossierTrigger";
 import { OperatorDossierDrawer } from "@/components/portfolio/OperatorDossier";
+import "./hud-theme.css";
 
 export function TelemetryFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isServices = pathname === "/services";
+  const { isLight } = useServicesTheme();
   const {
     projects,
     totalProjects,
@@ -58,6 +62,9 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
     <div
       ref={frameRef}
       data-god-mode={godMode}
+      data-services-theme={
+        isServices ? (isLight ? "light" : "dark") : undefined
+      }
       className="telemetry-frame min-h-svh bg-slate-950 text-slate-100"
     >
       <a href="#main-content" className="skip-link">
@@ -87,6 +94,11 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           </span>
         </div>
         <div className="hud-controls">
+          {!isServices && (
+            <Link href="/services" className="hud-button services-hud-link">
+              SERVICES
+            </Link>
+          )}
           <DossierTrigger
             className={cn(
               "hud-button dossier-hud-trigger",

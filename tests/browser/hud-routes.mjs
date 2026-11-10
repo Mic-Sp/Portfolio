@@ -43,6 +43,16 @@ async function palette(page) {
       scheme: css(el).colorScheme,
       globalScheme: css(document.documentElement).colorScheme,
       hud: css(document.querySelector(".top-hud")).backgroundColor,
+      hudTheme:
+        document.querySelector(".telemetry-frame").dataset.servicesTheme,
+      hudText: css(document.querySelector(".location-block > p")).color,
+      hudClock: css(document.querySelector(".telemetry-clock")).color,
+      hudUtc: css(document.querySelector(".telemetry-clock .text-slate-300"))
+        .color,
+      hudDot: css(document.querySelector(".status-dot")).backgroundColor,
+      hudDossier: css(document.querySelector(".dossier-hud-trigger"))
+        .backgroundColor,
+      hudDossierText: css(document.querySelector(".dossier-hud-trigger")).color,
       overflow: document.documentElement.scrollWidth > innerWidth,
     };
   });
@@ -92,7 +102,14 @@ async function verifyTheme(page) {
   assert.equal(light.submit, "rgb(5, 150, 105)");
   assert.equal(light.scheme, "light");
   assert.equal(light.globalScheme, "dark");
-  assert.equal(light.hud, dark.hud);
+  assert.notEqual(light.hud, dark.hud);
+  assert.equal(light.hudTheme, "light");
+  assert.equal(light.hudText, "rgb(51, 65, 85)");
+  assert.equal(light.hudClock, "rgb(51, 65, 85)");
+  assert.equal(light.hudUtc, "rgb(100, 116, 139)");
+  assert.equal(light.hudDot, "rgb(16, 185, 129)");
+  assert.equal(light.hudDossier, "rgb(241, 245, 249)");
+  assert.equal(light.hudDossierText, "rgb(30, 41, 59)");
   assert.equal(light.overflow, false);
   assert.equal(
     await page.evaluate(() => localStorage.getItem("services-theme")),
@@ -117,6 +134,9 @@ async function verifyTheme(page) {
     "dark",
   );
   const restored = await palette(page);
+  assert.equal(restored.hudTheme, "dark");
+  assert.equal(restored.hud, dark.hud);
+  assert.equal(restored.hudText, dark.hudText);
   assert.equal(restored.primary, dark.primary);
   assert.equal(restored.input, dark.input);
   assert.equal(restored.submit, "rgb(16, 185, 129)");
@@ -166,6 +186,21 @@ async function verifyPortfolio(page) {
     1,
   );
   const controls = page.locator(".top-hud");
+  const servicesLink = controls.getByRole("link", {
+    name: "SERVICES",
+    exact: true,
+  });
+  assert.equal(await servicesLink.getAttribute("href"), "/services");
+  assert.equal(
+    await servicesLink.evaluate(
+      (el) => el === el.parentElement.firstElementChild,
+    ),
+    true,
+  );
+  assert.equal(
+    await page.locator(".telemetry-frame").getAttribute("data-services-theme"),
+    null,
+  );
   await controls.getByRole("button", { name: "CLI (~)", exact: true }).click();
   await page.locator("#terminal-command").waitFor({ state: "visible" });
   await page.locator("#terminal-command").press("Escape");
@@ -210,6 +245,13 @@ async function verifyServices(page) {
     0,
   );
   assert.equal(await page.locator(".hud-controls button").count(), 1);
+  assert.equal(
+    await page
+      .locator(".top-hud")
+      .getByRole("link", { name: "SERVICES", exact: true })
+      .count(),
+    0,
+  );
   assert.match(
     await page.locator(".location-block").innerText(),
     /LOC: CHICAGOLAND/,
@@ -273,7 +315,21 @@ try {
   await page.goto(base, { waitUntil: "networkidle" });
   const portfolioDark = await portfolioBackground(page);
   await verifyPortfolio(page);
-  await page.goto(base + "/services", { waitUntil: "networkidle" });
+  const portfolioHud = await page
+    .locator(".top-hud")
+    .evaluate((el) => getComputedStyle(el).backgroundColor);
+  await page.evaluate(() => {
+    window.hudNavigationToken = "persistent-layout";
+  });
+  await page
+    .locator(".top-hud")
+    .getByRole("link", { name: "SERVICES", exact: true })
+    .click();
+  await page.waitForURL(base + "/services");
+  assert.equal(
+    await page.evaluate(() => window.hudNavigationToken),
+    "persistent-layout",
+  );
   results.push({
     route: "/services",
     width: 1440,
@@ -294,6 +350,12 @@ try {
   // Cache Components retain previous pages in hidden Activity boundaries.
   assert.equal(await page.locator(".services-page:visible").count(), 0);
   assert.deepEqual(await portfolioBackground(page), portfolioDark);
+  assert.equal(
+    await page
+      .locator(".top-hud")
+      .evaluate((el) => getComputedStyle(el).backgroundColor),
+    portfolioHud,
+  );
   assert.equal(
     await page.evaluate(
       () => getComputedStyle(document.documentElement).colorScheme,
@@ -378,6 +440,35 @@ try {
     "0s",
   );
   await blocked.close();
+  // Keep all HUD controls usable as the Services action joins the cluster.
+  await page.goto(base, { waitUntil: "networkidle" });
+  for (const width of [1440, 1280, 1024, 768, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    const layout = await page.locator(".top-hud").evaluate((el) => {
+      const blocks = [".location-block", ".system-status", ".hud-controls"].map(
+        (selector) => el.querySelector(selector).getBoundingClientRect(),
+      );
+      return {
+        overflow: document.documentElement.scrollWidth > innerWidth,
+        overlap: blocks.some((a, i) =>
+          blocks
+            .slice(i + 1)
+            .some(
+              (b) =>
+                Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1 &&
+                Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1,
+            ),
+        ),
+      };
+    });
+    assert.equal(layout.overflow, false, `HUD must fit at ${width}px`);
+    assert.equal(
+      layout.overlap,
+      false,
+      `HUD blocks must not overlap at ${width}px`,
+    );
+    results.push({ portfolioWidth: width, ...layout });
+  }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ passed: true, results, errors }, null, 2));
 } finally {

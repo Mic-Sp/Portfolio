@@ -1,0 +1,81 @@
+@layer theme, base, components, utilities;
+
+@layer utilities {
+  .services-hud-link {
+    background: #0f172a99;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+  .services-hud-link:hover {
+    color: #34d399;
+    border-color: #10b98180;
+  }
+  /* Four portfolio controls need their intrinsic width without overlapping Status. */
+  @media (min-width: 1280px) {
+    .telemetry-frame:not([data-services-theme]) > .top-hud {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      column-gap: 20px;
+    }
+  }
+  .telemetry-frame[data-services-theme] > .top-hud,
+  .telemetry-frame[data-services-theme]
+    > .top-hud
+    :where(p, span, svg, .hud-button) {
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .telemetry-frame[data-services-theme="light"] > header.top-hud {
+    color-scheme: light;
+    background: #f8fafcf2;
+    border-color: #e2e8f0;
+    color: #334155;
+  }
+  .telemetry-frame[data-services-theme="light"]
+    > .top-hud
+    :is(.location-block > p, .telemetry-clock, .system-status > p) {
+    color: #334155;
+    text-shadow: none;
+  }
+  .telemetry-frame[data-services-theme="light"]
+    > .top-hud
+    :is(.clock-divider, .node-count, .text-slate-300) {
+    color: #64748b;
+  }
+  .telemetry-frame[data-services-theme="light"] > .top-hud .location-block svg {
+    color: #059669;
+  }
+  .telemetry-frame[data-services-theme="light"] > .top-hud .status-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b98126;
+  }
+  .telemetry-frame[data-services-theme="light"] > .top-hud .hud-button {
+    color: #1e293b;
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+  }
+  .telemetry-frame[data-services-theme="light"]
+    > .top-hud
+    .hud-button.is-active {
+    color: #047857;
+    border-color: #05966966;
+    background: #ecfdf5;
+  }
+  .telemetry-frame[data-services-theme="light"] > .top-hud .hud-button:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+  }
+  .telemetry-frame[data-services-theme="light"]
+    > .top-hud
+    .hud-button:focus-visible {
+    outline-color: #059669;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .telemetry-frame[data-services-theme] > .top-hud,
+    .telemetry-frame[data-services-theme] > .top-hud * {
+      transition: none;
+    }
+  }
+}
