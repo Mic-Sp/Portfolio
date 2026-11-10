@@ -1,10 +1,15 @@
 import { PROFILE_CONFIG } from "@/data/profile.config";
+import { Fragment } from "react";
 
 export function HeroIdentity() {
+  const [primaryRole, ...specialties] = PROFILE_CONFIG.headline.split("//");
+  const credentials = PROFILE_CONFIG.subheadline
+    .split("•")
+    .map((credential) => credential.trim());
   return (
     <section className="hero-identity" aria-labelledby="identity-heading">
       <div className="hero-layout">
-        <div>
+        <div className="hero-copy">
           <div className="identity-eyebrow">
             <span className="identity-rule" />
             {" DEVELOPER PORTFOLIO "}
@@ -14,8 +19,28 @@ export function HeroIdentity() {
             {PROFILE_CONFIG.name}
             <span className="name-period">.</span>
           </h1>
-          <p className="hero-headline">{PROFILE_CONFIG.headline}</p>
-          <p className="hero-credentials">{PROFILE_CONFIG.subheadline}</p>
+          <p className="hero-headline">
+            {primaryRole.trim()}
+            {specialties.map((specialty, index) => (
+              <Fragment key={`${index}-${specialty}`}>
+                {" "}
+                <span className="hero-role-separator">{"//"}</span>{" "}
+                <span className="hero-role-highlight">{specialty.trim()}</span>
+              </Fragment>
+            ))}
+          </p>
+          <ul className="hero-credentials" aria-label="Credentials">
+            {credentials.map((credential, index) => (
+              <li key={credential}>
+                {index > 0 && (
+                  <span className="credential-separator" aria-hidden="true">
+                    •
+                  </span>
+                )}
+                <span className="credential-pill">{credential}</span>
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="identity-scope" aria-hidden="true">
           <svg viewBox="0 0 240 240" fill="none">

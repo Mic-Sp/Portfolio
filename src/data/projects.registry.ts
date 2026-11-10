@@ -63,7 +63,10 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
       "Steam OpenID",
       "Zod",
     ],
-    links: { live: "#", repo: "#" },
+    links: {
+      live: "https://backlog-buster-chi.vercel.app/",
+      repo: "https://github.com/Mic-Sp/Backlog-Buster",
+    },
     cliMeta: { commandAlias: "backlog", quickStat: "SEMANTIC VECTOR SEARCH" },
   },
   {
@@ -76,21 +79,25 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     version: "v1.0",
     status: "CLIENT PROD",
     accent: "violet",
-    tagline: "Edge-Deployed Clinical Counseling & Consulting Platform",
+    tagline:
+      "Production Web Platform for Clinical Counseling & Consulting (PLLC)",
     description:
-      "Production web platform engineered for clinical reliability, zero-cold-start edge delivery, custom DNS security policies, and accessible client intake workflows.",
+      "Custom production web platform engineered for Huddle & Heal Counseling & Consulting, PLLC, featuring build-time WCAG accessibility contrast verification, clinical copy boundary guardrails, automated GitHub-to-Cloudflare Pages deployment, and streamlined client intake routing.",
     architectureHighlights: [
-      "Zero-cold-start edge delivery",
-      "Custom DNS security policies",
-      "Accessible client intake workflows",
+      "WCAG contrast & clinical copy guardrails",
+      "GitHub-to-Cloudflare Pages CI/CD edge deploy",
+      "IL/IN teletherapy & client scheduling routing",
     ],
     techStack: [
       "Cloudflare Pages",
-      "Cloudflare Workers",
-      "Edge DNS Security",
-      "Responsive Architecture",
+      "GitHub CI/CD",
+      "WCAG Accessibility",
+      "Clinical Copy Guardrails",
+      "Responsive UI",
     ],
-    links: { live: "#" },
+    links: {
+      live: "https://huddleandhealcounselingandconsulting.com/",
+    },
     cliMeta: { commandAlias: "huddle", quickStat: "EDGE-DEPLOYED PLATFORM" },
   },
   {
