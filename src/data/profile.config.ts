@@ -1,10 +1,10 @@
 interface AcademicCredential {
   id: string;
   institution: string;
-  location?: string;
+  subheader: string;
   qualification: string;
-  honors: readonly string[];
-  capstone?: string;
+  highlights: readonly [string, string];
+  callout: { label: string; text: string };
   heroLabel: string;
 }
 
@@ -12,13 +12,14 @@ interface DirectChannel {
   href: `https://${string}`;
   label: string;
   handle: string;
+  description: string;
 }
 
 export interface CommsAndTelemetry {
   directChannels: {
     github: DirectChannel;
     linkedin: DirectChannel;
-    email: { address: string; href: `mailto:${string}` };
+    email: { address: string; href: `mailto:${string}`; description: string };
   };
   thmTelemetry: {
     handle: string;
@@ -34,15 +35,18 @@ const COMMS_AND_TELEMETRY = {
       href: "https://github.com/Mic-Sp",
       label: "GITHUB // MIC-SP",
       handle: "@Mic-Sp",
+      description: "Source repositories, Q-Split engine & AppSec tooling",
     },
     linkedin: {
       href: "https://www.linkedin.com/in/michael-sprague-it/",
       label: "LINKEDIN // MICHAEL-SPRAGUE-IT",
       handle: "/in/michael-sprague-it",
+      description: "Professional network, architecture updates & experience",
     },
     email: {
       address: "mic.sprague@gmail.com",
       href: "mailto:mic.sprague@gmail.com",
+      description: "Primary encrypted inbox for engineering & consulting",
     },
   },
   thmTelemetry: {
@@ -58,27 +62,47 @@ const EDUCATION: readonly AcademicCredential[] = [
   {
     id: "holy-cross",
     institution: "Holy Cross College",
-    location: "Notre Dame, IN",
-    qualification: "B.A. in Business",
-    honors: [
-      "Summa Cum Laude (3.98 GPA)",
-      "Delta Epsilon Sigma National Honor Society",
+    subheader: "Notre Dame, IN",
+    qualification: "B.A. in Liberal Arts, Concentration in Business",
+    highlights: [
+      "Summa Cum Laude (3.98 GPA) • Delta Epsilon Sigma National Honor Society",
+      "CS & Math Foundations: Linear Algebra, Calculus, Statistics & Operating Systems",
     ],
-    capstone: "Quantum Computing: An Economic Insight",
+    callout: {
+      label: "UNDERGRADUATE CAPSTONE",
+      text: "Quantum Computing: An Economic Insight",
+    },
     heroLabel: "B.A. Business",
   },
   {
     id: "columbia",
     institution: "Columbia University",
-    qualification: "Applied Artificial Intelligence Certificate",
-    honors: [],
+    subheader: "Fair Chance Futures Cohort",
+    qualification:
+      "Pathways to Applied AI Solutions Engineering (P.A.I.S.E.) Certificate",
+    highlights: [
+      "Python programming, relational SQL querying & end-to-end data pipeline engineering",
+      "Machine learning fundamentals, supervised & unsupervised modeling & core AI architectures",
+    ],
+    callout: {
+      label: "CORE FOCUS",
+      text: "Python, SQL & Foundational Machine Learning",
+    },
     heroLabel: "Applied AI Engineering",
   },
   {
     id: "next-chapter",
     institution: "Next Chapter",
-    qualification: "Software Engineering Apprenticeship",
-    honors: [],
+    subheader: "Intensive Engineering Cohort",
+    qualification: "AI Software Engineering Apprenticeship",
+    highlights: [
+      "Full-stack TypeScript, Next.js App Router, Postgres/pgvector & REST API architecture",
+      "AI workflow automation, multi-step LLM integration, CI/CD & AppSec guardrails",
+    ],
+    callout: {
+      label: "ENGINEERING TRACK",
+      text: "Full-Stack Systems & AI Workflow Automation",
+    },
     heroLabel: "AI Software Engineering",
   },
 ];

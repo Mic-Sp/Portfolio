@@ -96,9 +96,20 @@ test("whois and stack expose the complete shared dossier profile", async () => {
   assert.match(whois, /Summa Cum Laude \(3\.98 GPA\)/);
   assert.match(whois, /Delta Epsilon Sigma National Honor Society/);
   assert.match(whois, /Quantum Computing: An Economic Insight/);
+  assert.ok(whois.includes("B.A. in Liberal Arts, Concentration in Business"));
+  assert.ok(
+    whois.includes(
+      "Pathways to Applied AI Solutions Engineering (P.A.I.S.E.) Certificate",
+    ),
+  );
+  assert.ok(whois.includes("AI Software Engineering Apprenticeship"));
   for (const item of PROFILE_CONFIG.education) {
     assert.ok(whois.includes(item.institution));
     assert.ok(whois.includes(item.qualification));
+    assert.ok(whois.includes(item.subheader));
+    for (const highlight of item.highlights)
+      assert.ok(whois.includes(highlight));
+    assert.ok(whois.includes(`${item.callout.label}: "${item.callout.text}"`));
   }
   for (const specialization of PROFILE_CONFIG.specializations)
     assert.ok(whois.includes(specialization));

@@ -520,15 +520,11 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
         text(PROFILE_CONFIG.executiveBio),
         text(PROFILE_CONFIG.headline.trim()),
         ...PROFILE_CONFIG.education.flatMap((item) => [
-          text(
-            `${item.institution}${item.location ? ` (${item.location})` : ""}`,
-            "accent",
-          ),
+          text(`${item.institution} (${item.subheader})`, "accent"),
           text(`  + ${item.qualification}`),
-          ...item.honors.map((honor) => text(`  + ${honor}`)),
-          ...(item.capstone
-            ? [text(`  + Undergraduate Capstone: "${item.capstone}"`)]
-            : []),
+          ...item.highlights.map((highlight) => text(`  + ${highlight}`)),
+          text(`  ${item.callout.label}: "${item.callout.text}"`),
+          text(""),
         ]),
         text("CERTIFICATIONS & SPECIALIZATIONS", "accent"),
         ...PROFILE_CONFIG.specializations.map((item) => text(`  + ${item}`)),

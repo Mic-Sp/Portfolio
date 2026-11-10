@@ -22,6 +22,32 @@ export function CommsUplink({
   telemetryActive?: boolean;
 }) {
   const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const channels = [
+    {
+      ...directChannels.github,
+      id: "github",
+      Icon: GitFork,
+      status: "ONLINE",
+      action: "OPEN GITHUB PROFILE",
+    },
+    {
+      ...directChannels.linkedin,
+      id: "linkedin",
+      Icon: Network,
+      status: "VERIFIED",
+      action: "CONNECT ON LINKEDIN",
+    },
+    {
+      id: "email",
+      label: "DIRECT EMAIL",
+      handle: directChannels.email.address,
+      href: directChannels.email.href,
+      description: directChannels.email.description,
+      Icon: Mail,
+      status: "ONLINE",
+      action: "SEND MAILTO",
+    },
+  ];
   return (
     <section
       className="comms-uplink"
@@ -33,36 +59,45 @@ export function CommsUplink({
         VERIFICATION
       </h3>
       <div className="comms-direct-grid">
-        {[
-          { channel: directChannels.github, Icon: GitFork },
-          { channel: directChannels.linkedin, Icon: Network },
-        ].map(({ channel, Icon }) => (
-          <a
-            key={channel.href}
-            className="comms-channel-card"
-            href={channel.href}
-            target="_blank"
-            rel="noopener noreferrer"
+        {channels.map(({ Icon, ...channel }) => (
+          <article
+            key={channel.id}
+            className={`comms-channel-card${channel.id === "email" ? " comms-email-card" : ""}`}
+            aria-labelledby={`${prefix}-channel-${channel.id}`}
           >
-            <span className="comms-channel-label">
-              <Icon size={16} aria-hidden="true" /> {channel.label}
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </span>
-            <span className="comms-channel-handle">{channel.handle}</span>
-          </a>
+            <div className="comms-channel-main">
+              <header className="comms-channel-heading">
+                <h4
+                  className="comms-channel-label"
+                  id={`${prefix}-channel-${channel.id}`}
+                >
+                  <Icon size={16} aria-hidden="true" />{" "}
+                  <span>{channel.label}</span>
+                </h4>
+                <span className="comms-channel-status">{channel.status}</span>
+              </header>
+              <div className="comms-channel-readout">
+                <span className="comms-terminal-prefix" aria-hidden="true">
+                  &gt;_
+                </span>
+                <span className="comms-channel-handle">{channel.handle}</span>
+                <span className="comms-readout-dot" aria-hidden="true" />
+              </div>
+              <p className="comms-channel-description">{channel.description}</p>
+            </div>
+            <footer className="comms-channel-actions">
+              {channel.id === "email" && <CopyEmailButton />}
+              <a
+                className="comms-channel-action"
+                href={channel.href}
+                target={channel.id === "email" ? undefined : "_blank"}
+                rel={channel.id === "email" ? undefined : "noopener noreferrer"}
+              >
+                {channel.action} <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </footer>
+          </article>
         ))}
-        <div className="comms-channel-card comms-email-card">
-          <a href={directChannels.email.href}>
-            <span className="comms-channel-label">
-              <Mail size={16} aria-hidden="true" /> DIRECT EMAIL{" "}
-              <ArrowUpRight size={14} aria-hidden="true" />
-            </span>
-            <span className="comms-channel-handle">
-              {directChannels.email.address}
-            </span>
-          </a>
-          <CopyEmailButton />
-        </div>
       </div>
       <ContactTransmission prefix={prefix} />
       <article className="thm-telemetry-card" data-dossier-anchor="thm">

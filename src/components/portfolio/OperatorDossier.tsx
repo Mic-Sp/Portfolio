@@ -60,24 +60,28 @@ function DossierContent({
         <div className="dossier-education-grid">
           {PROFILE_CONFIG.education.map((item) => (
             <article className="dossier-education-card" key={item.id}>
-              <h4>{item.institution}</h4>
-              {item.location && (
-                <p className="dossier-institution-location">{item.location}</p>
-              )}
-              <p className="dossier-qualification">{item.qualification}</p>
-              {item.honors.length > 0 && (
+              <div>
+                <h4>{item.institution}</h4>
+                <p className="dossier-institution-location">{item.subheader}</p>
+                <p className="dossier-qualification">{item.qualification}</p>
                 <ul>
-                  {item.honors.map((honor) => (
-                    <li key={honor}>{honor}</li>
+                  {item.highlights.map((highlight) => (
+                    <li key={highlight}>
+                      <span
+                        className="dossier-detail-marker"
+                        aria-hidden="true"
+                      >
+                        ▹
+                      </span>
+                      <span>{highlight}</span>
+                    </li>
                   ))}
                 </ul>
-              )}
-              {item.capstone && (
-                <p className="dossier-capstone">
-                  <span>UNDERGRADUATE CAPSTONE</span>
-                  <em>“{item.capstone}”</em>
-                </p>
-              )}
+              </div>
+              <footer className="dossier-capstone">
+                <span>{item.callout.label}</span>
+                <em>“{item.callout.text}”</em>
+              </footer>
             </article>
           ))}
         </div>

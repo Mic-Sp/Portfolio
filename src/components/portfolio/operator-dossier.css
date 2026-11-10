@@ -76,11 +76,14 @@
   }
   .dossier-education-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     margin-top: 14px;
   }
   .dossier-education-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     min-width: 0;
     border: 1px solid #47556980;
     background: #0f172a80;
@@ -108,18 +111,30 @@
   }
   .dossier-education-card ul {
     display: grid;
-    gap: 5px;
+    gap: 10px;
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.65;
-    color: #e2e8f0;
+    color: #cbd5e1;
+  }
+  .dossier-education-card li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .dossier-detail-marker {
+    color: #67e8f9;
+    flex-shrink: 0;
+  }
+  .dossier-education-card li:nth-child(even) .dossier-detail-marker {
+    color: #6ee7b7;
   }
   .dossier-capstone {
     display: grid;
     gap: 5px;
-    margin-top: 14px;
+    margin-top: 16px;
     padding-top: 12px;
-    border-top: 1px solid #334155;
+    border-top: 1px solid #1e293bcc;
     font-size: 14px;
   }
   .dossier-capstone > span {
@@ -127,6 +142,10 @@
       500 12px/1.6 var(--font-mono),
       monospace;
     color: #cbd5e1;
+  }
+  .dossier-capstone > em {
+    min-height: 3.2em;
+    line-height: 1.6;
   }
   .dossier-specializations-label {
     margin-top: 20px;
@@ -297,6 +316,9 @@
     font-size: 16px;
   }
   @media (min-width: 768px) {
+    .dossier-education-card ul {
+      font-size: 14px;
+    }
     .dossier-matrix {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -312,10 +334,7 @@
   }
   @media (max-width: 1023px) {
     .dossier-education-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .dossier-education-card:first-child {
-      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
   @media (max-width: 767px) {
@@ -351,11 +370,6 @@
     }
     .dossier-rail {
       padding-inline: 18px;
-    }
-  }
-  @media (max-width: 599px) {
-    .dossier-education-grid {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
 }

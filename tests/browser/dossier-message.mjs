@@ -1,5 +1,6 @@
 // Requires Playwright and a running app. Override PORTFOLIO_BASE_URL / PLAYWRIGHT_MODULE if needed.
 import assert from "node:assert/strict";
+import { PROFILE_CONFIG } from "../../src/data/profile.config.ts";
 const { chromium } = await import(
   process.env.PLAYWRIGHT_MODULE || "playwright"
 );
@@ -207,6 +208,21 @@ async function close(page, method = "Escape") {
     // Preserve the CLI's original contact target and handoff behavior.
     await page.keyboard.press("`");
     await page.locator("#terminal-command").waitFor({ state: "visible" });
+    await page.locator("#terminal-command").fill("whois");
+    await page.locator("#terminal-command").press("Enter");
+    await page.waitForFunction(() =>
+      document
+        .querySelector(".terminal-entry:last-child")
+        ?.textContent.includes("P.A.I.S.E."),
+    );
+    const whois = await page.locator(".terminal-entry").last().innerText();
+    for (const credential of PROFILE_CONFIG.education) {
+      assert.ok(whois.includes(credential.qualification));
+      assert.ok(whois.includes(credential.subheader));
+      for (const highlight of credential.highlights)
+        assert.ok(whois.includes(highlight));
+      assert.ok(whois.includes(credential.callout.text));
+    }
     await page
       .getByRole("navigation", { name: "Quick commands" })
       .getByRole("button", { name: "msg", exact: true })
@@ -263,6 +279,221 @@ async function close(page, method = "Escape") {
     await page.waitForFunction(
       () => document.querySelector(".dossier-scroll")?.scrollTop > 100,
     );
+    const cards = page.locator(".dossier-education-card");
+    assert.equal(await cards.count(), PROFILE_CONFIG.education.length);
+    for (let i = 0; i < PROFILE_CONFIG.education.length; i++) {
+      const credential = PROFILE_CONFIG.education[i];
+      const card = cards.nth(i);
+      assert.equal(
+        await card.locator("h4").innerText(),
+        credential.institution,
+      );
+      assert.equal(
+        await card.locator(".dossier-institution-location").innerText(),
+        credential.subheader,
+      );
+      assert.equal(
+        await card.locator(".dossier-qualification").innerText(),
+        credential.qualification,
+      );
+      assert.equal(await card.locator("li").count(), 2);
+      for (const detail of credential.highlights)
+        assert.ok((await card.innerText()).includes(detail));
+      assert.equal(
+        await card.locator(".dossier-capstone > span").innerText(),
+        credential.callout.label,
+      );
+      assert.equal(
+        await card.locator(".dossier-capstone > em").innerText(),
+        `“${credential.callout.text}”`,
+      );
+    }
+    const geometry = await cards.evaluateAll((elements) =>
+      elements.map((el) => ({
+        width: el.getBoundingClientRect().width,
+        height: el.getBoundingClientRect().height,
+        dividerTop: el
+          .querySelector(".dossier-capstone")
+          .getBoundingClientRect().top,
+        labelTop: el
+          .querySelector(".dossier-capstone > span")
+          .getBoundingClientRect().top,
+      })),
+    );
+    for (const key of ["width", "height", "dividerTop", "labelTop"])
+      assert.ok(
+        Math.max(...geometry.map((card) => card[key])) -
+          Math.min(...geometry.map((card) => card[key])) <
+          1,
+        `credential ${key} must align`,
+      );
+    if (process.env.PORTFOLIO_SCREENSHOT_DIR)
+      await page.screenshot({
+        path: `${process.env.PORTFOLIO_SCREENSHOT_DIR}/dossier-credentials-desktop.png`,
+      });
+    results.push({ credentials: geometry });
+    const channels = PROFILE_CONFIG.commsAndTelemetry.directChannels;
+    const comms = page.locator(".comms-direct-grid");
+    await comms.evaluate((el) =>
+      el.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
+    const commsCards = comms.locator(".comms-channel-card");
+    assert.equal(await commsCards.count(), 3);
+    const expectedComms = [
+      { ...channels.github, action: "OPEN GITHUB PROFILE", status: "ONLINE" },
+      {
+        ...channels.linkedin,
+        action: "CONNECT ON LINKEDIN",
+        status: "VERIFIED",
+      },
+      {
+        ...channels.email,
+        handle: channels.email.address,
+        label: "DIRECT EMAIL",
+        action: "SEND MAILTO",
+        status: "ONLINE",
+      },
+    ];
+    for (let i = 0; i < expectedComms.length; i++) {
+      const expected = expectedComms[i],
+        card = commsCards.nth(i);
+      assert.equal(await card.locator("h4").innerText(), expected.label);
+      assert.equal(
+        await card.locator(".comms-channel-handle").innerText(),
+        expected.handle,
+      );
+      assert.equal(
+        await card.locator(".comms-channel-description").innerText(),
+        expected.description,
+      );
+      assert.equal(
+        await card.locator(".comms-channel-status").innerText(),
+        expected.status,
+      );
+      assert.equal(
+        await card
+          .getByRole("link", { name: expected.action, exact: true })
+          .getAttribute("href"),
+        expected.href,
+      );
+      assert.equal(
+        await card.locator(".comms-channel-actions").getByRole("link").count(),
+        1,
+      );
+    }
+    const commsGeometry = () =>
+      commsCards.evaluateAll((elements) =>
+        elements.map((el) => ({
+          width: el.getBoundingClientRect().width,
+          height: el.getBoundingClientRect().height,
+          readoutTop: el
+            .querySelector(".comms-channel-readout")
+            .getBoundingClientRect().top,
+          footerTop: el
+            .querySelector(".comms-channel-actions")
+            .getBoundingClientRect().top,
+          buttonHeight: el
+            .querySelector(".comms-channel-action")
+            .getBoundingClientRect().height,
+        })),
+      );
+    const beforeCopy = await commsGeometry();
+    for (const key of [
+      "width",
+      "height",
+      "readoutTop",
+      "footerTop",
+      "buttonHeight",
+    ])
+      assert.ok(
+        Math.max(...beforeCopy.map((card) => card[key])) -
+          Math.min(...beforeCopy.map((card) => card[key])) <
+          1,
+        `comms ${key} must align`,
+      );
+    assert.ok(beforeCopy.every((card) => card.buttonHeight >= 44));
+    await page
+      .context()
+      .grantPermissions(["clipboard-read", "clipboard-write"], {
+        origin: base,
+      });
+    const copyEmail = comms.getByRole("button", {
+      name: `Copy email address ${channels.email.address}`,
+      exact: true,
+    });
+    await copyEmail.click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".comms-email-card .copy-email-button")?.dataset
+          .copyStatus === "copied",
+    );
+    assert.equal(
+      await page.evaluate(() => navigator.clipboard.readText()),
+      channels.email.address,
+    );
+    assert.equal(await copyEmail.innerText(), "COPIED ✓");
+    assert.deepEqual(
+      await commsGeometry(),
+      beforeCopy,
+      "copy confirmation must not shift the cards",
+    );
+    if (process.env.PORTFOLIO_SCREENSHOT_DIR)
+      await page.screenshot({
+        path: `${process.env.PORTFOLIO_SCREENSHOT_DIR}/dossier-comms-desktop.png`,
+      });
+    results.push({ comms: beforeCopy, clipboard: "passed" });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page
+      .locator(".dossier-education-grid")
+      .evaluate((el) =>
+        el.scrollIntoView({ block: "start", behavior: "instant" }),
+      );
+    assert.equal(
+      await page
+        .locator(".dossier-education-grid")
+        .evaluate(
+          (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+        ),
+      1,
+    );
+    assert.equal(
+      await page
+        .locator(".dossier-scroll")
+        .evaluate((el) => el.scrollWidth <= el.clientWidth),
+      true,
+    );
+    if (process.env.PORTFOLIO_SCREENSHOT_DIR)
+      await page.screenshot({
+        path: `${process.env.PORTFOLIO_SCREENSHOT_DIR}/dossier-credentials-mobile.png`,
+      });
+    await comms.evaluate((el) =>
+      el.scrollIntoView({ block: "start", behavior: "instant" }),
+    );
+    assert.equal(
+      await comms.evaluate(
+        (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+      ),
+      1,
+    );
+    assert.equal(
+      await page
+        .locator(".dossier-scroll")
+        .evaluate((el) => el.scrollWidth <= el.clientWidth),
+      true,
+    );
+    await commsCards.last().scrollIntoViewIfNeeded();
+    assert.ok(
+      (
+        await commsCards
+          .last()
+          .getByRole("link", { name: "SEND MAILTO", exact: true })
+          .boundingBox()
+      ).width >= 100,
+    );
+    if (process.env.PORTFOLIO_SCREENSHOT_DIR)
+      await page.screenshot({
+        path: `${process.env.PORTFOLIO_SCREENSHOT_DIR}/dossier-comms-mobile.png`,
+      });
     await close(page);
     assert.deepEqual(errors, []);
     console.log(
