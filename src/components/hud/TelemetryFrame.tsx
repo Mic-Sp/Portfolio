@@ -11,6 +11,7 @@ import {
   Terminal,
 } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { useHud } from "@/context/HudContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
@@ -20,6 +21,8 @@ import { DossierTrigger } from "@/components/portfolio/DossierTrigger";
 import { OperatorDossierDrawer } from "@/components/portfolio/OperatorDossier";
 
 export function TelemetryFrame({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const isServices = pathname === "/services";
   const {
     projects,
     totalProjects,
@@ -58,7 +61,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
       className="telemetry-frame min-h-svh bg-slate-950 text-slate-100"
     >
       <a href="#main-content" className="skip-link">
-        Skip to projects
+        {isServices ? "Skip to services" : "Skip to projects"}
       </a>
       <div className="spatial-backdrop" aria-hidden="true" />
       <header ref={barRef} className="top-hud">
@@ -94,116 +97,129 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
             <Fingerprint size={14} aria-hidden="true" />
             <span>DOSSIER</span>
           </DossierTrigger>
-          <button
-            type="button"
-            onClick={toggleTerminal}
-            aria-pressed={isTerminalOpen}
-            aria-controls="developer-console"
-            aria-expanded={isTerminalOpen}
-            data-terminal-trigger
-            aria-keyshortcuts="` ~"
-            className={cn("hud-button", isTerminalOpen && "is-active")}
-          >
-            <Terminal size={13} aria-hidden="true" />
-            <span>CLI (~)</span>
-          </button>
-          <div className="view-toggle" role="group" aria-label="Project view">
-            <button
-              type="button"
-              aria-pressed={viewMode === "spatial"}
-              onClick={() => setViewMode("spatial")}
-              className={cn(
-                "view-button",
-                viewMode === "spatial" && "is-active",
-              )}
-            >
-              <Box size={12} aria-hidden="true" />
-              <span>3D DECK</span>
-            </button>
-            <span className="text-slate-300" aria-hidden="true">
-              /
-            </span>
-            <button
-              type="button"
-              aria-pressed={viewMode === "grid"}
-              onClick={() => setViewMode("grid")}
-              className={cn("view-button", viewMode === "grid" && "is-active")}
-            >
-              <Grid2X2 size={12} aria-hidden="true" />
-              <span>GRID</span>
-            </button>
-          </div>
+          {!isServices && (
+            <>
+              <button
+                type="button"
+                onClick={toggleTerminal}
+                aria-pressed={isTerminalOpen}
+                aria-controls="developer-console"
+                aria-expanded={isTerminalOpen}
+                data-terminal-trigger
+                aria-keyshortcuts="` ~"
+                className={cn("hud-button", isTerminalOpen && "is-active")}
+              >
+                <Terminal size={13} aria-hidden="true" />
+                <span>CLI (~)</span>
+              </button>
+              <div
+                className="view-toggle"
+                role="group"
+                aria-label="Project view"
+              >
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "spatial"}
+                  onClick={() => setViewMode("spatial")}
+                  className={cn(
+                    "view-button",
+                    viewMode === "spatial" && "is-active",
+                  )}
+                >
+                  <Box size={12} aria-hidden="true" />
+                  <span>3D DECK</span>
+                </button>
+                <span className="text-slate-300" aria-hidden="true">
+                  /
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "grid"}
+                  onClick={() => setViewMode("grid")}
+                  className={cn(
+                    "view-button",
+                    viewMode === "grid" && "is-active",
+                  )}
+                >
+                  <Grid2X2 size={12} aria-hidden="true" />
+                  <span>GRID</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </header>
       <DropDownTerminal />
       <OperatorDossierDrawer />
       {children}
-      <footer className="bottom-hud">
-        <nav className="pillar-nav" aria-label="Pillar quick-jump">
-          <span className="pillar-label">
-            <Command size={13} aria-hidden="true" /> PILLARS
-          </span>
-          <button
-            type="button"
-            className={cn(
-              "pillar-pill",
-              activePillarFilter === "ALL" &&
-                viewMode === "grid" &&
-                "all-active",
-            )}
-            aria-pressed={viewMode === "grid" && activePillarFilter === "ALL"}
-            onClick={() => setActivePillarFilter("ALL")}
-          >
-            ALL <span>{totalProjects.toString().padStart(2, "0")}</span>
-          </button>
-          {pillarCategories.map((category) => {
-            const theme = getProjectAccent(category.accent);
-            const selected =
-              viewMode === "grid"
-                ? activePillarFilter === category.pillar
-                : activeProject?.pillar === category.pillar;
-            return (
-              <button
-                key={category.pillar}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setActivePillarFilter(category.pillar)}
-                className={cn(
-                  "pillar-pill",
-                  selected && [theme.text, theme.background, theme.border],
-                )}
-              >
-                <span
-                  className={cn("h-1 w-1 shrink-0", theme.dot)}
-                  aria-hidden="true"
-                />
-                {category.pillarShort}
-              </button>
-            );
-          })}
-        </nav>
-        <div className="keybind-legend">
-          <span
-            className={cn(
-              "cycle-hint",
-              (viewMode !== "spatial" || isTerminalOpen) && "opacity-70",
-            )}
-          >
-            <kbd>
-              <ArrowLeft size={10} />
-              <ArrowRight size={10} />
-            </kbd>{" "}
-            CYCLE NODES{" "}
-            <span className="text-slate-300">
-              ({totalProjects > 0 ? activeIndex + 1 : 0}/{totalProjects})
+      {!isServices && (
+        <footer className="bottom-hud">
+          <nav className="pillar-nav" aria-label="Pillar quick-jump">
+            <span className="pillar-label">
+              <Command size={13} aria-hidden="true" /> PILLARS
             </span>
-          </span>
-          <span className="legend-divider">|</span>
-          <span>
-            <kbd>~</kbd> DROP CONSOLE
-          </span>
-        </div>
-      </footer>
+            <button
+              type="button"
+              className={cn(
+                "pillar-pill",
+                activePillarFilter === "ALL" &&
+                  viewMode === "grid" &&
+                  "all-active",
+              )}
+              aria-pressed={viewMode === "grid" && activePillarFilter === "ALL"}
+              onClick={() => setActivePillarFilter("ALL")}
+            >
+              ALL <span>{totalProjects.toString().padStart(2, "0")}</span>
+            </button>
+            {pillarCategories.map((category) => {
+              const theme = getProjectAccent(category.accent);
+              const selected =
+                viewMode === "grid"
+                  ? activePillarFilter === category.pillar
+                  : activeProject?.pillar === category.pillar;
+              return (
+                <button
+                  key={category.pillar}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setActivePillarFilter(category.pillar)}
+                  className={cn(
+                    "pillar-pill",
+                    selected && [theme.text, theme.background, theme.border],
+                  )}
+                >
+                  <span
+                    className={cn("h-1 w-1 shrink-0", theme.dot)}
+                    aria-hidden="true"
+                  />
+                  {category.pillarShort}
+                </button>
+              );
+            })}
+          </nav>
+          <div className="keybind-legend">
+            <span
+              className={cn(
+                "cycle-hint",
+                (viewMode !== "spatial" || isTerminalOpen) && "opacity-70",
+              )}
+            >
+              <kbd>
+                <ArrowLeft size={10} />
+                <ArrowRight size={10} />
+              </kbd>{" "}
+              CYCLE NODES{" "}
+              <span className="text-slate-300">
+                ({totalProjects > 0 ? activeIndex + 1 : 0}/{totalProjects})
+              </span>
+            </span>
+            <span className="legend-divider">|</span>
+            <span>
+              <kbd>~</kbd> DROP CONSOLE
+            </span>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

@@ -1,0 +1,140 @@
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* Tokens and color-scheme stay inside this page; the portfolio/HUD stay dark. */
+  .services-page {
+    color-scheme: dark;
+    --services-border: #1e293b;
+    --services-surface: #0f172a66;
+    --services-shadow: none;
+    --services-body: #94a3b8;
+    --services-detail: #cbd5e1;
+    --services-accent: #34d399;
+    --services-accent-hover: #6ee7b7;
+    --services-badge-border: #34d39933;
+    --services-badge-bg: #34d3990d;
+    --services-input: #0f172a;
+    --services-input-border: #1e293b;
+    --services-input-text: #fff;
+    --services-placeholder: #94a3b8;
+    --services-focus: #10b981;
+    --services-submit: #10b981;
+    --services-submit-hover: #059669;
+    --services-submit-text: #020617;
+  }
+  .services-page[data-services-theme="light"] {
+    color-scheme: light;
+    --services-border: #e2e8f0;
+    --services-surface: #fff;
+    --services-shadow: 0 1px 2px #0000000d;
+    --services-body: #475569;
+    --services-detail: #475569;
+    --services-accent: #059669;
+    --services-accent-hover: #047857;
+    --services-badge-border: #05966933;
+    --services-badge-bg: #ecfdf5;
+    --services-input: #fff;
+    --services-input-border: #cbd5e1;
+    --services-input-text: #0f172a;
+    --services-placeholder: #64748b;
+    --services-focus: #059669;
+    --services-submit: #059669;
+    --services-submit-hover: #047857;
+    --services-submit-text: #fff;
+  }
+  .services-page,
+  .services-page
+    :where(
+      .services-border,
+      .services-surface,
+      .services-body,
+      .services-detail,
+      .services-accent,
+      .services-accent-link,
+      .services-nav-link,
+      .services-badge,
+      .services-status-dot,
+      .services-input,
+      .services-submit,
+      .services-theme-toggle
+    ) {
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .services-page .services-border {
+    border-color: var(--services-border);
+  }
+  .services-page h1 {
+    color: inherit;
+    text-shadow: none;
+    filter: none;
+  }
+  .services-page .services-body {
+    color: var(--services-body);
+  }
+  .services-page .services-detail,
+  .services-page .services-nav-link {
+    color: var(--services-detail);
+  }
+  .services-page .services-accent,
+  .services-page .services-accent-link {
+    color: var(--services-accent);
+  }
+  .services-page .services-nav-link:hover,
+  .services-page .services-accent-link:hover {
+    color: var(--services-accent-hover);
+  }
+  .services-page .services-badge {
+    border-color: var(--services-badge-border);
+    background: var(--services-badge-bg);
+    color: var(--services-accent);
+  }
+  .services-page .services-status-dot {
+    background: var(--services-accent);
+  }
+  .services-page .services-surface {
+    background: var(--services-surface);
+    border-color: var(--services-border);
+    box-shadow: var(--services-shadow);
+  }
+  .services-page .services-input {
+    background: var(--services-input);
+    border-color: var(--services-input-border);
+    color: var(--services-input-text);
+  }
+  .services-page .services-input::placeholder {
+    color: var(--services-placeholder);
+  }
+  .services-page .services-submit {
+    background: var(--services-submit);
+    color: var(--services-submit-text);
+  }
+  .services-page .services-submit:hover {
+    background: var(--services-submit-hover);
+  }
+  .services-page .services-theme-toggle {
+    border-color: var(--services-border);
+    background: var(--services-surface);
+    color: var(--services-detail);
+  }
+  .services-page .services-theme-toggle:hover {
+    border-color: var(--services-accent);
+    color: var(--services-accent);
+  }
+  .services-page :is(a, button, input, textarea):focus-visible {
+    outline: 2px solid var(--services-focus);
+    outline-offset: 3px;
+  }
+  .services-page .services-input:focus-visible {
+    border-color: var(--services-focus);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .services-page,
+    .services-page * {
+      transition: none;
+    }
+  }
+}
