@@ -1,5 +1,6 @@
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { Fragment } from "react";
+import { OrbitalTelemetryCore } from "./OrbitalTelemetryCore";
 
 export function HeroIdentity() {
   const [primaryRole, ...specialties] = PROFILE_CONFIG.headline.split("//");
@@ -42,56 +43,7 @@ export function HeroIdentity() {
             ))}
           </ul>
         </div>
-        <div className="identity-scope" aria-hidden="true">
-          <svg viewBox="0 0 240 240" fill="none">
-            <path
-              d="M120 0v240M0 120h240"
-              stroke="currentColor"
-              strokeOpacity=".16"
-              strokeDasharray="2 6"
-            />
-            <circle
-              cx="120"
-              cy="120"
-              r="91"
-              stroke="currentColor"
-              strokeOpacity=".18"
-            />
-            <circle
-              cx="120"
-              cy="120"
-              r="70"
-              stroke="currentColor"
-              strokeOpacity=".4"
-              strokeDasharray="1 8"
-            />
-            <circle
-              cx="120"
-              cy="120"
-              r="48"
-              stroke="currentColor"
-              strokeOpacity=".17"
-            />
-            <path
-              d="M120 29a91 91 0 0 1 88 68M32 143a91 91 0 0 0 88 68"
-              stroke="currentColor"
-              strokeOpacity=".8"
-              strokeWidth="2"
-            />
-            <path
-              d="m120 78 37 21v42l-37 21-37-21V99l37-21Zm0 0v42m37-21-37 21-37-21m37 21v42"
-              stroke="currentColor"
-              strokeOpacity=".7"
-            />
-            <circle cx="120" cy="29" r="3" fill="currentColor" />
-            <circle cx="120" cy="211" r="3" fill="currentColor" />
-            <path
-              d="M10 30V10h20m180 0h20v20M10 210v20h20m180 0h20v-20"
-              stroke="currentColor"
-              strokeOpacity=".3"
-            />
-          </svg>
-        </div>
+        <OrbitalTelemetryCore />
       </div>
     </section>
   );

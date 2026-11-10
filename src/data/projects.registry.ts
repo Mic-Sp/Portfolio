@@ -86,7 +86,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     architectureHighlights: [
       "WCAG contrast & clinical copy guardrails",
       "GitHub-to-Cloudflare Pages CI/CD edge deploy",
-      "IL/IN teletherapy & client scheduling routing",
+      "IL/IN/TN teletherapy & client scheduling routing",
     ],
     techStack: [
       "Cloudflare Pages",

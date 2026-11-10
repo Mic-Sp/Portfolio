@@ -103,3 +103,13 @@ The hero omits the pre-header and bottom ribbons. Desktop identity uses a single
 `ProjectShowcaseToolbar` shares the heading, mode detail, count, and view toggle between spatial and grid modes. Desktop places them in one 61px toolbar; narrower screens wrap the same content without reducing the 12px label minimum. The active card begins 14px below that toolbar, including its bottom margin.
 
 With fonts loaded at 100% zoom and `scrollY === 0`, the active card starts at approximately y=327px on both 1440×900 and 1920×1080. At 1440×900, 59% of the card and its full architecture schematic are visible above the fixed footer. The 620px card width, card typography, deck physics, and console controls remain unchanged.
+
+## Kinetic orbital telemetry
+
+`OrbitalTelemetryCore` is a decorative client island beside the server-rendered identity text. Its 128×128px SVG contains clockwise orbital arcs and leading dots (14 seconds per revolution), a counter-rotating dashed radar ring (22 seconds), a pulsing center dot, and breathing corner brackets. The center cube projects eight 3D vertices connected by twelve edges; its geometry lives in the pure `src/lib/orbital-math.ts` module.
+
+Project accents come from the shared theme tokens. HUD selection changes trigger a short, decaying velocity impulse and inward bracket lock; hover gently accelerates the cube and brightens the crosshair. GodMode overrides the color with golden amber. Rotation phase is retained during selection and hover changes.
+
+The frame loop updates SVG attributes without React state updates per frame. It pauses when the core is outside the viewport, hidden by responsive layout, or the document is hidden, and cleans up its observer, visibility listener, and animation frame on unmount. `useReducedMotion()` is paired with a live media subscription because the installed Motion hook retains its initial setting. Reduced motion restores a static geometric frame while keeping accent synchronization. The first server and hydration renders are static and deterministic.
+
+Tests cover cube topology, perspective projection bounds and full-turn periodicity, and impulse decay. Browser verification measures ring rates, projected cube movement, hover acceleration, selection impulses, all active accents, GodMode, initial/live reduced-motion changes, offscreen pause/resume, and the unchanged above-the-fold layout.
