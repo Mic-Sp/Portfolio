@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { PROJECTS_REGISTRY } from "../src/data/projects.registry.ts";
+import { PROFILE_CONFIG } from "../src/data/profile.config.ts";
 import {
   CLI_COMMANDS,
   parseCommand,
@@ -43,6 +44,73 @@ function environment(registry = PROJECTS_REGISTRY) {
   return { state, context };
 }
 const output = (result) => result.lines.map((line) => line.text).join("\n");
+
+test("contact aliases, help and completion expose configured contact actions", async () => {
+  const { context } = environment();
+  const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const contact = await runCliCommand("contact", context);
+  const links = contact.lines.flatMap((line) => line.links ?? []);
+  assert.deepEqual(
+    links.map((link) => link.href),
+    [
+      directChannels.github.href,
+      directChannels.linkedin.href,
+      directChannels.email.href,
+      thmTelemetry.profileUrl,
+    ],
+  );
+  assert.equal(links[2].label, "mic.sprague@gmail.com");
+  for (const alias of ["uplink", "socials"])
+    assert.deepEqual(await runCliCommand(alias, context), contact);
+  assert.equal(getAutocomplete("cont").value, "contact ");
+  assert.equal(getAutocomplete("th").value, "thm ");
+});
+
+test("thm supplies operator identity and live verification without topic lists or fabricated metrics", async () => {
+  const { context } = environment();
+  const { thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const thm = await runCliCommand("thm", context);
+  const body = output(thm);
+  assert.ok(body.includes(thmTelemetry.handle));
+  assert.ok(body.includes(thmTelemetry.league));
+  assert.doesNotMatch(
+    body,
+    /STRIDE|MITRE ATLAS|Web App Pentesting|RSA Crypto|Ghidra/,
+  );
+  assert.equal(
+    thm.lines.flatMap((line) => line.links ?? [])[0].href,
+    thmTelemetry.profileUrl,
+  );
+  assert.doesNotMatch(body, /\d+\s*(rooms|days|%)|top\s*\d/i);
+});
+
+test("whois and stack expose the complete shared dossier profile", async () => {
+  const { context } = environment();
+  const whois = output(await runCliCommand("whois", context));
+  assert.ok(whois.includes(PROFILE_CONFIG.executiveBio));
+  assert.match(
+    whois,
+    /intelligent automated workflows, production web applications, and custom developer tools—engineered from the ground up with an application-security mindset\./,
+  );
+  assert.match(whois, /Holy Cross College \(Notre Dame, IN\)/);
+  assert.match(whois, /Summa Cum Laude \(3\.98 GPA\)/);
+  assert.match(whois, /Delta Epsilon Sigma National Honor Society/);
+  assert.match(whois, /Quantum Computing: An Economic Insight/);
+  for (const item of PROFILE_CONFIG.education) {
+    assert.ok(whois.includes(item.institution));
+    assert.ok(whois.includes(item.qualification));
+  }
+  for (const specialization of PROFILE_CONFIG.specializations)
+    assert.ok(whois.includes(specialization));
+  const stack = output(await runCliCommand("stack", context));
+  for (const [category, technologies] of Object.entries(
+    PROFILE_CONFIG.engineeringMatrix,
+  )) {
+    assert.ok(stack.includes(category.toUpperCase()));
+    for (const technology of technologies)
+      assert.ok(stack.includes(technology));
+  }
+});
 
 test("parser supports quotes, exact whitespace inside strings, escaped spaces, empty strings, and case-insensitive commands", () => {
   assert.deepEqual(parseCommand('LS --pillar "AI // QUANTUM"'), {

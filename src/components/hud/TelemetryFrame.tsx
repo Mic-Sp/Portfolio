@@ -6,6 +6,7 @@ import {
   Box,
   Command,
   Grid2X2,
+  Fingerprint,
   MapPin,
   Terminal,
 } from "lucide-react";
@@ -15,6 +16,8 @@ import { PROFILE_CONFIG } from "@/data/profile.config";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { TelemetryClock } from "./TelemetryClock";
 import { DropDownTerminal } from "./DropDownTerminal";
+import { DossierTrigger } from "@/components/portfolio/DossierTrigger";
+import { OperatorDossierDrawer } from "@/components/portfolio/OperatorDossier";
 
 export function TelemetryFrame({ children }: { children: ReactNode }) {
   const {
@@ -30,6 +33,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
     isTerminalOpen,
     toggleTerminal,
     godMode,
+    isDossierOpen,
   } = useHud();
   const frameRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLElement>(null);
@@ -80,6 +84,16 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           </span>
         </div>
         <div className="hud-controls">
+          <DossierTrigger
+            className={cn(
+              "hud-button dossier-hud-trigger",
+              isDossierOpen && "is-active",
+            )}
+            label="Operator dossier: bio and stack"
+          >
+            <Fingerprint size={14} aria-hidden="true" />
+            <span>DOSSIER</span>
+          </DossierTrigger>
           <button
             type="button"
             onClick={toggleTerminal}
@@ -122,6 +136,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
         </div>
       </header>
       <DropDownTerminal />
+      <OperatorDossierDrawer />
       {children}
       <footer className="bottom-hud">
         <nav className="pillar-nav" aria-label="Pillar quick-jump">

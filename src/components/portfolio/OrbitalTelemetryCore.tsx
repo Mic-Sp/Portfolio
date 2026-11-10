@@ -101,6 +101,7 @@ export function OrbitalTelemetryCore() {
       return;
 
     function reset() {
+      emblem!.dataset.playback = "paused";
       sweepGroup!.removeAttribute("transform");
       radarGroup!.removeAttribute("transform");
       cubePath!.setAttribute("d", INITIAL_PATH);
@@ -202,17 +203,32 @@ export function OrbitalTelemetryCore() {
     function syncPlayback() {
       cancelAnimationFrame(frame);
       lastTime = null;
-      if (visible && !document.hidden) frame = requestAnimationFrame(tick);
+      // Keep decorative SVG geometry out of the modal's rendering budget.
+      // Observing native presence also covers the dossier's complete exit animation.
+      const playing =
+        visible && !document.hidden && !document.querySelector("dialog[open]");
+      emblem!.dataset.playback = playing ? "running" : "paused";
+      if (playing) frame = requestAnimationFrame(tick);
     }
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       syncPlayback();
     });
     observer.observe(emblem);
+    const modals = new MutationObserver((records) => {
+      if (records.some((record) => record.target instanceof HTMLDialogElement))
+        syncPlayback();
+    });
+    modals.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["open"],
+    });
     document.addEventListener("visibilitychange", syncPlayback);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      modals.disconnect();
       document.removeEventListener("visibilitychange", syncPlayback);
     };
   }, [enabled]);

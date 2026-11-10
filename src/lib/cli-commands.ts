@@ -356,6 +356,59 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
       ),
   },
   {
+    name: "contact",
+    aliases: ["uplink", "socials"],
+    syntax: "contact",
+    description: "Direct channels and operator verification",
+    execute: () => {
+      const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+      return result(
+        text("COMMS UPLINK // DIRECT CHANNELS", "accent"),
+        ...[directChannels.github, directChannels.linkedin].map((channel) => ({
+          text: `${channel.label}  `,
+          links: [{ label: channel.handle, href: channel.href }],
+        })),
+        {
+          text: "EMAIL // ",
+          links: [
+            {
+              label: directChannels.email.address,
+              href: directChannels.email.href,
+            },
+          ],
+        },
+        {
+          text: "TRYHACKME // ",
+          links: [
+            { label: thmTelemetry.handle, href: thmTelemetry.profileUrl },
+          ],
+        },
+      );
+    },
+  },
+  {
+    name: "thm",
+    syntax: "thm",
+    description: "TryHackMe operator profile and live verification",
+    execute: () => {
+      const telemetry = PROFILE_CONFIG.commsAndTelemetry.thmTelemetry;
+      return result(
+        text(
+          `TRYHACKME // ${telemetry.handle} // ${telemetry.league}`,
+          "accent",
+        ),
+        {
+          text: "VERIFY LIVE PROFILE // ",
+          links: [{ label: telemetry.profileUrl, href: telemetry.profileUrl }],
+        },
+        text(
+          "Rank, streak and room counts are supplied live by TryHackMe.",
+          "muted",
+        ),
+      );
+    },
+  },
+  {
     name: "whois",
     syntax: "whois",
     description: "Executive bio and education",
@@ -364,7 +417,19 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
         text(PROFILE_CONFIG.legalName.toUpperCase(), "accent"),
         text(PROFILE_CONFIG.executiveBio),
         text(PROFILE_CONFIG.headline.trim()),
-        ...PROFILE_CONFIG.education.map((item) => text(`  + ${item}`)),
+        ...PROFILE_CONFIG.education.flatMap((item) => [
+          text(
+            `${item.institution}${item.location ? ` (${item.location})` : ""}`,
+            "accent",
+          ),
+          text(`  + ${item.qualification}`),
+          ...item.honors.map((honor) => text(`  + ${honor}`)),
+          ...(item.capstone
+            ? [text(`  + Undergraduate Capstone: "${item.capstone}"`)]
+            : []),
+        ]),
+        text("CERTIFICATIONS & SPECIALIZATIONS", "accent"),
+        ...PROFILE_CONFIG.specializations.map((item) => text(`  + ${item}`)),
         text(
           `${PROFILE_CONFIG.location} // ${PROFILE_CONFIG.systemStatus}`,
           "muted",

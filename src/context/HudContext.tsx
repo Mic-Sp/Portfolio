@@ -16,6 +16,7 @@ import { useHudKeyboard } from "@/hooks/useHudKeyboard";
 import type { PillarCategory, ProjectNode } from "@/types/portfolio";
 
 type ViewMode = "spatial" | "grid";
+export type DossierSection = "overview" | "credentials" | "stack";
 interface HudContextValue {
   projects: readonly ProjectNode[];
   pillarCategories: PillarCategory[];
@@ -32,6 +33,10 @@ interface HudContextValue {
   isTerminalOpen: boolean;
   toggleTerminal: () => void;
   closeTerminal: () => void;
+  isDossierOpen: boolean;
+  dossierSection: DossierSection;
+  openDossier: (section?: DossierSection) => void;
+  closeDossier: () => void;
   godMode: boolean;
   setGodMode: (enabled: boolean) => void;
 }
@@ -54,6 +59,9 @@ export function HudProvider({
   const [activePillarFilter, setPillarFilter] = useState<string | "ALL">("ALL");
   const [viewMode, setMode] = useState<ViewMode>("spatial");
   const [isTerminalOpen, setTerminalOpen] = useState(false);
+  const [isDossierOpen, setDossierOpen] = useState(false);
+  const [dossierSection, setDossierSection] =
+    useState<DossierSection>("overview");
   const [godMode, setGodMode] = useState(false);
 
   const selectProject = useCallback(
@@ -77,11 +85,17 @@ export function HudProvider({
         : 0,
     );
   }, [totalProjects]);
-  const toggleTerminal = useCallback(
-    () => setTerminalOpen((open) => !open),
-    [],
-  );
+  const toggleTerminal = useCallback(() => {
+    setDossierOpen(false);
+    setTerminalOpen((open) => !open);
+  }, []);
   const closeTerminal = useCallback(() => setTerminalOpen(false), []);
+  const openDossier = useCallback((section: DossierSection = "overview") => {
+    setTerminalOpen(false);
+    setDossierSection(section);
+    setDossierOpen(true);
+  }, []);
+  const closeDossier = useCallback(() => setDossierOpen(false), []);
   const setViewMode = useCallback(
     (mode: ViewMode) => {
       // A spatial selection can leave the previous grid filter. Keep it visible on return.
@@ -114,6 +128,8 @@ export function HudProvider({
   useHudKeyboard({
     viewMode,
     isTerminalOpen,
+    isDossierOpen,
+    closeDossier,
     toggleTerminal,
     nextProject,
     prevProject,
@@ -137,6 +153,10 @@ export function HudProvider({
         isTerminalOpen,
         toggleTerminal,
         closeTerminal,
+        isDossierOpen,
+        dossierSection,
+        openDossier,
+        closeDossier,
         godMode,
         setGodMode,
       }}

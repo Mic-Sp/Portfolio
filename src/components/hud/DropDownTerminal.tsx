@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import { CornerDownLeft, Terminal, X } from "lucide-react";
 import {
   useEffect,
@@ -11,6 +11,7 @@ import {
 } from "react";
 import { useHud } from "@/context/HudContext";
 import { PROJECTS_REGISTRY } from "@/data/projects.registry";
+import { getHudDrawerTransition } from "@/lib/hud-motion";
 import {
   getAutocomplete,
   getCommandEcho,
@@ -36,7 +37,6 @@ const BOOT_ENTRY: TerminalEntry = {
 
 export function DropDownTerminal() {
   const { isTerminalOpen } = useHud();
-  const reducedMotion = useReducedMotion();
   const [entries, setEntries] = useState<TerminalEntry[]>([BOOT_ENTRY]);
   const [history, setHistory] = useState<string[]>([]);
   const sequence = useRef(0);
@@ -64,35 +64,33 @@ export function DropDownTerminal() {
   }
 
   return (
-    <AnimatePresence initial={false}>
-      {isTerminalOpen && (
-        <motion.aside
-          key="developer-console"
-          id="developer-console"
-          className="drop-down-terminal"
-          role="dialog"
-          aria-modal="false"
-          aria-label="Developer console"
-          initial={{ y: "-100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "-100%", opacity: 0 }}
-          transition={
-            reducedMotion
-              ? { duration: 0 }
-              : { type: "tween", duration: 0.23, ease: [0.22, 1, 0.36, 1] }
-          }
-        >
-          <TerminalPanel
-            entries={entries}
-            history={history}
-            addEntry={addEntry}
-            updateEntry={updateEntry}
-            remember={remember}
-            clear={clear}
-          />
-        </motion.aside>
-      )}
-    </AnimatePresence>
+    <MotionConfig reducedMotion="never">
+      <AnimatePresence initial={false}>
+        {isTerminalOpen && (
+          <motion.aside
+            key="developer-console"
+            id="developer-console"
+            className="drop-down-terminal"
+            role="dialog"
+            aria-modal="false"
+            aria-label="Developer console"
+            initial={{ y: "-100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "-100%", opacity: 0 }}
+            transition={getHudDrawerTransition()}
+          >
+            <TerminalPanel
+              entries={entries}
+              history={history}
+              addEntry={addEntry}
+              updateEntry={updateEntry}
+              remember={remember}
+              clear={clear}
+            />
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   );
 }
 
@@ -246,6 +244,8 @@ function TerminalPanel({
     "ls",
     "whois",
     "stack",
+    "contact",
+    "thm",
     ...(first ? [`inspect ${first.id}`] : []),
     "entropy correct-horse-battery-staple",
     "iddqd",

@@ -1,12 +1,12 @@
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { Fragment } from "react";
 import { OrbitalTelemetryCore } from "./OrbitalTelemetryCore";
+import { DossierTrigger } from "./DossierTrigger";
+import { HeroUplinks } from "./HeroUplinks";
 
 export function HeroIdentity() {
   const [primaryRole, ...specialties] = PROFILE_CONFIG.headline.split("//");
-  const credentials = PROFILE_CONFIG.subheadline
-    .split("•")
-    .map((credential) => credential.trim());
+  const credentials = PROFILE_CONFIG.education;
   return (
     <section className="hero-identity" aria-labelledby="identity-heading">
       <div className="hero-layout">
@@ -32,16 +32,23 @@ export function HeroIdentity() {
           </p>
           <ul className="hero-credentials" aria-label="Credentials">
             {credentials.map((credential, index) => (
-              <li key={credential}>
+              <li key={credential.id}>
                 {index > 0 && (
                   <span className="credential-separator" aria-hidden="true">
                     •
                   </span>
                 )}
-                <span className="credential-pill">{credential}</span>
+                <DossierTrigger
+                  className="credential-pill"
+                  section="credentials"
+                  label={`View credentials: ${credential.heroLabel}`}
+                >
+                  {credential.heroLabel}
+                </DossierTrigger>
               </li>
             ))}
           </ul>
+          <HeroUplinks />
         </div>
         <OrbitalTelemetryCore />
       </div>
