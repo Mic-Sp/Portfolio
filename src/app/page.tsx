@@ -1,13 +1,13 @@
 import { TerminalPlaceholder } from "@/components/hud/TerminalPlaceholder";
 import { HeroIdentity } from "@/components/portfolio/HeroIdentity";
-import { ProjectGridPreview } from "@/components/projects/ProjectGridPreview";
+import { ProjectShowcase } from "@/components/projects/ProjectShowcase";
 
 export default function Home() {
   return (
     <main id="main-content" className="main-content">
       <TerminalPlaceholder />
       <HeroIdentity />
-      <ProjectGridPreview />
+      <ProjectShowcase />
     </main>
   );
 }

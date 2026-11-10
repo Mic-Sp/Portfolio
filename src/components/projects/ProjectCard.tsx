@@ -16,6 +16,7 @@ interface ProjectCardProps {
   index: number;
   selected: boolean;
   onSelect: () => void;
+  interactive?: boolean;
 }
 
 export function ProjectCard({
@@ -23,6 +24,7 @@ export function ProjectCard({
   index,
   selected,
   onSelect,
+  interactive = true,
 }: ProjectCardProps) {
   const theme = getProjectAccent(project.accent);
   const links = [
@@ -74,6 +76,7 @@ export function ProjectCard({
         <button
           type="button"
           onClick={onSelect}
+          disabled={!interactive}
           aria-label={`Select ${project.title}`}
           aria-pressed={selected}
           className={cn(
@@ -98,12 +101,16 @@ export function ProjectCard({
       <div className="project-card-footer">
         <div className="project-links">
           {links.map(({ key, url, label, icon: Icon }) =>
-            url === "#" ? (
+            url === "#" || !interactive ? (
               <span
                 key={key}
                 className="unavailable-link"
-                title="URL not yet provided"
-                aria-label={`${label}: URL not yet provided`}
+                title={
+                  url === "#"
+                    ? "URL not yet provided"
+                    : "Focus this node to open links"
+                }
+                aria-label={`${label}: ${url === "#" ? "URL not yet provided" : "focus this node to open links"}`}
               >
                 {label}
                 <Icon size={12} aria-hidden="true" />
@@ -114,6 +121,7 @@ export function ProjectCard({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
+                draggable={false}
                 aria-label={`${project.title}: ${label.toLowerCase()} (opens in a new tab)`}
               >
                 {label}

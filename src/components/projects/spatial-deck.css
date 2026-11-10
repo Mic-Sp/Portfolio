@@ -1,0 +1,363 @@
+@layer components {
+  .showcase-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 11px;
+    border: 1px solid #94a3b82b;
+    color: #a8bbce;
+    font:
+      8px var(--font-mono),
+      monospace;
+    white-space: nowrap;
+  }
+  .showcase-view-toggle:hover {
+    color: #a5f3fc;
+    border-color: #67e8f960;
+    background: #22d3ee08;
+  }
+  .spatial-viewport {
+    position: relative;
+    overflow: hidden;
+    margin-inline: -20px;
+    padding-inline: 20px;
+  }
+  .spatial-stage {
+    /* Let hit testing reach cards at negative Z instead of the transparent stage plane. */
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-items: stretch;
+    position: relative;
+    padding: 36px 0 70px;
+    perspective: 1400px;
+    transform-style: preserve-3d;
+    cursor: grab;
+    user-select: none;
+  }
+  .spatial-stage:active {
+    cursor: grabbing;
+  }
+  .spatial-deck[data-motion="reduced"] .spatial-stage {
+    cursor: auto;
+  }
+  .spatial-card-slot {
+    grid-area: 1 / 1;
+    width: min(480px, 55%);
+    min-width: 0;
+    position: relative;
+    transform-origin: 50% 50%;
+  }
+  .spatial-card-content {
+    height: 100%;
+  }
+  .spatial-card-slot .project-card {
+    height: 100%;
+    background: linear-gradient(135deg, #0b1425fa, #070e1cfa);
+  }
+  .spatial-card-slot[data-offset="0"] .project-card {
+    background:
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.055), transparent 65%),
+      #070e1c;
+  }
+  .spatial-card-slot[data-offset="0"] .spatial-card-content {
+    box-shadow:
+      0 30px 65px -25px #000d,
+      0 0 50px -32px rgba(var(--accent-rgb), 0.4);
+  }
+  .spatial-card-select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .spatial-card-select > span {
+    position: absolute;
+    inset-inline: 15px;
+    bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font:
+      8px var(--font-mono),
+      monospace;
+    padding: 11px;
+    border: 1px solid #94a3b84d;
+    background: #020617e6;
+    color: #e2e8f0;
+    opacity: 0;
+    transition: opacity 0.18s;
+  }
+  .spatial-card-select:hover > span,
+  .spatial-card-select:focus-visible > span {
+    opacity: 1;
+  }
+  .spatial-card-select:focus-visible {
+    outline-offset: -3px;
+  }
+  .deck-horizon {
+    position: absolute;
+    height: 110px;
+    bottom: 12px;
+    inset-inline: 7%;
+    pointer-events: none;
+    color: var(--accent, #67e8f9);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(var(--accent-rgb), 0.09),
+      transparent 65%
+    );
+  }
+  .deck-horizon > span {
+    position: absolute;
+    inset: 20% 2%;
+    border: 1px solid rgba(var(--accent-rgb), 0.17);
+    border-radius: 50%;
+  }
+  .deck-horizon > span:nth-child(2) {
+    inset: 31% 15%;
+    border-style: dashed;
+    opacity: 0.65;
+  }
+  .deck-horizon > span:nth-child(3) {
+    inset: 50% 0 auto;
+    border: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-rgb), 0.35),
+      transparent
+    );
+  }
+  .spatial-navigation {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    border-block: 1px solid #94a3b821;
+    padding: 12px 0;
+  }
+  .deck-chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid #94a3b82b;
+    color: #b5c4d6;
+    font:
+      9px var(--font-mono),
+      monospace;
+  }
+  .deck-chevron:hover:not(:disabled) {
+    color: #a5f3fc;
+    border-color: #67e8f960;
+    background: #22d3ee08;
+  }
+  .node-radar {
+    position: relative;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding: 5px;
+  }
+  .radar-node {
+    position: relative;
+    display: flex;
+    flex: 1 0 85px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 9px;
+    min-height: 40px;
+    border: 1px solid #94a3b821;
+    color: #75879e;
+    font:
+      9px var(--font-mono),
+      monospace;
+    white-space: nowrap;
+  }
+  .radar-node[aria-current="true"] {
+    border-color: rgba(var(--accent-rgb), 0.4);
+    color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.045);
+  }
+  .radar-node:hover:not(:disabled) {
+    border-color: rgba(var(--accent-rgb), 0.5);
+    color: var(--accent);
+  }
+  .radar-indicator {
+    height: 4px;
+    width: 4px;
+    flex-shrink: 0;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+  .radar-node[aria-current="true"] .radar-indicator {
+    opacity: 1;
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .radar-separator {
+    color: #475569;
+  }
+  .spatial-caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 19px;
+    font:
+      9px var(--font-mono),
+      monospace;
+    color: #94a3b8;
+  }
+  .spatial-caption > p {
+    line-height: 1.8;
+  }
+  .caption-divider {
+    padding-inline: 12px;
+    color: #475569;
+  }
+  .caption-pillar {
+    padding-left: 15px;
+    color: #64748b;
+    font-size: 7px;
+  }
+  .spatial-gesture-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 7px;
+    color: #64748b;
+  }
+  @media (max-width: 900px) {
+    .spatial-card-slot {
+      width: 62%;
+    }
+    .spatial-navigation {
+      gap: 10px;
+    }
+    .deck-chevron {
+      padding-inline: 10px;
+    }
+  }
+  @media (max-width: 639px) {
+    .registry-heading {
+      flex-wrap: wrap;
+    }
+    .spatial-deck .registry-title h2 {
+      font-size: 21px;
+    }
+    .spatial-deck .registry-heading {
+      gap: 10px;
+    }
+    .showcase-view-toggle {
+      font-size: 7px;
+      padding: 8px;
+      gap: 5px;
+    }
+    .spatial-viewport {
+      margin-inline: -22px;
+      padding-inline: 12px;
+    }
+    .spatial-stage {
+      padding-top: 25px;
+      padding-bottom: 50px;
+    }
+    .spatial-card-slot {
+      width: 81%;
+    }
+    .spatial-card-slot .project-card {
+      padding-inline: 17px;
+    }
+    .spatial-card-slot .card-telemetry {
+      font-size: 6px;
+      gap: 5px;
+    }
+    .spatial-card-slot .project-status {
+      font-size: 5.5px;
+    }
+    .spatial-card-slot .schematic-core {
+      width: 30px;
+    }
+    .spatial-card-slot .schematic-bus {
+      width: 12px;
+    }
+    .spatial-card-slot .schematic-modules > div {
+      font-size: 5.5px;
+    }
+    .spatial-navigation {
+      gap: 6px;
+      padding-block: 9px;
+    }
+    .deck-chevron {
+      font-size: 7px;
+      gap: 4px;
+      padding-inline: 7px;
+    }
+    .radar-node {
+      font-size: 8px;
+      flex-basis: 72px;
+      padding-inline: 7px;
+      gap: 5px;
+    }
+    .node-radar {
+      gap: 5px;
+    }
+    .spatial-caption {
+      font-size: 8px;
+      margin-top: 14px;
+    }
+    .caption-pillar {
+      display: none;
+    }
+    .spatial-gesture-hint {
+      font-size: 6px;
+    }
+    .deck-horizon {
+      height: 80px;
+      bottom: 10px;
+      inset-inline: 3%;
+    }
+  }
+  @media (max-width: 370px) {
+    .spatial-viewport {
+      margin-inline: -16px;
+      padding-inline: 10px;
+    }
+    .spatial-deck .registry-title h2 {
+      font-size: 18px;
+      gap: 6px;
+    }
+    .spatial-deck .registry-title {
+      gap: 6px;
+    }
+    .showcase-view-toggle {
+      font-size: 6px;
+      padding: 7px;
+    }
+    .spatial-deck .registry-meta {
+      font-size: 5px;
+    }
+    .spatial-card-slot .project-card {
+      padding-inline: 13px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spatial-stage {
+      perspective: none;
+      transform-style: flat;
+    }
+    .deck-horizon {
+      display: none;
+    }
+  }
+}

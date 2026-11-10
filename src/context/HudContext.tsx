@@ -51,7 +51,7 @@ export function HudProvider({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const activeIndex = wrapIndex(selectedIndex, totalProjects);
   const [activePillarFilter, setPillarFilter] = useState<string | "ALL">("ALL");
-  const [viewMode, setViewMode] = useState<ViewMode>("spatial");
+  const [viewMode, setMode] = useState<ViewMode>("spatial");
   const [isTerminalOpen, setTerminalOpen] = useState(false);
   const [godMode, setGodMode] = useState(false);
 
@@ -79,6 +79,19 @@ export function HudProvider({
   const toggleTerminal = useCallback(
     () => setTerminalOpen((open) => !open),
     [],
+  );
+  const setViewMode = useCallback(
+    (mode: ViewMode) => {
+      // A spatial selection can leave the previous grid filter. Keep it visible on return.
+      if (
+        mode === "grid" &&
+        activePillarFilter !== "ALL" &&
+        projects[activeIndex]?.pillar !== activePillarFilter
+      )
+        setPillarFilter("ALL");
+      setMode(mode);
+    },
+    [activePillarFilter, activeIndex, projects],
   );
   const setActivePillarFilter = useCallback(
     (pillar: string) => {

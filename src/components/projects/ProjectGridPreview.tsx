@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Layers3 } from "lucide-react";
 import { useHud } from "@/context/HudContext";
 import { ProjectCard } from "./ProjectCard";
+import { ProjectViewToggle } from "./ProjectViewToggle";
 
 export function ProjectGridPreview() {
   const {
@@ -11,18 +11,12 @@ export function ProjectGridPreview() {
     selectProject,
     activePillarFilter,
     setActivePillarFilter,
-    viewMode,
-    nextProject,
-    prevProject,
-    isTerminalOpen,
   } = useHud();
   const visibleProjects = projects
     .map((project, index) => ({ project, index }))
     .filter(
       ({ project }) =>
-        viewMode !== "grid" ||
-        activePillarFilter === "ALL" ||
-        project.pillar === activePillarFilter,
+        activePillarFilter === "ALL" || project.pillar === activePillarFilter,
     );
 
   return (
@@ -41,42 +35,11 @@ export function ProjectGridPreview() {
             </span>
           </h2>
         </div>
-        <div className="registry-controls">
-          <span className="preview-label">
-            <Layers3 size={12} aria-hidden="true" />
-            {viewMode === "spatial"
-              ? "SPATIAL DECK / PREVIEW"
-              : "PROJECT REGISTRY / GRID"}
-          </span>
-          {viewMode === "spatial" && (
-            <div
-              className="cycle-buttons"
-              role="group"
-              aria-label="Cycle projects"
-            >
-              <button
-                type="button"
-                onClick={prevProject}
-                aria-label="Previous project"
-                disabled={!projects.length || isTerminalOpen}
-              >
-                <ArrowLeft size={14} />
-              </button>
-              <button
-                type="button"
-                onClick={nextProject}
-                aria-label="Next project"
-                disabled={!projects.length || isTerminalOpen}
-              >
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          )}
-        </div>
+        <ProjectViewToggle />
       </div>
       <div className="registry-meta">
         <span>
-          {viewMode === "grid" && activePillarFilter !== "ALL"
+          {activePillarFilter !== "ALL"
             ? activePillarFilter
             : "INDEPENDENT BUILDS. CONNECTED DISCIPLINES."}
         </span>
