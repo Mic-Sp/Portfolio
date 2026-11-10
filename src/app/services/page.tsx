@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useServicesTheme } from "@/context/ServicesThemeContext";
+import { transmitContact } from "@/lib/contact-client";
+import {
+  ContactSchema,
+  contactFieldErrors,
+  type ContactFieldErrors,
+} from "@/lib/schemas/contact.schema";
+import { PROFILE_CONFIG } from "@/data/profile.config";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -72,27 +79,73 @@ const engagementSteps = [
 ];
 
 const fieldClassName = "services-input mt-2 w-full rounded-lg border px-4 py-3";
+type SubmissionStatus = "idle" | "loading" | "success" | "error";
 
 export default function ServicesPage() {
   const { isLight, toggleTheme } = useServicesTheme();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<SubmissionStatus>("idle");
+  const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
+  const inFlight = useRef(false);
+  const isSubmitting = status === "loading";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-    setStatus("");
+    if (inFlight.current) return;
+    const form = event.currentTarget;
+    const values = new FormData(form);
+    const parsed = ContactSchema.safeParse({
+      senderName: String(values.get("name") ?? ""),
+      senderEmail: String(values.get("email") ?? ""),
+      message: String(values.get("details") ?? ""),
+      subject: "Client Services Inquiry",
+      origin: "DOSSIER_GUI",
+      website: String(values.get("website") ?? ""),
+    });
+    if (!parsed.success) {
+      const errors = contactFieldErrors(parsed.error);
+      setFieldErrors(errors);
+      setStatus("error");
+      const firstInvalid = (
+        [
+          ["senderName", "name"],
+          ["senderEmail", "email"],
+          ["message", "details"],
+        ] as const
+      ).find(([field]) => errors[field]?.length);
+      if (firstInvalid)
+        form
+          .querySelector<HTMLInputElement | HTMLTextAreaElement>(
+            `[name="${firstInvalid[1]}"]`,
+          )
+          ?.focus();
+      return;
+    }
+    inFlight.current = true;
+    setFieldErrors({});
+    setStatus("loading");
 
     try {
-      // TODO: Replace this placeholder with a lead capture endpoint.
-      // Keep form values in the browser until that integration is ready.
-      await Promise.resolve();
-      setStatus("This form is a preview. No message has been sent.");
+      const result = await transmitContact(parsed.data);
+      if (result.ok) {
+        form.reset();
+        setStatus("success");
+      } else {
+        setFieldErrors(result.fieldErrors ?? {});
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
     } finally {
-      setIsSubmitting(false);
+      inFlight.current = false;
     }
+  }
+
+  function fieldError(field: keyof ContactFieldErrors, id: string) {
+    return fieldErrors[field]?.length ? (
+      <p id={id} className="services-error mt-2 text-xs">
+        {fieldErrors[field]?.join(" ")}
+      </p>
+    ) : null;
   }
 
   return (
@@ -243,7 +296,7 @@ export default function ServicesPage() {
           </ol>
         </section>
 
-        {/* Lead capture scaffold: intentionally has no backend yet. */}
+        {/* Project inquiries use the same guarded relay as the Dossier and CLI. */}
         <section
           id="project-inquiry"
           aria-labelledby="inquiry-heading"
@@ -261,81 +314,131 @@ export default function ServicesPage() {
           >
             Drop a high-level summary below. I respond within 24 business hours.
           </p>
-          <p id="inquiry-preview" className="services-body mt-2 text-xs">
-            This form is a preview; submissions are not sent yet.
-          </p>
           <form
             onSubmit={handleSubmit}
-            aria-describedby="inquiry-description inquiry-preview"
+            noValidate
+            aria-describedby="inquiry-description services-inquiry-feedback"
             aria-busy={isSubmitting}
-            className="mt-8 space-y-6"
+            className="relative mt-8 space-y-6"
           >
-            <div>
-              <label htmlFor="name" className="text-sm font-medium">
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                required
-                maxLength={120}
-                placeholder="Jane Doe"
-                className={fieldClassName}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                maxLength={254}
-                placeholder="jane@example.com"
-                className={fieldClassName}
-              />
-            </div>
-            <div>
-              <label htmlFor="details" className="text-sm font-medium">
-                Project Overview
-              </label>
-              <textarea
-                id="details"
-                name="details"
-                rows={5}
-                required
-                maxLength={5000}
-                placeholder="Tell me what you need built or which manual process you want automated..."
-                className={`${fieldClassName} resize-y`}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="services-submit inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-5 py-3 font-semibold disabled:cursor-wait disabled:opacity-60 sm:w-auto"
-            >
-              {isSubmitting ? (
-                <Loader2
-                  size={18}
-                  aria-hidden="true"
-                  className="motion-safe:animate-spin"
+            <fieldset disabled={isSubmitting} className="min-w-0 space-y-6">
+              <legend className="sr-only">Send a project inquiry</legend>
+              <div>
+                <label htmlFor="name" className="text-sm font-medium">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  minLength={2}
+                  maxLength={80}
+                  aria-invalid={!!fieldErrors.senderName}
+                  aria-describedby={
+                    fieldErrors.senderName ? "services-name-error" : undefined
+                  }
+                  placeholder="Jane Doe"
+                  className={fieldClassName}
                 />
-              ) : (
-                <Send size={18} aria-hidden="true" />
-              )}
-              {isSubmitting ? "Submitting…" : "Send Project Inquiry"}
-            </button>
+                {fieldError("senderName", "services-name-error")}
+              </div>
+              <div>
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  maxLength={120}
+                  aria-invalid={!!fieldErrors.senderEmail}
+                  aria-describedby={
+                    fieldErrors.senderEmail ? "services-email-error" : undefined
+                  }
+                  placeholder="jane@example.com"
+                  className={fieldClassName}
+                />
+                {fieldError("senderEmail", "services-email-error")}
+              </div>
+              <div>
+                <label htmlFor="details" className="text-sm font-medium">
+                  Project Overview
+                </label>
+                <textarea
+                  id="details"
+                  name="details"
+                  rows={5}
+                  required
+                  minLength={10}
+                  maxLength={2000}
+                  aria-invalid={!!fieldErrors.message}
+                  aria-describedby={
+                    fieldErrors.message ? "services-details-error" : undefined
+                  }
+                  placeholder="Tell me what you need built or which manual process you want automated..."
+                  className={`${fieldClassName} resize-y`}
+                />
+                {fieldError("message", "services-details-error")}
+              </div>
+              <div className="services-honeypot" aria-hidden="true">
+                <label htmlFor="services-website">Website</label>
+                <input
+                  id="services-website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="services-submit inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-5 py-3 font-semibold disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+              >
+                {isSubmitting ? (
+                  <Loader2
+                    size={18}
+                    aria-hidden="true"
+                    className="motion-safe:animate-spin"
+                  />
+                ) : (
+                  <Send size={18} aria-hidden="true" />
+                )}
+                {isSubmitting ? "Transmitting..." : "Send Project Inquiry"}
+              </button>
+            </fieldset>
             <p
-              role="status"
-              aria-live="polite"
-              className="services-accent min-h-6 text-sm"
+              id="services-inquiry-feedback"
+              role={status === "error" ? "alert" : "status"}
+              aria-live={status === "error" ? "assertive" : "polite"}
+              className={`services-feedback min-h-6 text-sm ${status === "error" ? "services-error" : "services-accent"}`}
+              data-status={status}
             >
-              {status}
+              {status === "success" ? (
+                "Message dispatched successfully. I will be in touch shortly."
+              ) : status === "error" ? (
+                <>
+                  Transmission failed. Please reach out directly via{" "}
+                  <a
+                    href={
+                      PROFILE_CONFIG.commsAndTelemetry.directChannels.linkedin
+                        .href
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    LinkedIn
+                  </a>
+                  .
+                </>
+              ) : (
+                ""
+              )}
             </p>
           </form>
         </section>

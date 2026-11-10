@@ -131,6 +131,32 @@
   .services-page .services-input:focus-visible {
     border-color: var(--services-focus);
   }
+  .services-page .services-error {
+    color: #fda4af;
+  }
+  .services-page[data-services-theme="light"] .services-error {
+    color: #be123c;
+  }
+  .services-page .services-feedback a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .services-page .services-input[aria-invalid="true"] {
+    border-color: #fb7185;
+  }
+  .services-page[data-services-theme="light"]
+    .services-input[aria-invalid="true"] {
+    border-color: #be123c;
+  }
+  .services-page .services-honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   @media (prefers-reduced-motion: reduce) {
     .services-page,
     .services-page * {

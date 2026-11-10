@@ -2,13 +2,16 @@
 
 @layer utilities {
   .services-hud-link {
-    background: #0f172a99;
-    border-color: #334155;
-    color: #cbd5e1;
+    font-size: 12px;
+    padding-inline: 12px;
+    background: #10b9810d;
+    border-color: #10b9814d;
+    color: #34d399;
   }
   .services-hud-link:hover {
     color: #34d399;
     border-color: #10b98180;
+    background: #10b9811a;
   }
   /* Four portfolio controls need their intrinsic width without overlapping Status. */
   @media (min-width: 1280px) {

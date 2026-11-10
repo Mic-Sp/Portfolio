@@ -96,7 +96,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
         <div className="hud-controls">
           {!isServices && (
             <Link href="/services" className="hud-button services-hud-link">
-              SERVICES
+              Client Services →
             </Link>
           )}
           <DossierTrigger

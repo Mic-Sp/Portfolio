@@ -82,15 +82,16 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     tagline:
       "Production Web Platform for Clinical Counseling & Consulting (LLC)",
     description:
-      "Custom production web platform engineered for Huddle & Heal Counseling & Consulting, PLLC, featuring build-time WCAG accessibility contrast verification, clinical copy boundary guardrails, automated GitHub-to-Cloudflare Pages deployment, and streamlined client intake routing.",
+      "Custom production web platform engineered for Huddle & Heal Counseling & Consulting, LLC, featuring build-time WCAG accessibility contrast verification, clinical copy boundary guardrails, automated GitHub-to-Cloudflare Pages CI/CD, and full cross-registrar DNS cutover (A, CNAME, TXT).",
     architectureHighlights: [
       "WCAG contrast & clinical copy guardrails",
-      "GitHub-to-Cloudflare Pages CI/CD edge deploy",
+      "Custom DNS migration (A/CNAME/TXT) & Cloudflare edge deploy",
       "IL/IN/TN teletherapy & client scheduling routing",
     ],
     techStack: [
       "Cloudflare Pages",
       "GitHub CI/CD",
+      "DNS Migration",
       "WCAG Accessibility",
       "Clinical Copy Guardrails",
       "Responsive UI",

@@ -187,7 +187,7 @@ async function verifyPortfolio(page) {
   );
   const controls = page.locator(".top-hud");
   const servicesLink = controls.getByRole("link", {
-    name: "SERVICES",
+    name: "Client Services →",
     exact: true,
   });
   assert.equal(await servicesLink.getAttribute("href"), "/services");
@@ -248,7 +248,7 @@ async function verifyServices(page) {
   assert.equal(
     await page
       .locator(".top-hud")
-      .getByRole("link", { name: "SERVICES", exact: true })
+      .getByRole("link", { name: "Client Services →", exact: true })
       .count(),
     0,
   );
@@ -323,7 +323,7 @@ try {
   });
   await page
     .locator(".top-hud")
-    .getByRole("link", { name: "SERVICES", exact: true })
+    .getByRole("link", { name: "Client Services →", exact: true })
     .click();
   await page.waitForURL(base + "/services");
   assert.equal(
