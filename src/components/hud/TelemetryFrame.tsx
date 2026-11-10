@@ -9,11 +9,12 @@ import {
   MapPin,
   Terminal,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useHud } from "@/context/HudContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { TelemetryClock } from "./TelemetryClock";
+import { DropDownTerminal } from "./DropDownTerminal";
 
 export function TelemetryFrame({ children }: { children: ReactNode }) {
   const {
@@ -28,15 +29,35 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
     setViewMode,
     isTerminalOpen,
     toggleTerminal,
+    godMode,
   } = useHud();
+  const frameRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return;
+    const update = () =>
+      frameRef.current?.style.setProperty(
+        "--hud-bar-height",
+        `${bar.getBoundingClientRect().height}px`,
+      );
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="telemetry-frame min-h-svh bg-slate-950 text-slate-100">
+    <div
+      ref={frameRef}
+      data-god-mode={godMode}
+      className="telemetry-frame min-h-svh bg-slate-950 text-slate-100"
+    >
       <a href="#main-content" className="skip-link">
         Skip to projects
       </a>
       <div className="spatial-backdrop" aria-hidden="true" />
-      <header className="top-hud">
+      <header ref={barRef} className="top-hud">
         <div className="location-block">
           <p className="flex items-center gap-2">
             <MapPin size={11} aria-hidden="true" />
@@ -47,7 +68,9 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
         <div className="system-status">
           <p className="flex items-center justify-center gap-2">
             <span className="status-dot" />
-            {PROFILE_CONFIG.systemStatus}
+            {godMode
+              ? "STATUS: GODMODE // UNLIMITED TELEMETRY"
+              : PROFILE_CONFIG.systemStatus}
           </p>
           <span className="node-count">
             NODES ONLINE:{" "}
@@ -61,7 +84,9 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
             type="button"
             onClick={toggleTerminal}
             aria-pressed={isTerminalOpen}
-            aria-controls="terminal-placeholder"
+            aria-controls="developer-console"
+            aria-expanded={isTerminalOpen}
+            data-terminal-trigger
             aria-keyshortcuts="` ~"
             className={cn("hud-button", isTerminalOpen && "is-active")}
           >
@@ -96,6 +121,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      <DropDownTerminal />
       {children}
       <footer className="bottom-hud">
         <nav className="pillar-nav" aria-label="Pillar quick-jump">

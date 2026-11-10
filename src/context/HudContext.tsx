@@ -31,6 +31,7 @@ interface HudContextValue {
   setViewMode: (mode: ViewMode) => void;
   isTerminalOpen: boolean;
   toggleTerminal: () => void;
+  closeTerminal: () => void;
   godMode: boolean;
   setGodMode: (enabled: boolean) => void;
 }
@@ -80,6 +81,7 @@ export function HudProvider({
     () => setTerminalOpen((open) => !open),
     [],
   );
+  const closeTerminal = useCallback(() => setTerminalOpen(false), []);
   const setViewMode = useCallback(
     (mode: ViewMode) => {
       // A spatial selection can leave the previous grid filter. Keep it visible on return.
@@ -134,6 +136,7 @@ export function HudProvider({
         setViewMode,
         isTerminalOpen,
         toggleTerminal,
+        closeTerminal,
         godMode,
         setGodMode,
       }}

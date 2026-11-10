@@ -37,6 +37,12 @@ export function useHudKeyboard({
           ));
       const consoleKey = event.key === "`" || event.key === "~";
 
+      if (event.key === "Escape" && isTerminalOpen) {
+        event.preventDefault();
+        toggleTerminal();
+        return;
+      }
+
       // The console close key remains available while typing in the future terminal.
       if (consoleKey && (!editable || isTerminalOpen)) {
         event.preventDefault();

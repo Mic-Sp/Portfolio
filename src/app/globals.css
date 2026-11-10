@@ -734,32 +734,6 @@
     color: #64748b;
     font-size: 7px;
   }
-  .terminal-placeholder {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #083344;
-    border: 1px solid #22d3ee50;
-    padding: 15px 18px;
-    font:
-      10px var(--font-mono),
-      monospace;
-    margin-top: 20px;
-    color: #67e8f9;
-  }
-  .terminal-placeholder[hidden] {
-    display: none;
-  }
-  .terminal-placeholder p {
-    flex: 1;
-    line-height: 1.8;
-  }
-  .terminal-detail {
-    color: #94a3b8;
-  }
-  .terminal-placeholder button {
-    padding: 5px;
-  }
   .empty-registry {
     padding: 50px 24px;
     border: 1px dashed #94a3b833;
@@ -1037,10 +1011,6 @@
     }
     .registry-end {
       font-size: 5px;
-    }
-    .terminal-placeholder {
-      padding: 12px;
-      font-size: 8px;
     }
   }
   @media (max-width: 370px) {

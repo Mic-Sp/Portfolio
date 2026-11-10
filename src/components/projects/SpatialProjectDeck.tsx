@@ -37,6 +37,7 @@ export function SpatialProjectDeck() {
     nextProject,
     prevProject,
     isTerminalOpen,
+    godMode,
   } = useHud();
   const prefersReducedMotion = useReducedMotion();
   const viewport = useDeckViewport();
@@ -98,6 +99,7 @@ export function SpatialProjectDeck() {
       aria-labelledby="spatial-heading"
       aria-roledescription="carousel"
       data-motion={reducedMotion ? "reduced" : "spatial"}
+      data-god-mode={godMode}
     >
       <div className="registry-heading">
         <div className="registry-title">
@@ -114,9 +116,11 @@ export function SpatialProjectDeck() {
       <div className="registry-meta">
         <span className="flex items-center gap-2">
           <ScanLine size={11} aria-hidden="true" />
-          {reducedMotion
-            ? "FOCUS VIEW // REDUCED MOTION"
-            : "SPATIAL EXPLORER // PERSPECTIVE 1400"}
+          {godMode
+            ? "GODMODE // UNLIMITED TELEMETRY"
+            : reducedMotion
+              ? "FOCUS VIEW // REDUCED MOTION"
+              : "SPATIAL EXPLORER // PERSPECTIVE 1400"}
         </span>
         <span>
           {formatNumber(position)} / {formatNumber(totalProjects)} IN FOCUS
