@@ -286,7 +286,7 @@ export function SpatialProjectDeck() {
               <span className={activeTheme?.text}>
                 {formatNumber(position)}
               </span>
-              <span className="text-slate-600"> / </span>
+              <span className="text-slate-300"> / </span>
               {formatNumber(totalProjects)}
               <span className="caption-divider">—</span>
               {activeProject?.title}

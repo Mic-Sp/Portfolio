@@ -70,7 +70,7 @@ export function ProjectGridPreview() {
       <div className="registry-end">
         <span className="flex items-center gap-2">
           <span className="h-1 w-1 bg-cyan-400/60" />
-          END OF REGISTRY <span className="text-slate-700">{"//"}</span> ALWAYS
+          END OF REGISTRY <span className="text-slate-300">{"//"}</span> ALWAYS
           BUILDING
         </span>
         <span>DESIGNED TO EVOLVE.</span>

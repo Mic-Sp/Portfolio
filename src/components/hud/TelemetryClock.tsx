@@ -36,7 +36,7 @@ export function TelemetryClock() {
     <div className="telemetry-clock" aria-label="Chicago and UTC clocks">
       <span>{now ? localFormatter.format(now) : "--:--:-- CST"}</span>
       <span className="clock-divider">/</span>
-      <span className="text-slate-500">
+      <span className="text-slate-300">
         {now ? utcFormatter.format(now) : "--:--:--"} UTC
       </span>
     </div>

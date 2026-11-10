@@ -18,7 +18,7 @@ export function HeroIdentity() {
           <div className="identity-eyebrow">
             <span className="identity-rule" />
             {" DEVELOPER PORTFOLIO "}
-            <span className="text-slate-600">{"//"}</span> MIC-SP
+            <span className="text-slate-300">{"//"}</span> MIC-SP
           </div>
           <h1 id="identity-heading">
             {nameParts.join(" ")}

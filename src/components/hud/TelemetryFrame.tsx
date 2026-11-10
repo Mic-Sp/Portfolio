@@ -106,7 +106,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
               <Box size={12} aria-hidden="true" />
               <span>3D DECK</span>
             </button>
-            <span className="text-slate-600" aria-hidden="true">
+            <span className="text-slate-300" aria-hidden="true">
               /
             </span>
             <button
@@ -171,7 +171,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           <span
             className={cn(
               "cycle-hint",
-              (viewMode !== "spatial" || isTerminalOpen) && "opacity-40",
+              (viewMode !== "spatial" || isTerminalOpen) && "opacity-70",
             )}
           >
             <kbd>

@@ -2,15 +2,16 @@
 
 @layer components {
   .showcase-view-toggle {
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 9px 11px;
-    border: 1px solid #94a3b82b;
+    border: 1px solid #64748b99;
     color: #a8bbce;
     font:
-      8px var(--font-mono),
+      500 14px var(--font-mono),
       monospace;
     white-space: nowrap;
   }
@@ -33,7 +34,7 @@
     justify-items: center;
     align-items: stretch;
     position: relative;
-    padding: 36px 0 70px;
+    padding: 40px 0 80px;
     perspective: 1400px;
     transform-style: preserve-3d;
     cursor: grab;
@@ -47,7 +48,7 @@
   }
   .spatial-card-slot {
     grid-area: 1 / 1;
-    width: min(480px, 55%);
+    width: min(620px, 64%);
     min-width: 0;
     position: relative;
     transform-origin: 50% 50%;
@@ -85,7 +86,7 @@
     justify-content: center;
     gap: 7px;
     font:
-      8px var(--font-mono),
+      500 14px var(--font-mono),
       monospace;
     padding: 11px;
     border: 1px solid #94a3b84d;
@@ -149,12 +150,12 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 14px;
-    border: 1px solid #94a3b82b;
+    border: 1px solid #64748b99;
     color: #b5c4d6;
     font:
-      9px var(--font-mono),
+      500 14px var(--font-mono),
       monospace;
   }
   .deck-chevron:hover:not(:disabled) {
@@ -173,16 +174,16 @@
   .radar-node {
     position: relative;
     display: flex;
-    flex: 1 0 85px;
+    flex: 1 0 112px;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 10px 9px;
-    min-height: 40px;
-    border: 1px solid #94a3b821;
-    color: #75879e;
+    min-height: 44px;
+    border: 1px solid #475569;
+    color: #e2e8f0;
     font:
-      9px var(--font-mono),
+      500 14px var(--font-mono),
       monospace;
     white-space: nowrap;
   }
@@ -207,7 +208,7 @@
     box-shadow: 0 0 8px var(--accent);
   }
   .radar-separator {
-    color: #475569;
+    color: #cbd5e1;
   }
   .spatial-caption {
     display: flex;
@@ -217,140 +218,90 @@
     gap: 14px;
     margin-top: 19px;
     font:
-      9px var(--font-mono),
+      500 14px var(--font-mono),
       monospace;
-    color: #94a3b8;
+    color: #e2e8f0;
   }
   .spatial-caption > p {
     line-height: 1.8;
   }
   .caption-divider {
     padding-inline: 12px;
-    color: #475569;
+    color: #cbd5e1;
   }
   .caption-pillar {
     padding-left: 15px;
-    color: #64748b;
-    font-size: 7px;
+    color: #cbd5e1;
+    font-size: 12px;
   }
   .spatial-gesture-hint {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 7px;
-    color: #64748b;
+    font-size: 12px;
+    color: #cbd5e1;
   }
-  @media (max-width: 900px) {
+  @media (max-width: 1023px) {
     .spatial-card-slot {
-      width: 62%;
+      width: min(620px, 70%);
     }
     .spatial-navigation {
-      gap: 10px;
+      gap: 12px;
     }
     .deck-chevron {
-      padding-inline: 10px;
+      padding-inline: 12px;
     }
   }
-  @media (max-width: 639px) {
-    .registry-heading {
-      flex-wrap: wrap;
+  @media (max-width: 767px) {
+    .showcase-view-toggle {
+      font-size: 12px;
+      padding: 10px 12px;
+      min-height: 44px;
     }
     .spatial-deck .registry-title h2 {
-      font-size: 21px;
-    }
-    .spatial-deck .registry-heading {
-      gap: 10px;
-    }
-    .showcase-view-toggle {
-      font-size: 7px;
-      padding: 8px;
-      gap: 5px;
+      font-size: 24px;
     }
     .spatial-viewport {
-      margin-inline: -22px;
+      margin-inline: -24px;
       padding-inline: 12px;
     }
     .spatial-stage {
-      padding-top: 25px;
-      padding-bottom: 50px;
+      padding-top: 28px;
+      padding-bottom: 56px;
     }
     .spatial-card-slot {
-      width: 81%;
-    }
-    .spatial-card-slot .project-card {
-      padding-inline: 17px;
-    }
-    .spatial-card-slot .card-telemetry {
-      font-size: 6px;
-      gap: 5px;
-    }
-    .spatial-card-slot .project-status {
-      font-size: 5.5px;
-    }
-    .spatial-card-slot .schematic-core {
-      width: 30px;
-    }
-    .spatial-card-slot .schematic-bus {
-      width: 12px;
-    }
-    .spatial-card-slot .schematic-modules > div {
-      font-size: 5.5px;
+      width: 86%;
     }
     .spatial-navigation {
       gap: 6px;
-      padding-block: 9px;
+      padding-block: 10px;
     }
     .deck-chevron {
-      font-size: 7px;
-      gap: 4px;
-      padding-inline: 7px;
+      font-size: 12px;
+      gap: 5px;
+      padding-inline: 8px;
     }
     .radar-node {
-      font-size: 8px;
-      flex-basis: 72px;
-      padding-inline: 7px;
-      gap: 5px;
-    }
-    .node-radar {
-      gap: 5px;
-    }
-    .spatial-caption {
-      font-size: 8px;
-      margin-top: 14px;
-    }
-    .caption-pillar {
-      display: none;
-    }
-    .spatial-gesture-hint {
-      font-size: 6px;
-    }
-    .deck-horizon {
-      height: 80px;
-      bottom: 10px;
-      inset-inline: 3%;
-    }
-  }
-  @media (max-width: 370px) {
-    .spatial-viewport {
-      margin-inline: -16px;
+      font-size: 12px;
+      flex-basis: 104px;
       padding-inline: 10px;
     }
-    .spatial-deck .registry-title h2 {
-      font-size: 18px;
+    .node-radar {
       gap: 6px;
     }
-    .spatial-deck .registry-title {
-      gap: 6px;
+    .spatial-caption {
+      font-size: 12px;
+      margin-top: 18px;
     }
-    .showcase-view-toggle {
-      font-size: 6px;
-      padding: 7px;
+    .caption-pillar {
+      display: block;
+      padding-left: 0;
+      margin-top: 6px;
     }
-    .spatial-deck .registry-meta {
-      font-size: 5px;
-    }
-    .spatial-card-slot .project-card {
-      padding-inline: 13px;
+    .deck-horizon {
+      height: 90px;
+      bottom: 10px;
+      inset-inline: 3%;
     }
   }
   @media (prefers-reduced-motion: reduce) {
