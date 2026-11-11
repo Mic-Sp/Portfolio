@@ -12,6 +12,7 @@ import {
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import {
   ArrowLeft,
+  ArrowDown,
   ArrowUpRight,
   CheckCircle2,
   ShieldCheck,
@@ -75,6 +76,24 @@ const engagementSteps = [
     title: "Hand-Off & Hardening",
     description:
       "Full source code access, automated deployment verification, and 14 days of dedicated support.",
+  },
+];
+
+const caseStudyImpacts = [
+  {
+    title: "Zero Recurring CMS Overhead",
+    detail:
+      "Replaced third-party site-builder subscriptions with owned edge-deployed code.",
+  },
+  {
+    title: "State-Specific Routing",
+    detail:
+      "Clean client-matching pathways for IL, IN, and TN teletherapy scheduling.",
+  },
+  {
+    title: "Defensive Accessibility",
+    detail:
+      "Build-time WCAG contrast enforcement and hardened clinical copy boundaries.",
   },
 ];
 
@@ -218,11 +237,10 @@ export default function ServicesPage() {
             admin loops and replacing subscription bloat with software you own.
           </p>
           <a
-            href="#project-inquiry"
-            rel="noreferrer"
-            className="services-accent-link inline-flex min-h-11 items-center gap-2 font-medium"
+            href="#contact"
+            className="services-submit services-project-cta inline-flex min-h-11 items-center gap-2 rounded-xl px-6 py-3 font-semibold shadow-sm motion-safe:hover:-translate-y-px"
           >
-            Discuss a project <ArrowUpRight size={18} aria-hidden="true" />
+            Start a Project <ArrowDown size={18} aria-hidden="true" />
           </a>
         </section>
 
@@ -266,6 +284,87 @@ export default function ServicesPage() {
           </div>
         </section>
 
+        {/* Shares the main container's max-w-6xl and px-6 page gutters. */}
+        <section
+          aria-labelledby="case-study-heading"
+          className="mx-auto max-w-6xl py-10"
+        >
+          <div className="services-surface services-case-study relative overflow-hidden rounded-2xl border p-6 sm:p-8 md:p-10">
+            <span className="services-badge mb-4 inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs leading-relaxed">
+              <CheckCircle2 size={14} className="shrink-0" aria-hidden="true" />
+              PROVEN OUTCOME // CLIENT PRODUCTION
+            </span>
+            <h2
+              id="case-study-heading"
+              className="text-2xl font-semibold tracking-tight md:text-3xl"
+            >
+              Huddle &amp; Heal Counseling &amp; Consulting
+            </h2>
+            <div className="mt-6 grid items-center gap-8 md:grid-cols-3">
+              <div className="min-w-0 md:col-span-2">
+                <p className="services-body text-base leading-relaxed">
+                  Engineered and deployed a bespoke clinical web platform and
+                  client intake gateway for a licensed multi-state mental health
+                  practice.
+                </p>
+                <ul className="mt-6 space-y-4 text-sm leading-relaxed">
+                  {caseStudyImpacts.map(({ title, detail }) => (
+                    <li key={title} className="flex items-start gap-3">
+                      <CheckCircle2
+                        size={18}
+                        className="services-accent mt-0.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <p className="min-w-0">
+                        <strong className="font-semibold">{title}:</strong>{" "}
+                        <span className="services-body">{detail}</span>
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <aside
+                aria-label="Live production system"
+                className="services-proof-callout min-w-0 space-y-5 rounded-xl border p-5"
+              >
+                <p className="services-accent flex items-center gap-2 font-mono text-xs leading-relaxed">
+                  <span
+                    className="services-status-dot h-2 w-2 shrink-0 rounded-full"
+                    aria-hidden="true"
+                  />
+                  PRODUCTION STATUS: ACTIVE
+                </p>
+                <div className="space-y-2">
+                  <a
+                    href="https://huddleandhealcounselingandconsulting.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="services-submit flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-center text-sm font-semibold"
+                  >
+                    View Live System
+                    <ArrowUpRight
+                      size={18}
+                      className="shrink-0"
+                      aria-hidden="true"
+                    />
+                  </a>
+                  <a
+                    href="#contact"
+                    className="services-scope-link flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-center font-mono text-xs font-medium"
+                  >
+                    Request Similar Scope
+                    <ArrowDown
+                      size={16}
+                      className="shrink-0"
+                      aria-hidden="true"
+                    />
+                  </a>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
         {/* Engagement process strip */}
         <section
           aria-labelledby="engagement-heading"
@@ -298,9 +397,9 @@ export default function ServicesPage() {
 
         {/* Project inquiries use the same guarded relay as the Dossier and CLI. */}
         <section
-          id="project-inquiry"
+          id="contact"
           aria-labelledby="inquiry-heading"
-          className="services-surface mx-auto max-w-2xl scroll-mt-8 rounded-xl border p-6 sm:p-10"
+          className="services-surface mx-auto max-w-2xl scroll-mt-24 rounded-xl border p-6 sm:p-10"
         >
           <h2
             id="inquiry-heading"

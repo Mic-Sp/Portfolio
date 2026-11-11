@@ -71,7 +71,7 @@ try {
     .getByRole("link", { name: "Client Services →", exact: true })
     .click();
   await page.waitForURL(base + "/services");
-  const section = page.locator("#project-inquiry"),
+  const section = page.locator("#contact"),
     form = section.locator("form");
   const submit = section.getByRole("button", {
     name: "Send Project Inquiry",

@@ -21,6 +21,9 @@
     --services-submit: #10b981;
     --services-submit-hover: #059669;
     --services-submit-text: #020617;
+    --services-proof-surface: #0f172a4d;
+    --services-proof-badge: #022c2266;
+    --services-primary-hover: #34d399;
   }
   .services-page[data-services-theme="light"] {
     color-scheme: light;
@@ -41,12 +44,16 @@
     --services-submit: #059669;
     --services-submit-hover: #047857;
     --services-submit-text: #fff;
+    --services-proof-surface: #fff;
+    --services-proof-badge: #ecfdf5;
+    --services-primary-hover: #047857;
   }
   .services-page,
   .services-page
     :where(
       .services-border,
       .services-surface,
+      .services-proof-callout,
       .services-body,
       .services-detail,
       .services-accent,
@@ -56,6 +63,7 @@
       .services-status-dot,
       .services-input,
       .services-submit,
+      .services-scope-link,
       .services-theme-toggle
     ) {
     transition:
@@ -104,6 +112,33 @@
     background: var(--services-input);
     border-color: var(--services-input-border);
     color: var(--services-input-text);
+  }
+  .services-page .services-case-study {
+    background: var(--services-proof-surface);
+  }
+  .services-page .services-case-study .services-badge {
+    background: var(--services-proof-badge);
+  }
+  .services-page .services-proof-callout {
+    border-color: var(--services-badge-border);
+    background: var(--services-badge-bg);
+  }
+  .services-page .services-case-study .services-submit:hover,
+  .services-page .services-project-cta:hover {
+    background: var(--services-primary-hover);
+  }
+  .services-page .services-project-cta {
+    transition-property:
+      background-color, color, border-color, box-shadow, translate;
+  }
+  .services-page .services-scope-link {
+    color: var(--services-accent);
+    border-color: var(--services-badge-border);
+  }
+  .services-page .services-scope-link:hover {
+    color: var(--services-accent-hover);
+    background: var(--services-badge-bg);
+    border-color: var(--services-accent);
   }
   .services-page .services-input::placeholder {
     color: var(--services-placeholder);
