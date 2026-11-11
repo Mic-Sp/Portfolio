@@ -1,0 +1,366 @@
+@layer theme, base, components, utilities;
+
+/* The base :root tokens are unlayered; keep this override in the same cascade tier. */
+:root[data-theme="light"] {
+  --background: #f1f5f9;
+  --foreground: #0f172a;
+  color-scheme: light;
+}
+
+@layer utilities {
+  /* Surface overrides only: the deck's transform hierarchy and motion values stay intact. */
+  .telemetry-frame[data-theme="light"] {
+    background: #f1f5f9;
+    color: #0f172a;
+
+    .accent-cyan {
+      --accent: #0369a1;
+      --accent-rgb: 3, 105, 161;
+    }
+    .accent-emerald {
+      --accent: #047857;
+      --accent-rgb: 4, 120, 87;
+    }
+    .accent-violet {
+      --accent: #6d28d9;
+      --accent-rgb: 109, 40, 217;
+    }
+    .accent-amber {
+      --accent: #b45309;
+      --accent-rgb: 180, 83, 9;
+    }
+    .accent-rose {
+      --accent: #be123c;
+      --accent-rgb: 190, 18, 60;
+    }
+    .accent-blue {
+      --accent: #1d4ed8;
+      --accent-rgb: 29, 78, 216;
+    }
+    .spatial-backdrop {
+      background-image:
+        radial-gradient(#94a3b8 0.8px, transparent 0.8px),
+        linear-gradient(#cbd5e14d 1px, transparent 1px),
+        linear-gradient(90deg, #cbd5e14d 1px, transparent 1px);
+      background-size:
+        24px 24px,
+        120px 120px,
+        120px 120px;
+      mask-image: radial-gradient(ellipse at 50% 33%, #000 15%, #0003 80%);
+    }
+    &::before {
+      background: radial-gradient(
+        ellipse at 74% 18%,
+        #0284c70a,
+        transparent 55%
+      );
+    }
+    .hero-copy::before {
+      background: radial-gradient(
+        ellipse at 28% 42%,
+        #fff9,
+        #e0f2fe40 48%,
+        transparent 75%
+      );
+    }
+    .identity-eyebrow {
+      color: #475569;
+    }
+    .identity-rule {
+      background: #0284c7;
+    }
+    .hero-identity h1 {
+      color: #0f172a;
+      text-shadow: 0 1px 0 #fff;
+      filter: none;
+    }
+    :is(.name-period, .hero-role-separator, .credential-separator) {
+      color: #0369a1;
+      text-shadow: none;
+    }
+    .hero-headline {
+      color: #334155;
+    }
+    .hero-role-highlight {
+      color: #0369a1;
+    }
+    :is(.credential-pill, .hero-uplink-pill) {
+      background: #ffffffe6;
+      border-color: #cbd5e1;
+      color: #334155;
+      box-shadow: 0 1px 2px #0f172a0d;
+    }
+    :is(.credential-pill, .hero-uplink-pill):hover {
+      border-color: #0284c7;
+      color: #0369a1;
+      background: #fff;
+    }
+    .hero-uplink-pill[data-copy-status="copied"] {
+      color: #047857;
+      border-color: #10b98180;
+      background: #ecfdf5;
+    }
+    .hero-uplink-pill[data-copy-status="error"] {
+      color: #b45309;
+    }
+    .direct-message-pill {
+      color: #0369a1;
+      border-color: #0284c780;
+      background: #f0f9ff;
+    }
+    .thm-quick-link {
+      color: #92400e;
+      border-color: #d9770666;
+      background: #fffbeb;
+    }
+    .identity-scope.orbital-core {
+      background: #ffffffcc;
+      border: 1px solid #cbd5e1;
+      box-shadow:
+        inset 0 1px 4px #0f172a0a,
+        0 1px 0 #fff;
+      color: var(--accent);
+    }
+    :is(.orbital-radar, .orbital-crosshair, .orbital-brackets) {
+      color: #334155;
+    }
+    .orbital-sweeps {
+      filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.2));
+    }
+    :is(.section-index, .empty-registry button) {
+      color: #0369a1;
+    }
+    :is(.registry-count, .project-toolbar, .spatial-navigation) {
+      border-color: #cbd5e1;
+    }
+    :is(
+      .project-toolbar-detail,
+      .project-toolbar-counter,
+      .registry-end,
+      .spatial-gesture-hint,
+      .caption-pillar,
+      .caption-divider,
+      .radar-separator
+    ) {
+      color: #475569;
+    }
+    :is(.hero-identity, .project-registry) .text-slate-300 {
+      color: #64748b;
+    }
+    :is(.registry-count, .showcase-view-toggle, .deck-chevron, .radar-node) {
+      background: #ffffffcc;
+      border-color: #cbd5e1;
+      color: #334155;
+      box-shadow: 0 1px 2px #0f172a0a;
+    }
+    :is(.showcase-view-toggle, .deck-chevron, .radar-node):hover:not(
+        :disabled
+      ) {
+      color: #0369a1;
+      background: #f0f9ff;
+      border-color: #0284c7;
+    }
+    .radar-node[aria-current="true"] {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.045);
+    }
+    .spatial-caption {
+      color: #334155;
+    }
+    .spatial-caption p > span:first-child {
+      color: #0369a1;
+    }
+    .project-card {
+      background: #fffffff2;
+      border-color: #cbd5e1e6;
+      backdrop-filter: blur(24px);
+      color: #0f172a;
+      box-shadow:
+        0 25px 50px -12px #0f172a29,
+        0 8px 24px -4px #0284c71f,
+        inset 0 1px 0 #fff;
+    }
+    .project-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 12px auto;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #fff 20% 80%,
+        transparent
+      );
+      pointer-events: none;
+    }
+    .spatial-card-slot .project-card {
+      background: #ffffffbf;
+      border-color: #e2e8f0cc;
+      backdrop-filter: blur(12px);
+      filter: brightness(0.97);
+      box-shadow:
+        0 10px 30px -10px #0f172a1a,
+        inset 0 1px 0 #fff;
+    }
+    .spatial-card-slot[data-offset="0"] .project-card {
+      background: #fffffff2;
+      border-color: #cbd5e1e6;
+      backdrop-filter: blur(24px);
+      filter: none;
+      box-shadow:
+        0 25px 50px -12px #0f172a29,
+        0 8px 24px -4px #0284c71f,
+        inset 0 1px 0 #fff;
+    }
+    .spatial-card-slot[data-offset="0"] .spatial-card-content {
+      box-shadow: none;
+    }
+    .project-card:hover,
+    .spatial-card-slot[data-offset="0"]
+      .spatial-hover-surface[data-pointer-hovered="true"]
+      .project-card {
+      border-color: var(--accent);
+      box-shadow:
+        0 28px 55px -12px #0f172a2e,
+        0 8px 28px -4px rgba(var(--accent-rgb), 0.18),
+        inset 0 1px 0 #fff;
+    }
+    .card-telemetry > span:first-child,
+    .project-number,
+    .project-number > span {
+      color: var(--accent);
+    }
+    .card-telemetry .h-1 {
+      background: var(--accent);
+    }
+    .project-status {
+      color: #047857;
+    }
+    .project-title-row h3 {
+      color: #0f172a;
+    }
+    .project-tagline {
+      color: #475569;
+    }
+    .project-description {
+      color: #334155;
+    }
+    .project-schematic {
+      background: #f1f5f9e6;
+      border-color: #e2e8f0e6;
+      box-shadow: inset 0 1px 2px #0f172a0a;
+    }
+    .schematic-rail {
+      color: #475569;
+    }
+    .schematic-core {
+      color: var(--accent);
+    }
+    .schematic-modules {
+      border-left-color: #cbd5e1;
+    }
+    :is(.schematic-bus, .module-port) {
+      background: #cbd5e1;
+    }
+    .schematic-modules > div {
+      background: #fff;
+      border-color: #e2e8f0e6;
+      color: #1e293b;
+      box-shadow: 0 1px 2px #0f172a0d;
+    }
+    .tech-stack li {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .project-card-footer {
+      border-color: #e2e8f0;
+      color: #1e293b;
+    }
+    .project-links a {
+      color: #1e293b;
+    }
+    .project-links a:hover {
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.06);
+    }
+    :is(.project-links .unavailable-link, .selection-label) {
+      color: #64748b;
+    }
+    .project-card[data-selected="true"] .selection-label {
+      color: #0369a1;
+      font-weight: 600;
+    }
+    .select-node {
+      background: #fff;
+      color: var(--accent);
+      border-color: #cbd5e1;
+    }
+    .select-node[aria-pressed="true"] {
+      background: rgba(var(--accent-rgb), 0.045);
+      border-color: var(--accent);
+    }
+    .spatial-card-select > span {
+      background: #fffffff2;
+      border-color: #94a3b8;
+      color: #334155;
+    }
+    .empty-registry {
+      background: #ffffffb3;
+      border-color: #94a3b8;
+      color: #334155;
+    }
+    .skip-link {
+      background: #0369a1;
+      color: #fff;
+    }
+    :is(.hero-identity, .project-registry) :is(button, a):focus-visible {
+      outline-color: #0369a1;
+    }
+    .drop-down-terminal {
+      /* The console deliberately retains its high-contrast dark terminal palette. */
+      color-scheme: dark;
+    }
+  }
+
+  /* Golden overdrive remains legible on the cleanroom canvas. */
+  .telemetry-frame[data-theme="light"][data-god-mode="true"] {
+    :is(.top-hud, .bottom-hud) {
+      background: #fffbebeb;
+      border-color: #d9770680;
+    }
+    .system-status > p {
+      color: #92400e;
+      text-shadow: none;
+    }
+    .status-dot {
+      background: #b45309;
+      box-shadow: 0 0 8px #d9770633;
+    }
+    :is(
+      .spatial-viewport,
+      .spatial-card-slot[data-offset="0"],
+      .radar-node[aria-current="true"]
+    ) {
+      --accent: #b45309;
+      --accent-rgb: 180, 83, 9;
+    }
+    .spatial-card-slot[data-offset="0"] .project-card {
+      border-color: #d97706;
+      box-shadow:
+        0 25px 50px -12px #0f172a29,
+        0 8px 24px -4px #d9770633,
+        inset 0 1px 0 #fff;
+    }
+    .spatial-card-slot[data-offset="0"] .select-node,
+    .top-hud .hud-button.is-active {
+      color: #92400e;
+      border-color: #d9770680;
+      background: #fffbeb;
+    }
+    .orbital-core[data-god-mode="true"] {
+      color: #b45309;
+    }
+  }
+}

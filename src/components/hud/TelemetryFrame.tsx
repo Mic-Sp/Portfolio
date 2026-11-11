@@ -8,13 +8,15 @@ import {
   Grid2X2,
   Fingerprint,
   MapPin,
+  Moon,
+  Sun,
   Terminal,
 } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useHud } from "@/context/HudContext";
-import { useServicesTheme } from "@/context/ServicesThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { TelemetryClock } from "./TelemetryClock";
@@ -26,7 +28,7 @@ import "./hud-theme.css";
 export function TelemetryFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isServices = pathname === "/services";
-  const { isLight } = useServicesTheme();
+  const { isLight, toggleTheme } = useTheme();
   const {
     projects,
     totalProjects,
@@ -62,9 +64,8 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
     <div
       ref={frameRef}
       data-god-mode={godMode}
-      data-services-theme={
-        isServices ? (isLight ? "light" : "dark") : undefined
-      }
+      data-theme={isLight ? "light" : "dark"}
+      data-page={isServices ? "services" : "portfolio"}
       className="telemetry-frame min-h-svh bg-slate-950 text-slate-100"
     >
       <a href="#main-content" className="skip-link">
@@ -94,6 +95,20 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           </span>
         </div>
         <div className="hud-controls">
+          <button
+            type="button"
+            className="hud-button theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle light mode"
+            aria-pressed={isLight}
+            title={isLight ? "Switch to dark mode" : "Switch to light mode"}
+          >
+            {isLight ? (
+              <Moon size={18} aria-hidden="true" />
+            ) : (
+              <Sun size={18} aria-hidden="true" />
+            )}
+          </button>
           {!isServices && (
             <Link href="/services" className="hud-button services-hud-link">
               Client Services →

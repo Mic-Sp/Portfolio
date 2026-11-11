@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
-import { useServicesTheme } from "@/context/ServicesThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import { transmitContact } from "@/lib/contact-client";
 import {
   ContactSchema,
@@ -20,8 +20,6 @@ import {
   Globe,
   Send,
   Loader2,
-  Sun,
-  Moon,
 } from "lucide-react";
 import "./services.css";
 
@@ -101,7 +99,7 @@ const fieldClassName = "services-input mt-2 w-full rounded-lg border px-4 py-3";
 type SubmissionStatus = "idle" | "loading" | "success" | "error";
 
 export default function ServicesPage() {
-  const { isLight, toggleTheme } = useServicesTheme();
+  const { isLight } = useTheme();
   const [status, setStatus] = useState<SubmissionStatus>("idle");
   const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
   const inFlight = useRef(false);
@@ -194,20 +192,6 @@ export default function ServicesPage() {
               />
               Available for Q4/Q1 Projects
             </span>
-            <button
-              type="button"
-              className="services-theme-toggle inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border"
-              onClick={toggleTheme}
-              aria-label="Toggle light mode"
-              aria-pressed={isLight}
-              title={isLight ? "Switch to dark mode" : "Switch to light mode"}
-            >
-              {isLight ? (
-                <Moon size={18} aria-hidden="true" />
-              ) : (
-                <Sun size={18} aria-hidden="true" />
-              )}
-            </button>
           </div>
         </div>
       </nav>

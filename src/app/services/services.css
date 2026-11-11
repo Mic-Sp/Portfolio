@@ -63,8 +63,7 @@
       .services-status-dot,
       .services-input,
       .services-submit,
-      .services-scope-link,
-      .services-theme-toggle
+      .services-scope-link
     ) {
     transition:
       background-color 200ms ease,
@@ -149,15 +148,6 @@
   }
   .services-page .services-submit:hover {
     background: var(--services-submit-hover);
-  }
-  .services-page .services-theme-toggle {
-    border-color: var(--services-border);
-    background: var(--services-surface);
-    color: var(--services-detail);
-  }
-  .services-page .services-theme-toggle:hover {
-    border-color: var(--services-accent);
-    color: var(--services-accent);
   }
   .services-page :is(a, button, input, textarea):focus-visible {
     outline: 2px solid var(--services-focus);

@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { TelemetryFrame } from "@/components/hud/TelemetryFrame";
 import { HudProvider } from "@/context/HudContext";
-import { ServicesThemeProvider } from "@/context/ServicesThemeContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import "./globals.css";
+import "./portfolio-light.css";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
@@ -32,9 +33,9 @@ export default function RootLayout({
     >
       <body className="antialiased">
         <HudProvider>
-          <ServicesThemeProvider>
+          <ThemeProvider>
             <TelemetryFrame>{children}</TelemetryFrame>
-          </ServicesThemeProvider>
+          </ThemeProvider>
         </HudProvider>
       </body>
     </html>

@@ -15,9 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useHud } from "@/context/HudContext";
-import { useServicesTheme } from "@/context/ServicesThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
 import { activateDossierSection } from "@/lib/dossier-navigation";
@@ -146,9 +145,7 @@ export function OperatorDossierDrawer() {
 }
 
 function DossierPanel() {
-  const pathname = usePathname();
-  const { isLight: servicesIsLight } = useServicesTheme();
-  const isLight = pathname === "/services" && servicesIsLight;
+  const { isLight } = useTheme();
   const { dossierSection, dossierRequestId, closeDossier, isTerminalOpen } =
     useHud();
   const reducedMotion = useMotionPreference();

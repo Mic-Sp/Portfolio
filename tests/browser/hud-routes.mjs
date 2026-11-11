@@ -43,8 +43,7 @@ async function palette(page) {
       scheme: css(el).colorScheme,
       globalScheme: css(document.documentElement).colorScheme,
       hud: css(document.querySelector(".top-hud")).backgroundColor,
-      hudTheme:
-        document.querySelector(".telemetry-frame").dataset.servicesTheme,
+      hudTheme: document.querySelector(".telemetry-frame").dataset.theme,
       hudText: css(document.querySelector(".location-block > p")).color,
       hudClock: css(document.querySelector(".telemetry-clock")).color,
       hudUtc: css(document.querySelector(".telemetry-clock .text-slate-300"))
@@ -64,8 +63,15 @@ async function waitForTheme(page, theme) {
       document.querySelector(".services-page")?.dataset.servicesTheme === theme,
     theme,
   );
-  // Child surfaces and text finish their independent color transitions too.
-  await page.waitForTimeout(240);
+  // Wait for the rendered color rather than wall time on slower rendering hosts.
+  await page.waitForFunction(
+    (theme) =>
+      getComputedStyle(document.querySelector(".services-page .services-body"))
+        .color ===
+      (theme === "light" ? "rgb(71, 85, 105)" : "rgb(148, 163, 184)"),
+    theme,
+  );
+  await page.waitForTimeout(100);
 }
 
 async function verifyTheme(page) {
@@ -101,7 +107,7 @@ async function verifyTheme(page) {
   assert.equal(light.inputText, "rgb(15, 23, 42)");
   assert.equal(light.submit, "rgb(5, 150, 105)");
   assert.equal(light.scheme, "light");
-  assert.equal(light.globalScheme, "dark");
+  assert.equal(light.globalScheme, "light");
   assert.notEqual(light.hud, dark.hud);
   assert.equal(light.hudTheme, "light");
   assert.equal(light.hudText, "rgb(51, 65, 85)");
@@ -112,7 +118,7 @@ async function verifyTheme(page) {
   assert.equal(light.hudDossierText, "rgb(30, 41, 59)");
   assert.equal(light.overflow, false);
   assert.equal(
-    await page.evaluate(() => localStorage.getItem("services-theme")),
+    await page.evaluate(() => localStorage.getItem("portfolio-theme")),
     "light",
   );
   assert.equal(await toggle.getAttribute("aria-pressed"), "true");
@@ -130,7 +136,7 @@ async function verifyTheme(page) {
   await toggle.click();
   await waitForTheme(page, "dark");
   assert.equal(
-    await page.evaluate(() => localStorage.getItem("services-theme")),
+    await page.evaluate(() => localStorage.getItem("portfolio-theme")),
     "dark",
   );
   const restored = await palette(page);
@@ -142,7 +148,7 @@ async function verifyTheme(page) {
   assert.equal(restored.submit, "rgb(16, 185, 129)");
   await page.reload({ waitUntil: "networkidle" });
   await waitForTheme(page, "dark");
-  // Keep a saved light preference while navigating to the dark-only portfolio.
+  // Keep a saved light preference while navigating to the portfolio with the same global preference.
   await toggle.click();
   await waitForTheme(page, "light");
   return { dark, light };
@@ -165,10 +171,7 @@ async function verifyDossier(page) {
     "",
   );
   const lightDossier = await page.evaluate(
-    () =>
-      location.pathname === "/services" &&
-      document.querySelector(".services-page")?.dataset.servicesTheme ===
-        "light",
+    () => document.documentElement.dataset.theme === "light",
   );
   assert.equal(
     await page.locator("#operator-dossier").getAttribute("data-dossier-theme"),
@@ -216,14 +219,14 @@ async function verifyPortfolio(page) {
   });
   assert.equal(await servicesLink.getAttribute("href"), "/services");
   assert.equal(
-    await servicesLink.evaluate(
-      (el) => el === el.parentElement.firstElementChild,
+    await servicesLink.evaluate((el) =>
+      el.previousElementSibling.matches(".theme-toggle"),
     ),
     true,
   );
   assert.equal(
-    await page.locator(".telemetry-frame").getAttribute("data-services-theme"),
-    null,
+    await page.locator(".telemetry-frame").getAttribute("data-theme"),
+    await page.locator("html").getAttribute("data-theme"),
   );
   await controls.getByRole("button", { name: "CLI (~)", exact: true }).click();
   await page.locator("#terminal-command").waitFor({ state: "visible" });
@@ -268,7 +271,7 @@ async function verifyServices(page) {
       .count(),
     0,
   );
-  assert.equal(await page.locator(".hud-controls button").count(), 1);
+  assert.equal(await page.locator(".hud-controls button").count(), 2);
   assert.equal(
     await page
       .locator(".top-hud")
@@ -373,6 +376,16 @@ try {
   await verifyPortfolio(page);
   // Cache Components retain previous pages in hidden Activity boundaries.
   assert.equal(await page.locator(".services-page:visible").count(), 0);
+  assert.deepEqual(await portfolioBackground(page), [241, 245, 249]);
+  assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
+  // A toggle on the portfolio restores its exact original dark canvas and HUD.
+  await page.locator(".theme-toggle").click();
+  await page.waitForFunction(
+    (expected) =>
+      getComputedStyle(document.querySelector(".top-hud")).backgroundColor ===
+      expected,
+    portfolioHud,
+  );
   assert.deepEqual(await portfolioBackground(page), portfolioDark);
   assert.equal(
     await page
@@ -380,12 +393,8 @@ try {
       .evaluate((el) => getComputedStyle(el).backgroundColor),
     portfolioHud,
   );
-  assert.equal(
-    await page.evaluate(
-      () => getComputedStyle(document.documentElement).colorScheme,
-    ),
-    "dark",
-  );
+  await page.locator(".theme-toggle").click();
+  await page.waitForTimeout(250);
   assert.equal(
     await page.evaluate(() => window.hudNavigationToken),
     "persistent-layout",
@@ -459,7 +468,7 @@ try {
   );
   assert.equal(
     await blocked
-      .locator(".services-theme-toggle")
+      .locator(".theme-toggle")
       .evaluate((el) => getComputedStyle(el).transitionDuration),
     "0s",
   );
