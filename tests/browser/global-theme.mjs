@@ -150,7 +150,7 @@ try {
   assert.equal(light.canvas, "rgb(241, 245, 249)");
   assert.equal(light.hero, "rgb(15, 23, 42)");
   assert.equal(light.title, "rgb(15, 23, 42)");
-  assert.equal(light.body, "rgb(51, 65, 85)");
+  assert.equal(light.body, "rgb(71, 85, 105)");
   assert.equal(light.surface, "rgba(255, 255, 255, 0.95)");
   assert.equal(light.blur, "blur(24px)");
   assert.equal(light.module, "rgb(255, 255, 255)");

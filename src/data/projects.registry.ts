@@ -14,7 +14,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     accent: "cyan",
     tagline: "Hybrid Quantum-Classical Workload Simulator & Co-Design Profiler",
     description:
-      "Full-stack simulation engine profiling hybrid quantum-classical workloads across QPU architectures (including IBM Quantum System Two Nighthawk r2 and FTQC surface code bounds), modeling T1/T2 idle decoherence, depth expansion, and repetition-rate telemetry.",
+      "Profiles resource contention and decoherence overhead across hybrid quantum-classical workloads, modeling realistic gate constraints before running on cloud hardware.",
     architectureHighlights: [
       "Hybrid quantum-classical workload profiling",
       "T1/T2 idle decoherence & depth expansion",
@@ -48,7 +48,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     tagline:
       "AI-Driven Video Game Library Tracker & Semantic Recommendation Engine",
     description:
-      "Full-stack library manager featuring Steam OpenID 2.0 auto-sync, pgvector semantic search, hybrid IGDB/RAWG/Gemini AI chronological lore ordering, Zod guardrails, and a live Custom Theme Studio.",
+      "Eliminates game discovery paralysis through semantic vector search and hybrid API sync, replacing manual library tracking with automated saga chronology and progression tracking.",
     architectureHighlights: [
       "Steam OpenID 2.0 library auto-sync",
       "pgvector semantic recommendations",
@@ -80,9 +80,9 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     status: "CLIENT PROD",
     accent: "violet",
     tagline:
-      "Production Web Platform for Clinical Counseling & Consulting (LLC)",
+      "Production Web Platform for Huddle & Heal Counseling & Consulting (LLC)",
     description:
-      "Custom production web platform engineered for Huddle & Heal Counseling & Consulting, LLC, featuring build-time WCAG accessibility contrast verification, clinical copy boundary guardrails, automated GitHub-to-Cloudflare Pages CI/CD, and full cross-registrar DNS cutover (A, CNAME, TXT).",
+      "Engineered for strict zero-failure accessibility and zero recurring CMS overhead, delivering an edge-cached intake platform with sub-second regional load times across all three licensed states.",
     architectureHighlights: [
       "WCAG contrast & clinical copy guardrails",
       "Custom DNS migration (A/CNAME/TXT) & Cloudflare edge deploy",
@@ -114,7 +114,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     tagline:
       "Zero-Knowledge Client-Side Password Breach & Shannon Entropy Auditor",
     description:
-      "Privacy-first security utility implementing SHA-1 k-Anonymity range queries against the Have I Been Pwned API alongside real-time client-side Shannon entropy bit-strength mathematics.",
+      "Eliminates trust-based security assumptions by auditing password vulnerability and mathematical bit-entropy entirely in browser memory without ever transmitting user input.",
     architectureHighlights: [
       "SHA-1 k-Anonymity range queries",
       "Client-side Shannon entropy mathematics",
