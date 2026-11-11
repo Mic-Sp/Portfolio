@@ -15,13 +15,16 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useHud } from "@/context/HudContext";
+import { useServicesTheme } from "@/context/ServicesThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
 import { activateDossierSection } from "@/lib/dossier-navigation";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { CommsUplink } from "./CommsUplink";
 import "./operator-dossier.css";
+import "./operator-dossier-light.css";
 
 const MATRIX_ICONS = [Cpu, Layers3, ShieldCheck];
 const REST_TRANSFORM = "translate3d(0%, 0, 0)";
@@ -143,6 +146,9 @@ export function OperatorDossierDrawer() {
 }
 
 function DossierPanel() {
+  const pathname = usePathname();
+  const { isLight: servicesIsLight } = useServicesTheme();
+  const isLight = pathname === "/services" && servicesIsLight;
   const { dossierSection, dossierRequestId, closeDossier, isTerminalOpen } =
     useHud();
   const reducedMotion = useMotionPreference();
@@ -198,6 +204,7 @@ function DossierPanel() {
       ref={dialog}
       id="operator-dossier"
       className="operator-dossier-dialog"
+      data-dossier-theme={isLight ? "light" : "dark"}
       aria-labelledby="dossier-drawer-title"
       onKeyDown={(event) => {
         // The native modal remains present during exit, after the HUD open flag clears.

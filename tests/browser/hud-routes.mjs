@@ -164,6 +164,30 @@ async function verifyDossier(page) {
     await page.locator("#operator-dossier").getAttribute("open"),
     "",
   );
+  const lightDossier = await page.evaluate(
+    () =>
+      location.pathname === "/services" &&
+      document.querySelector(".services-page")?.dataset.servicesTheme ===
+        "light",
+  );
+  assert.equal(
+    await page.locator("#operator-dossier").getAttribute("data-dossier-theme"),
+    lightDossier ? "light" : "dark",
+  );
+  if (lightDossier) {
+    assert.equal(
+      await page
+        .locator(".dossier-drawer-heading h2")
+        .evaluate((el) => getComputedStyle(el).color),
+      "rgb(15, 23, 42)",
+    );
+    assert.equal(
+      await page
+        .locator(".dossier-sheet")
+        .evaluate((el) => getComputedStyle(el).backdropFilter),
+      "blur(12px)",
+    );
+  }
   await page.keyboard.press("Escape");
   await page.locator("#operator-dossier").waitFor({ state: "detached" });
   assert.equal(

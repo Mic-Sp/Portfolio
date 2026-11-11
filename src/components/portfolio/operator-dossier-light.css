@@ -1,0 +1,286 @@
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* All overrides require the Services light theme. Dark rules stay in their source files. */
+  .operator-dossier-dialog[data-dossier-theme="light"] {
+    color-scheme: light;
+    color: #0f172a;
+
+    .dossier-backdrop {
+      background: linear-gradient(90deg, #0f172a33, #0f172a40);
+    }
+    .dossier-sheet {
+      background: #f8fafcf2;
+      border-left-color: #cbd5e1;
+      box-shadow:
+        -24px 0 70px #64748b33,
+        inset 1px 0 0 #ffffffb3;
+    }
+    /* Never filter the moving panel: add the glass finish only at rest. */
+    .dossier-slide[data-motion-state="settled"] .dossier-sheet {
+      backdrop-filter: blur(12px);
+    }
+    .dossier-sheet::after {
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        #94a3b8 3px,
+        #94a3b8 4px
+      );
+      opacity: 0.025;
+    }
+    .dossier-drawer-heading {
+      border-color: #e2e8f0;
+    }
+    .dossier-drawer-heading .dossier-label {
+      color: #64748b;
+    }
+    .dossier-close {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .dossier-close:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .dossier-scroll {
+      scrollbar-color: #94a3b8 #f1f5f9;
+    }
+    .dossier-content {
+      color: #1e293b;
+    }
+    .dossier-label {
+      color: #047857;
+    }
+    .dossier-positioning {
+      background: linear-gradient(110deg, #ecfdf5, #ffffffb3 80%);
+      border-left-color: #10b98180;
+    }
+    .dossier-positioning > p {
+      color: #1e293b;
+    }
+    :is(
+      .dossier-location,
+      .dossier-institution-location,
+      .dossier-education-card ul,
+      .dossier-capstone > span
+    ) {
+      color: #475569;
+    }
+    :is(
+      .dossier-location > span,
+      .dossier-qualification,
+      .dossier-capstone > em,
+      .dossier-matrix-icon
+    ) {
+      color: #047857;
+    }
+    .dossier-education-card .dossier-detail-marker {
+      color: #047857;
+    }
+    :is(.dossier-education-card, .dossier-matrix-column) {
+      background: #fff;
+      border-color: #e2e8f0;
+      color: #334155;
+      box-shadow: 0 1px 2px #64748b0d;
+    }
+    :is(
+      .dossier-drawer-heading h2,
+      .dossier-education-card h4,
+      .dossier-matrix-column h4
+    ) {
+      color: #0f172a;
+    }
+    .dossier-capstone {
+      border-color: #e2e8f0;
+    }
+    .dossier-specializations li {
+      background: #fff;
+      border-color: #e2e8f0;
+      color: #334155;
+    }
+    .dossier-specializations li:hover {
+      border-color: #cbd5e1;
+    }
+    .dossier-matrix-column > ul {
+      color: #334155;
+    }
+    .dossier-matrix-column > ul > li {
+      border-left-color: #a7f3d0;
+    }
+    .dossier-rail {
+      background: #e2e8f099;
+      border-color: #e2e8f0;
+      color: #475569;
+    }
+    .dossier-rail kbd {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
+    .comms-channel-card {
+      background: #fff;
+      border-color: #e2e8f0;
+      box-shadow: 0 1px 2px #64748b0d;
+    }
+    .comms-channel-card:hover,
+    .comms-channel-card:focus-within {
+      background: #fff;
+      border-color: #10b98180;
+    }
+    .comms-channel-label {
+      color: #334155;
+    }
+    .comms-channel-status {
+      color: #059669;
+      background: #ecfdf5;
+      border-color: #6ee7b780;
+    }
+    .comms-channel-readout {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      box-shadow: inset 0 1px 3px #64748b0d;
+    }
+    .comms-channel-handle {
+      color: #0f172a;
+    }
+    .comms-terminal-prefix {
+      color: #047857;
+    }
+    .comms-readout-dot {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b98126;
+    }
+    .comms-channel-description {
+      color: #475569;
+    }
+    .comms-channel-actions {
+      border-color: #e2e8f0;
+    }
+    :is(.comms-channel-action, .copy-email-button) {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    :is(.comms-channel-action, .copy-email-button):hover {
+      color: #047857;
+      border-color: #10b98180;
+      background: #ecfdf5;
+    }
+    .copy-email-button[data-copy-status="copied"] {
+      color: #047857;
+      background: #ecfdf5;
+      border-color: #10b98180;
+    }
+    .copy-email-button[data-copy-status="error"] {
+      color: #b45309;
+    }
+
+    .contact-transmission {
+      background: #fff;
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 2px #64748b0d;
+    }
+    .contact-transmission > header {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      color: #047857;
+    }
+    .contact-transmission h4 {
+      color: #0f172a;
+    }
+    .contact-transmission::after {
+      border-color: #10b981;
+      box-shadow:
+        0 0 20px #10b98126,
+        inset 0 0 12px #10b9810d;
+    }
+    :is(.contact-field, .contact-transmission label) {
+      color: #334155;
+    }
+    .contact-transmission :is(input, textarea) {
+      background: #fff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .contact-transmission :is(input, textarea)::placeholder {
+      color: #64748b;
+    }
+    .contact-transmission :is(input, textarea):focus-visible {
+      border-color: #059669;
+    }
+    .contact-transmission [aria-invalid="true"] {
+      border-color: #be123c;
+    }
+    :is(
+      .contact-message-label > span,
+      .contact-security,
+      .contact-feedback,
+      .contact-note
+    ) {
+      color: #475569;
+    }
+    :is(.contact-security svg, .contact-note a) {
+      color: #047857;
+    }
+    .contact-feedback[data-status="success"],
+    .contact-feedback[data-status="pending"] {
+      color: #047857;
+    }
+    .contact-field-error,
+    .contact-feedback[data-status="error"] {
+      color: #be123c;
+    }
+    .contact-submit-row button {
+      background: #047857;
+      border-color: #047857;
+      color: #fff;
+    }
+    .contact-submit-row button:hover:not(:disabled) {
+      background: #065f46;
+      border-color: #065f46;
+    }
+
+    .thm-telemetry-card {
+      background: #fff;
+      border-color: #e2e8f0;
+      box-shadow: 0 1px 2px #64748b0d;
+    }
+    .thm-telemetry-heading {
+      border-color: #e2e8f0;
+    }
+    .thm-telemetry-heading h4 {
+      color: #0f172a;
+    }
+    .thm-telemetry-heading h4 svg {
+      color: #b45309;
+    }
+    .thm-league {
+      color: #92400e;
+      background: #fffbeb;
+      border-color: #fcd34d;
+      box-shadow: none;
+    }
+    .thm-badge-status {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+    .thm-profile-link {
+      background: #fffbeb;
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+    .thm-profile-link:hover {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #78350f;
+    }
+    :is(a, button, input, textarea):focus-visible {
+      outline-color: #059669;
+    }
+  }
+}
