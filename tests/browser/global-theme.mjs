@@ -8,6 +8,7 @@ const base = process.env.PORTFOLIO_BASE_URL || "http://127.0.0.1:3000";
 const screenshots = process.env.PORTFOLIO_SCREENSHOT_DIR;
 const browser = await chromium.launch({
   headless: true,
+  executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH,
   args: ["--no-sandbox"],
 });
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -286,7 +287,7 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 900 });
   await page
-    .locator(".top-hud")
+    .locator(".conversion-footer")
     .getByRole("link", { name: "Client Services →", exact: true })
     .click();
   await page.waitForURL(base + "/services");

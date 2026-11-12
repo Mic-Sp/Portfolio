@@ -213,14 +213,22 @@ async function verifyPortfolio(page) {
     1,
   );
   const controls = page.locator(".top-hud");
-  const servicesLink = controls.getByRole("link", {
+  assert.equal(await controls.locator('a[href="/services"]').count(), 0);
+  const servicesLink = page.locator(".conversion-footer").getByRole("link", {
     name: "Client Services →",
     exact: true,
   });
   assert.equal(await servicesLink.getAttribute("href"), "/services");
+  const resume = controls.getByRole("link", {
+    name: "Resume (PDF)",
+    exact: true,
+  });
+  assert.equal(await resume.getAttribute("href"), "/resume.pdf");
+  assert.equal(await resume.getAttribute("target"), "_blank");
+  assert.equal(await resume.getAttribute("rel"), "noopener noreferrer");
   assert.equal(
-    await servicesLink.evaluate((el) =>
-      el.previousElementSibling.matches(".theme-toggle"),
+    await resume.evaluate((el) =>
+      el.previousElementSibling.textContent.includes("Get in Touch"),
     ),
     true,
   );
@@ -271,7 +279,7 @@ async function verifyServices(page) {
       .count(),
     0,
   );
-  assert.equal(await page.locator(".hud-controls button").count(), 2);
+  assert.equal(await page.locator(".hud-controls button").count(), 3);
   assert.equal(
     await page
       .locator(".top-hud")
@@ -317,6 +325,7 @@ async function verifyServices(page) {
 
 const browser = await chromium.launch({
   headless: true,
+  executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH,
   args: ["--no-sandbox"],
 });
 try {
@@ -342,6 +351,40 @@ try {
   await page.goto(base, { waitUntil: "networkidle" });
   const portfolioDark = await portfolioBackground(page);
   await verifyPortfolio(page);
+  assert.equal(
+    await page.title(),
+    "Michael Anthony Sprague | AI & Full-Stack Software Engineer",
+  );
+  assert.equal(
+    await page.locator('meta[name="twitter:card"]').getAttribute("content"),
+    "summary_large_image",
+  );
+  for (const selector of [
+    'meta[property="og:image"]',
+    'meta[name="twitter:image"]',
+  ]) {
+    const imageUrl = await page.locator(selector).getAttribute("content");
+    const localImageUrl = new URL(imageUrl);
+    assert.equal(
+      (
+        await page.request.get(
+          base + localImageUrl.pathname + localImageUrl.search,
+        )
+      ).status(),
+      200,
+    );
+  }
+  assert.match(
+    await page.locator(".hero-headline").innerText(),
+    /AI & Full-Stack Software Engineer/,
+  );
+  assert.equal(
+    await page.locator(".hero-institutional-subtitle").innerText(),
+    "Columbia University (PAISE) · Next Chapter Apprentice · B.A. Business, Summa Cum Laude",
+  );
+  const resumeResponse = await page.request.get(base + "/resume.pdf");
+  assert.equal(resumeResponse.status(), 200);
+  assert.match(resumeResponse.headers()["content-type"], /application\/pdf/);
   const portfolioHud = await page
     .locator(".top-hud")
     .evaluate((el) => getComputedStyle(el).backgroundColor);
@@ -349,7 +392,7 @@ try {
     window.hudNavigationToken = "persistent-layout";
   });
   await page
-    .locator(".top-hud")
+    .locator(".conversion-footer")
     .getByRole("link", { name: "Client Services →", exact: true })
     .click();
   await page.waitForURL(base + "/services");
@@ -501,6 +544,33 @@ try {
       `HUD blocks must not overlap at ${width}px`,
     );
     results.push({ portfolioWidth: width, ...layout });
+    if (width === 1440 || width === 390) {
+      for (const origin of [".top-hud", ".conversion-footer"]) {
+        const trigger = page
+          .locator(origin)
+          .getByRole("button", { name: "Get in Touch", exact: true });
+        if (origin === ".top-hud")
+          await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+        else await trigger.scrollIntoViewIfNeeded();
+        const scrollBefore = await page.evaluate(() => scrollY);
+        await trigger.click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".dossier-slide")?.dataset.motionState ===
+              "settled" &&
+            document.activeElement?.getAttribute("name") === "senderName",
+        );
+        assert.equal(await page.locator("#operator-dossier[open]").count(), 1);
+        await page.keyboard.press("Escape");
+        await page.locator("#operator-dossier").waitFor({ state: "detached" });
+        assert.equal(
+          await trigger.evaluate((el) => el === document.activeElement),
+          true,
+        );
+        assert.equal(await page.evaluate(() => scrollY), scrollBefore);
+        results.push({ contactOrigin: origin, width, focusRestored: true });
+      }
+    }
   }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ passed: true, results, errors }, null, 2));

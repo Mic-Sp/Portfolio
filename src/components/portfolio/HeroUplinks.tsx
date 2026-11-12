@@ -38,11 +38,10 @@ export function HeroUplinks() {
       </a>
       <CopyEmailButton compact />
       <DossierTrigger
-        className="hero-uplink-pill direct-message-pill"
+        className="hero-uplink-pill direct-message-pill contact-cta"
         target="transmission"
-        label="Direct message: open transmission form"
       >
-        <Send size={13} aria-hidden="true" /> DIRECT MESSAGE
+        <Send size={13} aria-hidden="true" /> Get in Touch
       </DossierTrigger>
       <a
         className="hero-uplink-pill thm-quick-link"

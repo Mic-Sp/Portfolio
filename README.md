@@ -27,7 +27,9 @@ npm run format:check
 
 The Dossier's **Direct Transmission** form and console `msg <return_email> <message...>` command (aliases: `transmit`, `send`) share `ContactSchema` and `POST /api/contact`. Run `msg` for clickable console/form shortcuts. Messages and return addresses are excluded from console history and command echoes; drafts are not saved to browser storage.
 
-The Hero's **Direct Message** pill opens the drawer directly to the form. `openDossierToSection("transmission")` waits for the slide to settle before scrolling, focusing Name, and briefly highlighting the form. `"top"` and `"thm"` target the overview and live badge. Reduced motion uses instant scrolling without the decorative pulse. Scroll and focus stay inside the drawer.
+The header, Hero, and conversion footer's **Get in Touch** buttons open the same drawer directly to the form. `openDossierToSection("transmission")` waits for the slide to settle before scrolling, focusing Name, and briefly highlighting the form. `"top"` and `"thm"` target the overview and live badge. Reduced motion uses instant scrolling without the decorative pulse. Scroll and focus stay inside the drawer. The header's **Resume (PDF)** link serves `public/resume.pdf`; replace that file when updating the resume. Client Services remains available in the conversion footer.
+
+Set `SITE_URL` to override the portfolio's public origin (including `https://`) for absolute Open Graph and Twitter preview URLs. If unset, metadata uses `VERCEL_PROJECT_PRODUCTION_URL`, then `VERCEL_URL`, then `https://portfolio-dusky-ten-97.vercel.app/`. Both social previews use the existing `src/app/opengraph-image.png` asset.
 
 With Playwright available and a local server running, `node tests/browser/dossier-message.mjs` checks the actual Hero/CLI triggers, focus timing, drawer motion, responsive layout, and reduced motion. Set `PORTFOLIO_BASE_URL` for a different server URL, or `PLAYWRIGHT_MODULE` to the entry file of an external Playwright installation.
 

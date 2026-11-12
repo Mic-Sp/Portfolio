@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import "./globals.css";
 import "./portfolio-light.css";
+import "./recruiter-hierarchy.css";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
@@ -18,9 +19,42 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const title = `${PROFILE_CONFIG.legalName} | AI & Full-Stack Software Engineer`;
+const description =
+  "AI & Full-Stack Software Engineer open to full-time roles. Explore Michael Sprague's applied AI, TypeScript, React, and Next.js projects, resume, and experience.";
+const deploymentHost =
+  process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+const siteUrl =
+  process.env.SITE_URL ||
+  (deploymentHost
+    ? `https://${deploymentHost}`
+    : "https://portfolio-dusky-ten-97.vercel.app/");
+const socialImage = {
+  url: "/opengraph-image.png",
+  width: 1200,
+  height: 621,
+  alt: "Michael Anthony Sprague's software engineering portfolio and selected projects",
+};
+
 export const metadata: Metadata = {
-  title: "Michael A. Sprague | Systems Engineer",
-  description: `${PROFILE_CONFIG.headline}. Explore projects in applied AI, hybrid quantum-classical systems, full-stack engineering, and application security.`,
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: `${PROFILE_CONFIG.legalName} | Portfolio`,
+    url: "/",
+    title,
+    description,
+    images: [socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [socialImage],
+  },
 };
 
 export default function RootLayout({

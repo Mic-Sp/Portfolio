@@ -1,0 +1,150 @@
+@layer theme, base, components, utilities;
+
+@layer utilities {
+  .telemetry-frame[data-theme] {
+    --contact-accent: #67e8f9;
+    --contact-accent-hover: #a5f3fc;
+    --contact-on-accent: #020617;
+    --recruiter-muted: #cbd5e1;
+    --conversion-border: #47556980;
+    --conversion-surface: #0f172a66;
+  }
+  .telemetry-frame[data-theme="light"] {
+    --contact-accent: #0369a1;
+    --contact-accent-hover: #075985;
+    --contact-on-accent: #fff;
+    --recruiter-muted: #475569;
+    --conversion-border: #cbd5e1;
+    --conversion-surface: #ffffffb3;
+  }
+  .hero-institutional-subtitle {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    color: var(--recruiter-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+  .recruiter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .recruiter-actions .hud-button {
+    font-size: 12px;
+    font-weight: 600;
+    padding-inline: 12px;
+  }
+  .telemetry-frame[data-theme] :is(.hud-button, .hero-uplink-pill).contact-cta {
+    color: var(--contact-on-accent);
+    background: var(--contact-accent);
+    border-color: var(--contact-accent);
+    font-weight: 600;
+  }
+  .telemetry-frame[data-theme]
+    :is(.hud-button, .hero-uplink-pill).contact-cta:hover {
+    color: var(--contact-on-accent);
+    background: var(--contact-accent-hover);
+    border-color: var(--contact-accent-hover);
+  }
+  .telemetry-frame[data-theme] .top-hud .resume-cta {
+    color: var(--contact-accent);
+    border-color: var(--contact-accent);
+    background: transparent;
+  }
+  .telemetry-frame[data-theme] .top-hud .resume-cta:hover {
+    color: var(--contact-accent-hover);
+    border-color: var(--contact-accent-hover);
+    background: var(--conversion-surface);
+  }
+  .conversion-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 28px;
+    margin-top: 32px;
+    padding: 24px;
+    border-block: 1px solid var(--conversion-border);
+    background: var(--conversion-surface);
+    color: var(--recruiter-muted);
+    font:
+      500 13px/1.5 var(--font-mono),
+      monospace;
+  }
+  .conversion-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+  .conversion-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+  }
+  .conversion-footer svg {
+    flex-shrink: 0;
+  }
+  .conversion-services {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-left: auto;
+    font-size: 12px;
+  }
+  .conversion-footer a:hover {
+    color: var(--contact-accent);
+  }
+  .conversion-footer :focus-visible {
+    outline-color: var(--contact-accent);
+  }
+  /* Give the contact pair its full width before telemetry can crowd it. */
+  @media (min-width: 768px) and (max-width: 1535px) {
+    .telemetry-frame[data-theme] > .top-hud {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px 24px;
+    }
+    .telemetry-frame[data-theme] .system-status {
+      grid-column: 2;
+      grid-row: 1;
+      display: grid;
+      justify-items: end;
+      width: auto;
+      padding-top: 0;
+      border-top: 0;
+    }
+    .telemetry-frame[data-theme] .hud-controls {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      flex-wrap: wrap;
+    }
+  }
+  @media (max-width: 767px) {
+    .recruiter-actions {
+      order: -1;
+      flex-basis: 100%;
+    }
+    .recruiter-actions .hud-button {
+      flex: 1;
+      padding-inline: 8px;
+    }
+    .hero-institutional-subtitle {
+      font-size: 14px;
+    }
+    .conversion-footer {
+      gap: 12px;
+      padding: 20px 16px;
+    }
+    .conversion-footer > .contact-cta {
+      width: 100%;
+    }
+    .conversion-links {
+      flex-basis: 100%;
+      justify-content: space-between;
+      gap: 8px 12px;
+    }
+    .conversion-services {
+      margin-left: 0;
+    }
+  }
+}

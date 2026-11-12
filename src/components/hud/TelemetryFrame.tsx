@@ -7,14 +7,15 @@ import {
   Command,
   Grid2X2,
   Fingerprint,
+  FileText,
   MapPin,
   Moon,
   Sun,
+  Send,
   Terminal,
 } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { useHud } from "@/context/HudContext";
 import { useTheme } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
@@ -109,11 +110,24 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
               <Sun size={18} aria-hidden="true" />
             )}
           </button>
-          {!isServices && (
-            <Link href="/services" className="hud-button services-hud-link">
-              Client Services →
-            </Link>
-          )}
+          <nav className="recruiter-actions" aria-label="Contact and resume">
+            <DossierTrigger
+              className="hud-button contact-cta"
+              target="transmission"
+            >
+              <Send size={14} aria-hidden="true" />
+              <span>Get in Touch</span>
+            </DossierTrigger>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hud-button resume-cta"
+            >
+              <FileText size={14} aria-hidden="true" />
+              <span>Resume (PDF)</span>
+            </a>
+          </nav>
           <DossierTrigger
             className={cn(
               "hud-button dossier-hud-trigger",

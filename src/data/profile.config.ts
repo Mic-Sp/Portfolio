@@ -110,7 +110,7 @@ const EDUCATION: readonly AcademicCredential[] = [
 export const PROFILE_CONFIG = {
   name: "Michael A. Sprague",
   legalName: "Michael Anthony Sprague",
-  headline: "AI & Full-Stack Systems Engineer // AppSec",
+  headline: "AI & Full-Stack Software Engineer // AppSec",
   subheadline: EDUCATION.map((item) => item.heroLabel).join(" • "),
   location: "CHICAGOLAND // NW INDIANA",
   systemStatus: "STATUS: BUILDING // OPEN TO ROLES",

@@ -30,6 +30,10 @@ export function HeroIdentity() {
               </Fragment>
             ))}
           </p>
+          <p className="hero-institutional-subtitle">
+            Columbia University (PAISE) · Next Chapter Apprentice · B.A.
+            Business, Summa Cum Laude
+          </p>
           <ul className="hero-credentials" aria-label="Credentials">
             {credentials.map((credential, index) => (
               <li key={credential.id}>

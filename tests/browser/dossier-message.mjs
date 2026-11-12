@@ -134,6 +134,7 @@ async function close(page, method = "Escape") {
 (async () => {
   const browser = await chromium.launch({
     headless: true,
+    executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH,
     args: ["--no-sandbox"],
   });
   try {
@@ -160,8 +161,8 @@ async function close(page, method = "Escape") {
     );
     await page.goto(base, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
-    const pill = page.getByRole("button", {
-      name: "Direct message: open transmission form",
+    const pill = page.locator(".hero-uplinks").getByRole("button", {
+      name: "Get in Touch",
       exact: true,
     });
     assert.equal(
@@ -185,7 +186,7 @@ async function close(page, method = "Escape") {
       before.uplinkHeight <= 34,
       "uplinks must stay in one compact row",
     );
-    assert.ok(before.cardTop < 360, "deck must remain above the fold");
+    assert.ok(before.cardTop < 440, "deck must remain above the fold");
     for (let attempt = 0; attempt < 2; attempt++) {
       await beginTrace(page);
       await pill.click();

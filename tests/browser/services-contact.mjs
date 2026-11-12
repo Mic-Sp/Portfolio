@@ -15,6 +15,7 @@ const values = {
 };
 const browser = await chromium.launch({
   headless: true,
+  executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH,
   args: ["--no-sandbox"],
 });
 try {
@@ -67,7 +68,7 @@ try {
     window.servicesFormDocument = "no-reload";
   });
   await page
-    .locator(".top-hud")
+    .locator(".conversion-footer")
     .getByRole("link", { name: "Client Services →", exact: true })
     .click();
   await page.waitForURL(base + "/services");
@@ -227,7 +228,7 @@ try {
   await page.waitForURL(base + "/");
   assert.equal(
     await page
-      .locator(".top-hud")
+      .locator(".conversion-footer")
       .getByRole("link", { name: "Client Services →", exact: true })
       .count(),
     1,

@@ -6,18 +6,6 @@
     min-width: 44px;
     padding: 10px;
   }
-  .services-hud-link {
-    font-size: 12px;
-    padding-inline: 12px;
-    background: #10b9810d;
-    border-color: #10b9814d;
-    color: #34d399;
-  }
-  .services-hud-link:hover {
-    color: #34d399;
-    border-color: #10b98180;
-    background: #10b9811a;
-  }
   /* Portfolio controls need their intrinsic width without overlapping Status. */
   @media (min-width: 1280px) {
     .telemetry-frame[data-page="portfolio"] > .top-hud {
@@ -75,24 +63,6 @@
   .telemetry-frame[data-theme="light"] > .top-hud .hud-button:hover {
     background: #e2e8f0;
     color: #1e293b;
-  }
-  /* Keep this navigation CTA distinct from the neutral HUD controls. */
-  .telemetry-frame[data-theme="light"]
-    > .top-hud
-    .hud-button.services-hud-link {
-    background: #ecfdf5e6;
-    border-color: #05966980;
-    color: #065f46;
-    font-family: var(--font-mono), monospace;
-    font-size: 12px;
-    font-weight: 600;
-    box-shadow: 0 1px 2px #0000000d;
-  }
-  .telemetry-frame[data-theme="light"]
-    > .top-hud
-    .hud-button.services-hud-link:hover {
-    background: #d1fae5;
-    border-color: #059669;
   }
   .telemetry-frame[data-theme="light"] > .top-hud .hud-button:focus-visible {
     outline-color: #059669;
