@@ -6,8 +6,7 @@ export function ProjectSchematic({ project }: { project: ProjectNode }) {
   return (
     <div className="project-schematic" aria-hidden="true">
       <div className="schematic-rail">
-        <span>SYS. ARCHITECTURE</span>
-        <span>{systems.length.toString().padStart(2, "0")} MODULES</span>
+        <span>KEY FEATURES &amp; ARCHITECTURE</span>
       </div>
       <div className="schematic-flow">
         <div className="schematic-core">

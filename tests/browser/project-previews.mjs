@@ -13,6 +13,48 @@ const browser = await chromium.launch({
   args: ["--no-sandbox"],
 });
 
+function expectedCopy(project) {
+  const clientSite = project.id === "huddle-and-heal";
+  return {
+    status: clientSite ? "Live Client Site" : "Live Demo Available",
+    live: clientSite ? "Live Site ↗" : "Live Demo ↗",
+  };
+}
+
+async function verifyCardCopy(page, project, interactive = true) {
+  const card = page.locator(`[data-project-id="${project.id}"]`);
+  const copy = expectedCopy(project);
+  assert.equal(await card.locator(".project-status").innerText(), copy.status);
+  assert.equal(
+    await card.locator(".schematic-rail").innerText(),
+    "KEY FEATURES & ARCHITECTURE",
+  );
+  assert.doesNotMatch(
+    await card.innerText(),
+    /STANDBY|SYS\. ARCHITECTURE|LIVE SYSTEM|SOURCE/,
+  );
+  for (const [label, href] of [
+    [copy.live, project.links.live],
+    ["GitHub ↗", project.links.repo],
+  ]) {
+    const link = card.getByRole("link", {
+      name: `${project.title}: ${label} (opens in a new tab)`,
+      exact: true,
+    });
+    if (interactive && href && href !== "#") {
+      assert.equal(await link.innerText(), label);
+      assert.equal(await link.getAttribute("href"), href);
+      assert.equal(await link.getAttribute("target"), "_blank");
+      assert.equal(await link.getAttribute("rel"), "noopener noreferrer");
+    } else assert.equal(await link.count(), 0);
+  }
+  if ((await card.getAttribute("data-selected")) === "false")
+    assert.equal(
+      await card.locator(".selection-label").innerText(),
+      "Select Project →",
+    );
+}
+
 async function verifyLightbox(page, project) {
   const modal = page.locator("#project-lightbox");
   await modal.waitFor({ state: "visible" });
@@ -72,8 +114,8 @@ async function verifyLightbox(page, project) {
     project.hook,
   );
   for (const [label, href] of [
-    ["Live System", project.links.live],
-    ["Source", project.links.repo],
+    [expectedCopy(project).live, project.links.live],
+    ["GitHub ↗", project.links.repo],
   ]) {
     const link = modal.getByRole("link", { name: label, exact: true });
     if (href && href !== "#") {
@@ -127,6 +169,10 @@ try {
   await page.waitForFunction(
     () => document.querySelector(".spatial-deck")?.dataset.motion === "spatial",
   );
+  for (const project of PROJECTS_REGISTRY)
+    await verifyCardCopy(page, project, project.id === "q-split");
+  for (const select of await page.locator(".spatial-card-select").all())
+    assert.equal(await select.innerText(), "Select Project");
   assert.equal(await page.locator(".project-thumbnail").count(), 0);
   assert.equal(
     await page.locator(".project-preview-trigger:not([disabled])").count(),
@@ -197,6 +243,7 @@ try {
   await page.locator(".project-grid").waitFor({ state: "visible" });
   for (let i = 0; i < PROJECTS_REGISTRY.length; i++) {
     const project = PROJECTS_REGISTRY[i];
+    await verifyCardCopy(page, project);
     const thumb = page.locator(
       `[data-project-id="${project.id}"] .project-thumbnail`,
     );
@@ -245,6 +292,8 @@ try {
   );
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
+    for (const project of PROJECTS_REGISTRY)
+      await verifyCardCopy(page, project);
     const thumb = page.locator(".project-thumbnail").last();
     await thumb.scrollIntoViewIfNeeded();
     await thumb.click();
@@ -279,6 +328,8 @@ try {
         passed: true,
         results,
         checks: [
+          "plain-English availability badges, architecture headings, and selection prompts",
+          "matching Live Demo, Live Site, and GitHub links in cards and previews",
           "16:9 thumbnails with independent crop configuration",
           "original PNGs shown uncropped at full source resolution",
           "spatial cards use compact triggers only",

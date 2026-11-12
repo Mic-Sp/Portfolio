@@ -193,7 +193,7 @@ export function SpatialProjectNode({
             className="spatial-card-select"
             data-deck-select
             aria-pressed={false}
-            aria-label={`Focus ${project.title}`}
+            aria-label={`Select ${project.title}`}
             disabled={terminalOpen}
             onClick={(event) => {
               keyboardSelection.current = event.detail === 0;
@@ -201,8 +201,7 @@ export function SpatialProjectNode({
             }}
           >
             <span>
-              FOCUS NODE {(index + 1).toString().padStart(2, "0")}{" "}
-              <ArrowRight size={11} aria-hidden="true" />
+              Select Project <ArrowRight size={11} aria-hidden="true" />
             </span>
           </button>
         )}

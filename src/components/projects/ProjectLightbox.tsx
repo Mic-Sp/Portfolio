@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, GitBranch, ScanEye, X } from "lucide-react";
+import { ScanEye, X } from "lucide-react";
 import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { hideModalBackground } from "@/lib/modal-background";
+import { getProjectCopy } from "@/lib/project-copy";
 import type { ProjectNode } from "@/types/portfolio";
 import "./project-previews.css";
 
@@ -25,9 +26,10 @@ export function ProjectLightbox({
   const closeButton = useRef<HTMLButtonElement>(null);
   const backdropDown = useRef(false);
   const [aspectRatio, setAspectRatio] = useState(16 / 9);
+  const { liveLabel } = getProjectCopy(project.status);
   const actions = [
-    { label: "Live System", href: project.links.live, Icon: ArrowUpRight },
-    { label: "Source", href: project.links.repo, Icon: GitBranch },
+    { label: liveLabel, href: project.links.live },
+    { label: "GitHub ↗", href: project.links.repo },
   ].filter((action) => action.href && action.href !== "#");
 
   useLayoutEffect(() => {
@@ -151,14 +153,14 @@ export function ProjectLightbox({
         <footer className="project-lightbox-footer">
           <p id="project-lightbox-summary">{project.hook}</p>
           <nav aria-label={`${project.title} project links`}>
-            {actions.map(({ label, href, Icon }) => (
+            {actions.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {label} <Icon size={16} aria-hidden="true" />
+                {label}
               </a>
             ))}
           </nav>

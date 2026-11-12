@@ -1,15 +1,9 @@
 "use client";
 
-import {
-  ArrowUpRight,
-  Check,
-  Crosshair,
-  FileText,
-  GitBranch,
-  ScanEye,
-} from "lucide-react";
+import { Check, Crosshair, FileText, ScanEye } from "lucide-react";
 import Image from "next/image";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
+import { getProjectCopy } from "@/lib/project-copy";
 import type { ProjectNode } from "@/types/portfolio";
 import { ProjectSchematic } from "./ProjectSchematic";
 import { ProjectCaseStudy } from "./ProjectCaseStudy";
@@ -35,14 +29,15 @@ export function ProjectCard({
   onPreview,
 }: ProjectCardProps) {
   const theme = getProjectAccent(project.accent);
+  const { statusLabel, liveLabel } = getProjectCopy(project.status);
   const links = [
     {
       key: "live",
-      label: "LIVE SYSTEM",
+      label: liveLabel,
       url: project.links.live,
-      icon: ArrowUpRight,
+      icon: null,
     },
-    { key: "repo", label: "SOURCE", url: project.links.repo, icon: GitBranch },
+    { key: "repo", label: "GitHub ↗", url: project.links.repo, icon: null },
     { key: "docs", label: "DOCS", url: project.links.docs, icon: FileText },
   ].filter((link) => link.url);
 
@@ -97,8 +92,11 @@ export function ProjectCard({
         </span>
         <div className="project-telemetry-actions">
           <span className="project-status">
-            <span className={cn("h-1 w-1 rounded-full", theme.dot)} />
-            {project.status}
+            <span
+              className={cn("h-1 w-1 rounded-full", theme.dot)}
+              aria-hidden="true"
+            />
+            {statusLabel}
           </span>
           {variant === "spatial" && (
             <button
@@ -169,12 +167,12 @@ export function ProjectCard({
                 title={
                   url === "#"
                     ? "URL not yet provided"
-                    : "Focus this node to open links"
+                    : "Select this project to open links"
                 }
-                aria-label={`${label}: ${url === "#" ? "URL not yet provided" : "focus this node to open links"}`}
+                aria-label={`${label}: ${url === "#" ? "URL not yet provided" : "select this project to open links"}`}
               >
                 {label}
-                <Icon size={12} aria-hidden="true" />
+                {Icon && <Icon size={12} aria-hidden="true" />}
               </span>
             ) : (
               <a
@@ -183,10 +181,10 @@ export function ProjectCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 draggable={false}
-                aria-label={`${project.title}: ${label.toLowerCase()} (opens in a new tab)`}
+                aria-label={`${project.title}: ${label} (opens in a new tab)`}
               >
                 {label}
-                <Icon size={12} aria-hidden="true" />
+                {Icon && <Icon size={12} aria-hidden="true" />}
               </a>
             ),
           )}
@@ -197,7 +195,7 @@ export function ProjectCard({
               <Check size={10} /> SELECTED
             </>
           ) : (
-            "STANDBY"
+            "Select Project →"
           )}
         </span>
       </div>
