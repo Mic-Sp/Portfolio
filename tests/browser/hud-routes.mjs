@@ -380,7 +380,7 @@ try {
   );
   assert.equal(
     await page.locator(".hero-institutional-subtitle").innerText(),
-    "Columbia University (PAISE) · Next Chapter Apprentice · B.A. Business, Summa Cum Laude",
+    "Columbia University (PAISE) · Next Chapter · Holy Cross College",
   );
   const resumeResponse = await page.request.get(base + "/resume.pdf");
   assert.equal(resumeResponse.status(), 200);

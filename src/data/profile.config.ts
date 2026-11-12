@@ -119,6 +119,44 @@ export const PROFILE_CONFIG = {
     "AI & Full-Stack Software Engineer building intelligent automated workflows, production web applications, and custom developer tools, engineered from the ground up with an application-security mindset.",
   education: EDUCATION,
   commsAndTelemetry: COMMS_AND_TELEMETRY,
+  skillsIndex: [
+    {
+      label: "LANGUAGES",
+      values: ["TypeScript", "Python", "SQL", "JavaScript", "HTML/CSS"],
+    },
+    {
+      label: "FRAMEWORKS & AI",
+      values: [
+        "Next.js",
+        "FastAPI",
+        "React",
+        "Tailwind CSS",
+        "Qiskit Aer",
+        "Gemini API",
+        "pgvector",
+        "Prisma",
+      ],
+    },
+    {
+      label: "INFRA & CLOUD",
+      values: [
+        "Cloudflare Pages",
+        "Vercel",
+        "Docker",
+        "Neon Postgres",
+        "GitHub Actions CI/CD",
+        "DNS",
+      ],
+    },
+    {
+      label: "CREDENTIALS",
+      values: [
+        "Columbia University PAISE",
+        "NVIDIA AI Infrastructure",
+        "TryHackMe Gold League (Top 7%)",
+      ],
+    },
+  ],
   specializations: [
     "Claude Academy MCP Advanced & Claude Code",
     "DeepLearning.AI Supervised Machine Learning",

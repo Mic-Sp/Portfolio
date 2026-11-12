@@ -1,0 +1,277 @@
+@layer theme, base, components, utilities;
+
+@layer components {
+  .project-telemetry-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .project-preview-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 5px 8px;
+    border: 1px solid #64748b80;
+    color: #cbd5e1;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    white-space: nowrap;
+  }
+  .project-preview-trigger:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.06);
+  }
+  .project-thumbnail {
+    background: #020617;
+    cursor: zoom-in;
+    isolation: isolate;
+  }
+  .project-thumbnail img {
+    pointer-events: none;
+  }
+  .thumbnail-corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    color: #67e8f9;
+    pointer-events: none;
+  }
+  .thumbnail-corner-tl {
+    top: 0;
+    left: 0;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+  .thumbnail-corner-br {
+    right: 0;
+    bottom: 0;
+    border-right: 2px solid;
+    border-bottom: 2px solid;
+  }
+  .thumbnail-label {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 1px solid #67e8f959;
+    color: #ecfeff;
+    background: #020617e6;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    pointer-events: none;
+  }
+  .project-thumbnail:hover,
+  .project-thumbnail:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px -8px var(--accent);
+  }
+  .project-lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 24px;
+    border: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: transparent;
+    color: #f1f5f9;
+    color-scheme: dark;
+  }
+  .project-lightbox[open] {
+    display: grid;
+    place-items: center;
+  }
+  .project-lightbox::backdrop {
+    background: transparent;
+  }
+  .project-lightbox-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #020617cc;
+  }
+  .project-lightbox-panel {
+    position: relative;
+    width: min(1600px, 100%);
+    min-width: 0;
+    margin: auto;
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    background: #070e1cf5;
+    box-shadow:
+      0 30px 90px #0008,
+      inset 0 1px 0 #ffffff0a;
+  }
+  .project-lightbox-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 24px;
+    border-bottom: 1px solid #47556980;
+  }
+  .project-lightbox-header > div {
+    min-width: 0;
+  }
+  .project-lightbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+    font:
+      500 12px/1.6 var(--font-mono),
+      monospace;
+  }
+  .project-lightbox-label svg {
+    flex-shrink: 0;
+  }
+  .project-lightbox-header h2 {
+    margin-top: 6px;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .project-lightbox-close,
+  .project-lightbox-footer a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #64748b99;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    color: #e2e8f0;
+    white-space: nowrap;
+  }
+  .project-lightbox-close {
+    flex-shrink: 0;
+  }
+  .project-lightbox-media {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-height: min(80vh, max(160px, calc(100dvh - 250px)));
+    background: #020617;
+  }
+  .project-lightbox-image {
+    object-fit: contain;
+    object-position: center;
+    max-height: 80vh;
+  }
+  .project-lightbox-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    padding: 18px 24px;
+    border-top: 1px solid #47556980;
+  }
+  .project-lightbox-footer > p {
+    flex: 1 1 420px;
+    max-width: 80ch;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .project-lightbox-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .project-lightbox :is(a, button):hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(var(--accent-rgb), 0.06);
+  }
+  .project-lightbox :is(a, button):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  @media (max-width: 639px) {
+    .project-lightbox {
+      padding: 12px;
+    }
+    .project-lightbox-header {
+      flex-wrap: wrap;
+      padding: 16px;
+    }
+    .project-lightbox-header h2 {
+      font-size: 20px;
+    }
+    .project-lightbox-media {
+      max-height: min(80vh, max(160px, calc(100dvh - 340px)));
+    }
+    .project-lightbox-footer {
+      padding: 16px;
+    }
+  }
+}
+
+@layer utilities {
+  .telemetry-frame[data-theme="light"] .project-preview-trigger {
+    color: #475569;
+    border-color: #cbd5e1;
+    background: #ffffffcc;
+  }
+  .telemetry-frame[data-theme="light"]
+    .project-preview-trigger:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .telemetry-frame[data-theme="light"] .project-thumbnail {
+    border-color: #0891b233;
+  }
+  .telemetry-frame[data-theme="light"] .thumbnail-corner {
+    color: #0369a1;
+  }
+  .project-lightbox[data-theme="light"] {
+    color: #0f172a;
+    color-scheme: light;
+  }
+  .project-lightbox[data-theme="light"] .project-lightbox-backdrop {
+    background: #0f172a99;
+  }
+  .project-lightbox[data-theme="light"] .project-lightbox-panel {
+    background: #f8fafcf7;
+    border-color: #cbd5e1;
+    box-shadow:
+      0 30px 90px #0f172a40,
+      inset 0 1px 0 #fff;
+  }
+  .project-lightbox[data-theme="light"]
+    :is(.project-lightbox-header, .project-lightbox-footer) {
+    border-color: #cbd5e1;
+  }
+  .project-lightbox[data-theme="light"] .project-lightbox-media {
+    background: #e2e8f0;
+  }
+  .project-lightbox[data-theme="light"] .project-lightbox-footer > p {
+    color: #475569;
+  }
+  .project-lightbox[data-theme="light"]
+    :is(.project-lightbox-close, .project-lightbox-footer a) {
+    color: #334155;
+    border-color: #cbd5e1;
+    background: #fff;
+  }
+  .project-lightbox[data-theme="light"] :is(a, button):hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+}

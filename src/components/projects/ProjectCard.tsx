@@ -6,10 +6,14 @@ import {
   Crosshair,
   FileText,
   GitBranch,
+  ScanEye,
 } from "lucide-react";
+import Image from "next/image";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
 import type { ProjectNode } from "@/types/portfolio";
 import { ProjectSchematic } from "./ProjectSchematic";
+import { ProjectCaseStudy } from "./ProjectCaseStudy";
+import "./project-previews.css";
 
 interface ProjectCardProps {
   project: ProjectNode;
@@ -17,6 +21,8 @@ interface ProjectCardProps {
   selected: boolean;
   onSelect: () => void;
   interactive?: boolean;
+  variant: "grid" | "spatial";
+  onPreview: (project: ProjectNode) => void;
 }
 
 export function ProjectCard({
@@ -25,6 +31,8 @@ export function ProjectCard({
   selected,
   onSelect,
   interactive = true,
+  variant,
+  onPreview,
 }: ProjectCardProps) {
   const theme = getProjectAccent(project.accent);
   const links = [
@@ -50,6 +58,36 @@ export function ProjectCard({
       )}
       aria-labelledby={`title-${project.id}`}
     >
+      {variant === "grid" && (
+        <button
+          type="button"
+          className="project-thumbnail relative mb-6 block aspect-video w-full overflow-hidden border border-cyan-500/20"
+          onClick={() => onPreview(project)}
+          aria-label={`Preview ${project.title} screenshot`}
+          aria-haspopup="dialog"
+          aria-controls="project-lightbox"
+        >
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            fill
+            sizes="(max-width: 767px) 200vw, (max-width: 1279px) 100vw, 1200px"
+            className={project.thumbnailClass}
+            draggable={false}
+          />
+          <span
+            className="thumbnail-corner thumbnail-corner-tl"
+            aria-hidden="true"
+          />
+          <span
+            className="thumbnail-corner thumbnail-corner-br"
+            aria-hidden="true"
+          />
+          <span className="thumbnail-label" aria-hidden="true">
+            <ScanEye size={14} /> VIEW FULL UI
+          </span>
+        </button>
+      )}
       <div className="card-corner corner-tl" aria-hidden="true" />
       <div className="card-corner corner-br" aria-hidden="true" />
       <div className="card-telemetry">
@@ -57,10 +95,25 @@ export function ProjectCard({
           <span className={cn("h-1 w-1", theme.dot)} />
           {project.pillarShort}
         </span>
-        <span className="project-status">
-          <span className={cn("h-1 w-1 rounded-full", theme.dot)} />
-          {project.status}
-        </span>
+        <div className="project-telemetry-actions">
+          <span className="project-status">
+            <span className={cn("h-1 w-1 rounded-full", theme.dot)} />
+            {project.status}
+          </span>
+          {variant === "spatial" && (
+            <button
+              type="button"
+              className="project-preview-trigger"
+              disabled={!interactive}
+              onClick={() => onPreview(project)}
+              aria-label={`Preview ${project.title} screenshot`}
+              aria-haspopup="dialog"
+              aria-controls="project-lightbox"
+            >
+              <ScanEye size={14} aria-hidden="true" /> [ UI PREVIEW ]
+            </button>
+          )}
+        </div>
       </div>
       <div className="project-title-row">
         <div>
@@ -101,6 +154,11 @@ export function ProjectCard({
         ))}
       </ul>
       <ProjectSchematic project={project} />
+      <ProjectCaseStudy
+        project={project}
+        interactive={interactive}
+        variant={variant}
+      />
       <div className="project-card-footer">
         <div className="project-links">
           {links.map(({ key, url, label, icon: Icon }) =>

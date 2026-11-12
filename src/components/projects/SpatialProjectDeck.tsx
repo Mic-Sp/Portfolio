@@ -11,8 +11,13 @@ import { cn, getProjectAccent } from "@/lib/theme-utils";
 import { SpatialProjectNode } from "./SpatialProjectNode";
 import { ProjectShowcaseToolbar } from "./ProjectShowcaseToolbar";
 import "./spatial-deck.css";
+import type { ProjectNode } from "@/types/portfolio";
 
-export function SpatialProjectDeck() {
+export function SpatialProjectDeck({
+  onPreview,
+}: {
+  onPreview: (project: ProjectNode) => void;
+}) {
   const {
     projects,
     activeIndex,
@@ -107,6 +112,13 @@ export function SpatialProjectDeck() {
             onPointerDown={startDrag}
             onPointerCancel={() => setIsDragging(false)}
             onClickCapture={(event) => {
+              if (
+                event.target instanceof Element &&
+                event.target.closest("[data-deck-interactive]")
+              ) {
+                dragged.current = false;
+                return;
+              }
               if (dragged.current && event.detail > 0) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -149,6 +161,7 @@ export function SpatialProjectDeck() {
                   disabled={isDragging || isTerminalOpen}
                   terminalOpen={isTerminalOpen}
                   onSelect={() => selectProject(index)}
+                  onPreview={onPreview}
                 />
               ))}
             </motion.div>

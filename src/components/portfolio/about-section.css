@@ -87,6 +87,32 @@
     font-size: 16px;
     line-height: 1.8;
   }
+  .about-skills-index {
+    display: grid;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #ffffff1a;
+    font:
+      400 12px/1.7 var(--font-mono),
+      monospace;
+  }
+  .about-skills-index > div {
+    display: grid;
+    grid-template-columns: 115px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+  .about-skills-index dt {
+    color: var(--contact-accent);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .about-skills-index dd {
+    min-width: 0;
+    color: var(--recruiter-muted);
+    overflow-wrap: anywhere;
+  }
   .about-availability {
     display: flex;
     align-items: baseline;
@@ -120,5 +146,11 @@
     .about-heading {
       margin-bottom: 20px;
     }
+  }
+}
+
+@layer utilities {
+  .telemetry-frame[data-theme="light"] .about-skills-index {
+    border-color: #cbd5e1;
   }
 }

@@ -3,8 +3,13 @@
 import { useHud } from "@/context/HudContext";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectShowcaseToolbar } from "./ProjectShowcaseToolbar";
+import type { ProjectNode } from "@/types/portfolio";
 
-export function ProjectGridPreview() {
+export function ProjectGridPreview({
+  onPreview,
+}: {
+  onPreview: (project: ProjectNode) => void;
+}) {
   const {
     projects,
     activeIndex,
@@ -42,6 +47,8 @@ export function ProjectGridPreview() {
             index={index}
             selected={activeIndex === index}
             onSelect={() => selectProject(index)}
+            variant="grid"
+            onPreview={onPreview}
           />
         ))}
       </div>

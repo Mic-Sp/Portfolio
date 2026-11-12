@@ -161,15 +161,23 @@ async function close(page, method = "Escape") {
     );
     await page.goto(base, { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
-    const pill = page.locator(".hero-uplinks").getByRole("button", {
+    const pill = page.locator(".top-hud").getByRole("button", {
       name: "Get in Touch",
       exact: true,
     });
     assert.equal(
-      await pill.evaluate((el) =>
-        el.previousElementSibling?.classList.contains("copy-email-button"),
-      ),
+      await page
+        .locator(".hero-uplinks .thm-quick-link")
+        .evaluate((el) =>
+          el.previousElementSibling?.classList.contains("copy-email-button"),
+        ),
       true,
+    );
+    assert.equal(
+      await page
+        .getByRole("button", { name: "Get in Touch", exact: true })
+        .count(),
+      2,
     );
     const before = await page.evaluate(() => ({
       heroHeight: document

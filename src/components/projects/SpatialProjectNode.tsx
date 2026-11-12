@@ -27,6 +27,7 @@ export function SpatialProjectNode({
   disabled,
   terminalOpen,
   onSelect,
+  onPreview,
 }: {
   project: ProjectNode;
   index: number;
@@ -37,6 +38,7 @@ export function SpatialProjectNode({
   disabled: boolean;
   terminalOpen: boolean;
   onSelect: () => void;
+  onPreview: (project: ProjectNode) => void;
 }) {
   const slot = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
@@ -159,6 +161,8 @@ export function SpatialProjectNode({
             selected={selected}
             onSelect={onSelect}
             interactive={selected}
+            variant="spatial"
+            onPreview={onPreview}
           />
         </div>
         {selected && (

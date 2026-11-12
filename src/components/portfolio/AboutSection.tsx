@@ -1,4 +1,5 @@
 import "./about-section.css";
+import { PROFILE_CONFIG } from "@/data/profile.config";
 
 export function AboutSection() {
   return (
@@ -29,6 +30,17 @@ export function AboutSection() {
             <li>Next Chapter</li>
             <li>TryHackMe Gold League Top 7%</li>
           </ul>
+          <dl
+            className="about-skills-index"
+            aria-label="Skills and credentials"
+          >
+            {PROFILE_CONFIG.skillsIndex.map(({ label, values }) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{values.join(" · ")}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
         <div className="about-story">
           <p>

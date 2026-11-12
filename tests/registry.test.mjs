@@ -1,11 +1,26 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
 import {
   PROJECTS_REGISTRY,
   getActiveProjects,
   getPillarCategories,
   getProjectById,
 } from "../src/data/projects.registry.ts";
+
+test("project screenshots resolve to real image assets with accessible descriptions", () => {
+  for (const project of PROJECTS_REGISTRY) {
+    assert.match(project.image, /^\/projects\/[a-z-]+\.(jpg|png)$/);
+    assert.ok(project.imageAlt.trim().length > 20);
+    const bytes = readFileSync(
+      new URL(`../public${project.image}`, import.meta.url),
+    );
+    assert.ok(bytes.length > 1000, `${project.id} must have a real screenshot`);
+    if (project.image.endsWith(".jpg"))
+      assert.deepEqual([...bytes.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+    else assert.equal(bytes.subarray(1, 4).toString(), "PNG");
+  }
+});
 
 test("active projects sort by order without mutating the registry", () => {
   const previous = [...PROJECTS_REGISTRY];
