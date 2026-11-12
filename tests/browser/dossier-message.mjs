@@ -100,7 +100,9 @@ async function assertTarget(page, reducedMotion = false) {
   });
   assert.equal(metrics.pageY, 0);
   assert.equal(metrics.overflow, false);
-  assert.ok(metrics.travel > 200, "drawer must physically slide in");
+  if (reducedMotion)
+    assert.ok(metrics.travel < 1, "reduced motion must remove drawer travel");
+  else assert.ok(metrics.travel > 200, "drawer must physically slide in");
   assert.ok(metrics.focusStates.length > 0);
   assert.ok(
     metrics.focusStates.every((state) => state === "settled"),
@@ -121,7 +123,7 @@ async function assertTarget(page, reducedMotion = false) {
 async function close(page, method = "Escape") {
   if (method === "button")
     await page
-      .getByRole("button", { name: "Close operator dossier", exact: true })
+      .getByRole("button", { name: "Close Bio & Credentials", exact: true })
       .click();
   else await page.keyboard.press(method);
   await page.locator("#operator-dossier").waitFor({ state: "detached" });
@@ -238,7 +240,10 @@ async function close(page, method = "Escape") {
       .click();
     await beginTrace(page);
     await page
-      .getByRole("button", { name: "OPEN DOSSIER MESSAGE FORM", exact: true })
+      .getByRole("button", {
+        name: "OPEN BIO & CREDENTIALS MESSAGE FORM",
+        exact: true,
+      })
       .click();
     results.push({ origin: "CLI", ...(await assertTarget(page)) });
     await close(page);
@@ -257,8 +262,9 @@ async function close(page, method = "Escape") {
     await close(page);
     // Ordinary dossier and credentials triggers must still open their own sections.
     await page
+      .locator(".top-hud")
       .getByRole("button", {
-        name: "Operator dossier: bio and stack",
+        name: "Bio & Credentials",
         exact: true,
       })
       .click();

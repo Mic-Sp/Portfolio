@@ -33,7 +33,12 @@ export function TelemetryClock() {
   );
   const now = seconds === null ? null : new Date(seconds * 1000);
   return (
-    <div className="telemetry-clock" aria-label="Chicago and UTC clocks">
+    <div
+      className="telemetry-clock"
+      role="timer"
+      aria-live="off"
+      aria-label="Chicago and UTC clocks"
+    >
       <span>{now ? localFormatter.format(now) : "--:--:-- CST"}</span>
       <span className="clock-divider">/</span>
       <span className="text-slate-300">

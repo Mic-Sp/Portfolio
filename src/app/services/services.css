@@ -32,7 +32,7 @@
     --services-shadow: 0 1px 2px #0000000d;
     --services-body: #475569;
     --services-detail: #475569;
-    --services-accent: #059669;
+    --services-accent: #047857;
     --services-accent-hover: #047857;
     --services-badge-border: #05966933;
     --services-badge-bg: #ecfdf5;
@@ -41,7 +41,7 @@
     --services-input-text: #0f172a;
     --services-placeholder: #64748b;
     --services-focus: #059669;
-    --services-submit: #059669;
+    --services-submit: #047857;
     --services-submit-hover: #047857;
     --services-submit-text: #fff;
     --services-proof-surface: #fff;

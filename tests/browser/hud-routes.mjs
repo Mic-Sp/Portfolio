@@ -105,7 +105,7 @@ async function verifyTheme(page) {
   assert.equal(light.border, "rgb(226, 232, 240)");
   assert.equal(light.input, "rgb(255, 255, 255)");
   assert.equal(light.inputText, "rgb(15, 23, 42)");
-  assert.equal(light.submit, "rgb(5, 150, 105)");
+  assert.equal(light.submit, "rgb(4, 120, 87)");
   assert.equal(light.scheme, "light");
   assert.equal(light.globalScheme, "light");
   assert.notEqual(light.hud, dark.hud);
@@ -155,10 +155,8 @@ async function verifyTheme(page) {
 }
 
 async function verifyDossier(page) {
-  const trigger = page.locator(".top-hud").getByRole("button", {
-    name: "Operator dossier: bio and stack",
-    exact: true,
-  });
+  // The trigger deliberately leaves the accessibility tree while its modal is open.
+  const trigger = page.locator(".top-hud .dossier-hud-trigger");
   await trigger.click();
   await page.waitForFunction(
     () =>
@@ -166,6 +164,11 @@ async function verifyDossier(page) {
       "settled",
   );
   assert.equal(await trigger.getAttribute("aria-expanded"), "true");
+  assert.equal(
+    await page.locator(".top-hud").getAttribute("aria-hidden"),
+    "true",
+  );
+  assert.equal(await page.locator(".top-hud").getAttribute("inert"), "");
   assert.equal(
     await page.locator("#operator-dossier").getAttribute("open"),
     "",

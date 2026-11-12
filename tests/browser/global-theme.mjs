@@ -161,7 +161,10 @@ try {
   assert.equal(light.transformStyle, "preserve-3d");
   assert.deepEqual(light.transforms, dark.transforms);
   assert.ok(Math.abs(light.cardTop - dark.cardTop) < 1);
-  assert.ok(light.cardTop < 400);
+  assert.ok(
+    light.cardTop < 500,
+    "first project stays above the fold beneath the expanded identity",
+  );
   assert.equal(await page.evaluate(() => scrollY), 0);
   assert.equal(
     await page.evaluate(() => localStorage.getItem("portfolio-theme")),

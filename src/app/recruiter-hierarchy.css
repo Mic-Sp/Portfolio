@@ -30,7 +30,8 @@
     align-items: center;
     gap: 8px;
   }
-  .recruiter-actions .hud-button {
+  .recruiter-actions .hud-button,
+  .top-hud .dossier-hud-trigger {
     font-size: 12px;
     font-weight: 600;
     padding-inline: 12px;

@@ -47,9 +47,8 @@
       border-color 0.18s,
       box-shadow 0.18s;
   }
-  button:focus-visible,
-  a:focus-visible {
-    outline: 2px solid #67e8f9;
+  :focus-visible {
+    outline: 2px solid var(--focus-accent, #67e8f9);
     outline-offset: 5px;
   }
   ::selection {
@@ -57,8 +56,12 @@
     color: #ecfeff;
   }
   .telemetry-frame {
+    --focus-accent: #67e8f9;
     position: relative;
     isolation: isolate;
+  }
+  .telemetry-frame[data-theme="light"] {
+    --focus-accent: #0369a1;
   }
   .spatial-backdrop {
     position: fixed;

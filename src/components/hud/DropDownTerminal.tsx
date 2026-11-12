@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useHud } from "@/context/HudContext";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { PROJECTS_REGISTRY } from "@/data/projects.registry";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
 import {
@@ -37,6 +38,7 @@ const BOOT_ENTRY: TerminalEntry = {
 
 export function DropDownTerminal() {
   const { isTerminalOpen } = useHud();
+  const reducedMotion = useMotionPreference();
   const [entries, setEntries] = useState<TerminalEntry[]>([BOOT_ENTRY]);
   const [history, setHistory] = useState<string[]>([]);
   const sequence = useRef(0);
@@ -64,7 +66,7 @@ export function DropDownTerminal() {
   }
 
   return (
-    <MotionConfig reducedMotion="never">
+    <MotionConfig reducedMotion="user">
       <AnimatePresence initial={false}>
         {isTerminalOpen && (
           <motion.aside
@@ -74,10 +76,10 @@ export function DropDownTerminal() {
             role="dialog"
             aria-modal="false"
             aria-label="Developer console"
-            initial={{ y: "-100%", opacity: 0 }}
+            initial={{ y: reducedMotion ? 0 : "-100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "-100%", opacity: 0 }}
-            transition={getHudDrawerTransition()}
+            exit={{ y: reducedMotion ? 0 : "-100%", opacity: 0 }}
+            transition={getHudDrawerTransition(reducedMotion)}
           >
             <TerminalPanel
               entries={entries}
@@ -205,7 +207,7 @@ function TerminalPanel({
   }
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.nativeEvent.isComposing) return;
-    if (["Escape", "`", "~"].includes(event.key)) {
+    if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
       hud.closeTerminal();

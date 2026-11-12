@@ -53,8 +53,7 @@ export function useHudKeyboard({
         return;
       }
 
-      // The console close key remains available while typing in the future terminal.
-      if (consoleKey && (!editable || isTerminalOpen)) {
+      if (consoleKey && !editable) {
         event.preventDefault();
         toggleTerminal();
         return;

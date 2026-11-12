@@ -4,6 +4,7 @@ import { TelemetryFrame } from "@/components/hud/TelemetryFrame";
 import { HudProvider } from "@/context/HudContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 import "./portfolio-light.css";
 import "./recruiter-hierarchy.css";
@@ -22,13 +23,6 @@ const jetbrainsMono = JetBrains_Mono({
 const title = `${PROFILE_CONFIG.legalName} | AI & Full-Stack Software Engineer`;
 const description =
   "AI & Full-Stack Software Engineer open to full-time roles. Explore Michael Sprague's applied AI, TypeScript, React, and Next.js projects, resume, and experience.";
-const deploymentHost =
-  process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
-const siteUrl =
-  process.env.SITE_URL ||
-  (deploymentHost
-    ? `https://${deploymentHost}`
-    : "https://portfolio-dusky-ten-97.vercel.app/");
 const socialImage = {
   url: "/opengraph-image.png",
   width: 1200,
@@ -37,9 +31,15 @@ const socialImage = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: SITE_URL,
   title,
   description,
+  alternates: { canonical: "/" },
+  icons: {
+    icon: { url: "/icon.svg", type: "image/svg+xml" },
+    shortcut: "/favicon.ico",
+    apple: { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

@@ -7,7 +7,13 @@ import {
   useSpring,
 } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useCallback, useEffect, useRef, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type PointerEvent,
+} from "react";
 import { getPointerPosition } from "@/lib/pointer-math";
 import { getSpatialTargets } from "@/lib/spatial-math";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
@@ -43,6 +49,15 @@ export function SpatialProjectNode({
   const slot = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const selected = offset === 0;
+  const keyboardSelection = useRef(false);
+  useLayoutEffect(() => {
+    if (selected && keyboardSelection.current) {
+      slot.current
+        ?.querySelector<HTMLButtonElement>(".select-node")
+        ?.focus({ preventScroll: true });
+      keyboardSelection.current = false;
+    }
+  }, [selected]);
   const wing = Math.abs(offset) === 1;
   const {
     zIndex,
@@ -177,10 +192,13 @@ export function SpatialProjectNode({
             type="button"
             className="spatial-card-select"
             data-deck-select
-            tabIndex={-1}
+            aria-pressed={false}
             aria-label={`Focus ${project.title}`}
             disabled={terminalOpen}
-            onClick={onSelect}
+            onClick={(event) => {
+              keyboardSelection.current = event.detail === 0;
+              onSelect();
+            }}
           >
             <span>
               FOCUS NODE {(index + 1).toString().padStart(2, "0")}{" "}

@@ -19,6 +19,7 @@ import { useHud } from "@/context/HudContext";
 import { useTheme } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
+import { hideModalBackground } from "@/lib/modal-background";
 import { activateDossierSection } from "@/lib/dossier-navigation";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { CommsUplink } from "./CommsUplink";
@@ -136,7 +137,7 @@ function DossierContent({
 export function OperatorDossierDrawer() {
   const { isDossierOpen } = useHud();
   return (
-    <MotionConfig reducedMotion="never">
+    <MotionConfig reducedMotion="user">
       <AnimatePresence initial={false}>
         {isDossierOpen && <DossierPanel key="operator-dossier" />}
       </AnimatePresence>
@@ -173,9 +174,11 @@ function DossierPanel() {
     document.body.style.overflow = "hidden";
     panel.showModal();
     closeButton.current?.focus({ preventScroll: true });
+    const restoreBackground = hideModalBackground(panel);
     // AnimatePresence keeps this modal and its scroll lock alive until both exits finish.
     return () => {
       document.body.style.overflow = previousOverflow;
+      restoreBackground();
       if (panel.open) panel.close();
       const destination = pendingFocus.terminal
         ? document.getElementById("terminal-command")
@@ -201,6 +204,8 @@ function DossierPanel() {
       ref={dialog}
       id="operator-dossier"
       className="operator-dossier-dialog"
+      role="dialog"
+      aria-modal="true"
       data-dossier-theme={isLight ? "light" : "dark"}
       aria-labelledby="dossier-drawer-title"
       onKeyDown={(event) => {
@@ -253,19 +258,19 @@ function DossierPanel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={getHudDrawerTransition()}
+        transition={getHudDrawerTransition(reducedMotion)}
       />
       <motion.div
         className="dossier-slide"
         data-motion-state={isPresent && isSettled ? "settled" : "moving"}
         initial={{
-          transform: OFFSCREEN_TRANSFORM,
+          transform: reducedMotion ? REST_TRANSFORM : OFFSCREEN_TRANSFORM,
         }}
         animate={{ transform: REST_TRANSFORM }}
         exit={{
-          transform: OFFSCREEN_TRANSFORM,
+          transform: reducedMotion ? REST_TRANSFORM : OFFSCREEN_TRANSFORM,
         }}
-        transition={getHudDrawerTransition()}
+        transition={getHudDrawerTransition(reducedMotion)}
         onAnimationStart={() => setIsSettled(false)}
         onAnimationComplete={(definition) => {
           if (
@@ -283,16 +288,14 @@ function DossierPanel() {
               <p className="dossier-label">
                 OPERATOR // {PROFILE_CONFIG.legalName}
               </p>
-              <h2 id="dossier-drawer-title">
-                Operator Dossier & Capabilities Matrix
-              </h2>
+              <h2 id="dossier-drawer-title">BIO &amp; CREDENTIALS</h2>
             </div>
             <button
               ref={closeButton}
               className="dossier-close"
               type="button"
               onClick={closeDossier}
-              aria-label="Close operator dossier"
+              aria-label="Close Bio & Credentials"
             >
               <X size={20} aria-hidden="true" />
             </button>
@@ -304,9 +307,9 @@ function DossierPanel() {
             />
           </div>
           <footer className="dossier-rail">
-            <span>PROFILE // BIO & STACK</span>
+            <span>BIO &amp; CREDENTIALS</span>
             <span>
-              <kbd>ESC</kbd> CLOSE DOSSIER
+              <kbd>ESC</kbd> CLOSE
             </span>
           </footer>
         </div>

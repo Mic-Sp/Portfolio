@@ -7,6 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { cn, getProjectAccent } from "@/lib/theme-utils";
+import { hideModalBackground } from "@/lib/modal-background";
 import type { ProjectNode } from "@/types/portfolio";
 import "./project-previews.css";
 
@@ -40,8 +41,10 @@ export function ProjectLightbox({
     document.body.style.overflow = "hidden";
     panel.showModal();
     closeButton.current?.focus({ preventScroll: true });
+    const restoreBackground = hideModalBackground(panel);
     // AnimatePresence retains the focus trap and scroll lock throughout exit.
     return () => {
+      restoreBackground();
       if (panel.open) panel.close();
       document.body.style.overflow = previousOverflow;
       if (previousFocus?.isConnected && previousFocus.getClientRects().length)
@@ -55,6 +58,9 @@ export function ProjectLightbox({
       id="project-lightbox"
       className={cn("project-lightbox", getProjectAccent(project.accent).scope)}
       data-theme={isLight ? "light" : "dark"}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${project.title} UI preview`}
       aria-labelledby="project-lightbox-title"
       aria-describedby="project-lightbox-summary"
       initial={{ opacity: 0 }}

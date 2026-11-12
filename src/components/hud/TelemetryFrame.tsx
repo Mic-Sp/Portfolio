@@ -133,10 +133,10 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
               "hud-button dossier-hud-trigger",
               isDossierOpen && "is-active",
             )}
-            label="Operator dossier: bio and stack"
+            label="Bio & Credentials"
           >
             <Fingerprint size={14} aria-hidden="true" />
-            <span>DOSSIER</span>
+            <span>Bio &amp; Credentials</span>
           </DossierTrigger>
           {!isServices && (
             <>
@@ -239,12 +239,7 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
             })}
           </nav>
           <div className="keybind-legend">
-            <span
-              className={cn(
-                "cycle-hint",
-                (viewMode !== "spatial" || isTerminalOpen) && "opacity-70",
-              )}
-            >
+            <span className="cycle-hint">
               <kbd>
                 <ArrowLeft size={10} />
                 <ArrowRight size={10} />

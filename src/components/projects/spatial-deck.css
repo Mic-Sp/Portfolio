@@ -170,6 +170,15 @@
   .spatial-card-select:focus-visible {
     outline-offset: -3px;
   }
+  .spatial-card-slot:focus-within {
+    opacity: 1 !important;
+  }
+  /* A node behind the active card must expose its keyboard focus indicator. */
+  .spatial-card-slot:has(.spatial-card-select:focus-visible) {
+    transform: translate3d(0, 0, 0) !important;
+    filter: none !important;
+    z-index: 31 !important;
+  }
   .deck-horizon {
     position: absolute;
     height: 110px;

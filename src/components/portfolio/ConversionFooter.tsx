@@ -8,7 +8,11 @@ export function ConversionFooter() {
     PROFILE_CONFIG.commsAndTelemetry.directChannels;
 
   return (
-    <footer className="conversion-footer" aria-label="Get in touch">
+    <footer
+      className="conversion-footer"
+      role="region"
+      aria-label="Get in touch"
+    >
       <DossierTrigger className="hud-button contact-cta" target="transmission">
         <Send size={15} aria-hidden="true" /> Get in Touch
       </DossierTrigger>

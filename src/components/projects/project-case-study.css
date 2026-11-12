@@ -64,8 +64,8 @@
     overflow-wrap: anywhere;
   }
   .case-study-content:focus-visible {
-    outline: 1px solid #22d3ee80;
-    outline-offset: 3px;
+    outline: 2px solid var(--focus-accent, #67e8f9);
+    outline-offset: -2px;
   }
 }
 
