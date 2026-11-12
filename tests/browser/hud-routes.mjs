@@ -5,6 +5,27 @@ const { chromium } = await import(
 );
 const base = process.env.PORTFOLIO_BASE_URL || "http://127.0.0.1:3000";
 
+async function waitForScrollIdle(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve, reject) => {
+        let previous = scrollY;
+        let stableFrames = 0;
+        const started = performance.now();
+        const check = () => {
+          stableFrames =
+            Math.abs(scrollY - previous) < 0.5 ? stableFrames + 1 : 0;
+          previous = scrollY;
+          if (stableFrames >= 6) return resolve();
+          if (performance.now() - started > 5000)
+            return reject(new Error("Page scroll did not settle"));
+          requestAnimationFrame(check);
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+}
+
 async function portfolioBackground(page) {
   return page.locator(".telemetry-frame").evaluate((el) => {
     const context = document.createElement("canvas").getContext("2d");
@@ -210,9 +231,7 @@ async function verifyPortfolio(page) {
     1,
   );
   assert.equal(
-    await page
-      .getByRole("group", { name: "Project view", exact: true })
-      .count(),
+    await page.locator("#projects .showcase-view-toggle").count(),
     1,
   );
   const controls = page.locator(".top-hud");
@@ -229,11 +248,40 @@ async function verifyPortfolio(page) {
   assert.equal(await resume.getAttribute("href"), "/resume.pdf");
   assert.equal(await resume.getAttribute("target"), "_blank");
   assert.equal(await resume.getAttribute("rel"), "noopener noreferrer");
+  const navigation = page.getByRole("navigation", {
+    name: "Main navigation",
+    exact: true,
+  });
+  assert.deepEqual(await navigation.locator("a, button").allTextContents(), [
+    "Projects",
+    "About",
+    "Bio & Credentials",
+    "Resume (PDF)",
+    "Get in Touch",
+  ]);
   assert.equal(
-    await resume.evaluate((el) =>
-      el.previousElementSibling.textContent.includes("Get in Touch"),
-    ),
-    true,
+    await controls.locator(".view-toggle, .showcase-view-toggle").count(),
+    0,
+  );
+  assert.equal(
+    await page
+      .getByRole("heading", { name: "Projects", level: 2, exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(
+    await page
+      .getByRole("heading", { name: "About Me", level: 2, exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(
+    await page.locator("#projects .section-index").innerText(),
+    "01 // SELECTED SYSTEMS",
+  );
+  assert.equal(
+    await page.locator("#about .about-index").innerText(),
+    "02 // OPERATOR PROFILE",
   );
   assert.equal(
     await page.locator(".telemetry-frame").getAttribute("data-theme"),
@@ -243,9 +291,15 @@ async function verifyPortfolio(page) {
   await page.locator("#terminal-command").waitFor({ state: "visible" });
   await page.locator("#terminal-command").press("Escape");
   await page.locator("#developer-console").waitFor({ state: "detached" });
-  await controls.getByRole("button", { name: "GRID", exact: true }).click();
+  await page
+    .locator("#projects")
+    .getByRole("button", { name: "Switch to Grid View", exact: true })
+    .click();
   await page.locator(".project-grid").waitFor({ state: "visible" });
-  await controls.getByRole("button", { name: "3D DECK", exact: true }).click();
+  await page
+    .locator("#projects")
+    .getByRole("button", { name: "Switch to 3D View", exact: true })
+    .click();
   await page
     .locator('.spatial-card-slot[data-offset="0"]')
     .waitFor({ state: "visible" });
@@ -523,7 +577,7 @@ try {
   await blocked.close();
   // Keep all HUD controls usable as the Services action joins the cluster.
   await page.goto(base, { waitUntil: "networkidle" });
-  for (const width of [1440, 1280, 1024, 768, 390]) {
+  for (const width of [1920, 1536, 1440, 1280, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const layout = await page.locator(".top-hud").evaluate((el) => {
       const blocks = [".location-block", ".system-status", ".hud-controls"].map(
@@ -548,6 +602,43 @@ try {
       false,
       `HUD blocks must not overlap at ${width}px`,
     );
+    const navigation = page.getByRole("navigation", {
+      name: "Main navigation",
+      exact: true,
+    });
+    for (const [label, id] of [
+      ["Projects", "projects"],
+      ["About", "about"],
+    ]) {
+      const link = navigation.getByRole("link", { name: label, exact: true });
+      assert.equal(await link.getAttribute("href"), `#${id}`);
+      await link.click();
+      await page.waitForFunction((id) => location.hash === `#${id}`, id);
+      await page.waitForFunction((id) => {
+        const target = document.getElementById(id).getBoundingClientRect();
+        const hud = document.querySelector(".top-hud").getBoundingClientRect();
+        return target.top >= hud.bottom - 1 && target.top < innerHeight;
+      }, id);
+      await waitForScrollIdle(page);
+    }
+    for (const name of ["Bio & Credentials", "Resume (PDF)", "Get in Touch"]) {
+      const control = navigation.getByRole(
+        name === "Resume (PDF)" ? "link" : "button",
+        { name, exact: true },
+      );
+      assert.equal(
+        await control.isVisible(),
+        true,
+        `${name} visible at ${width}px`,
+      );
+      const box = await control.boundingBox();
+      assert.ok(box.width >= 44 && box.height >= 44);
+    }
+    assert.equal(
+      await page.locator(".top-hud [data-terminal-trigger]").isVisible(),
+      width >= 768,
+    );
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
     results.push({ portfolioWidth: width, ...layout });
     if (width === 1440 || width === 390) {
       for (const origin of [".top-hud", ".conversion-footer"]) {
@@ -557,6 +648,7 @@ try {
         if (origin === ".top-hud")
           await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
         else await trigger.scrollIntoViewIfNeeded();
+        await waitForScrollIdle(page);
         const scrollBefore = await page.evaluate(() => scrollY);
         await trigger.click();
         await page.waitForFunction(

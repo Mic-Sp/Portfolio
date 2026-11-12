@@ -4,15 +4,13 @@ import { PROFILE_CONFIG } from "@/data/profile.config";
 export function AboutSection() {
   return (
     <section
-      id="operator-profile"
+      id="about"
       className="about-section"
       aria-labelledby="operator-profile-heading"
     >
       <header className="about-heading">
-        <span className="about-index" aria-hidden="true">
-          02 /
-        </span>
-        <h2 id="operator-profile-heading">OPERATOR PROFILE</h2>
+        <span className="about-index">02 // OPERATOR PROFILE</span>
+        <h2 id="operator-profile-heading">About Me</h2>
       </header>
       <div className="about-layout">
         <div className="about-summary">

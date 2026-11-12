@@ -188,8 +188,8 @@ try {
   await page.mouse.up();
   assert.equal(await selected(page), "backlog-buster");
   await page
-    .locator(".top-hud")
-    .getByRole("button", { name: "GRID", exact: true })
+    .locator("#projects .project-toolbar")
+    .getByRole("button", { name: "Switch to Grid View", exact: true })
     .click();
   await page.locator(".project-grid").waitFor({ state: "visible" });
   await button(page, "q-split").click();
@@ -261,8 +261,8 @@ try {
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page
-    .locator(".top-hud")
-    .getByRole("button", { name: "3D DECK", exact: true })
+    .locator("#projects .project-toolbar")
+    .getByRole("button", { name: "Switch to 3D View", exact: true })
     .click();
   await page.locator(".spatial-stage").waitFor({ state: "visible" });
   await button(page, "backlog-buster").click();

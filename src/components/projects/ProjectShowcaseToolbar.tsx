@@ -19,10 +19,10 @@ export function ProjectShowcaseToolbar({
   return (
     <div className="project-toolbar">
       <div className="registry-title">
-        <span className="section-index">01 /</span>
+        <span className="section-index">01 // SELECTED SYSTEMS</span>
         <h2 id={headingId}>
-          Selected systems
-          <span className="registry-count">
+          Projects
+          <span className="registry-count" aria-hidden="true">
             {totalProjects.toString().padStart(2, "0")}
           </span>
         </h2>

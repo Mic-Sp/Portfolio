@@ -5,7 +5,7 @@ import { AboutSection } from "@/components/portfolio/AboutSection";
 
 export default function Home() {
   return (
-    <main id="main-content" className="main-content">
+    <main id="main-content" tabIndex={-1} className="main-content">
       <HeroIdentity />
       <ProjectShowcase />
       <AboutSection />

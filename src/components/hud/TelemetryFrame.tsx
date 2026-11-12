@@ -3,9 +3,7 @@
 import {
   ArrowLeft,
   ArrowRight,
-  Box,
   Command,
-  Grid2X2,
   Fingerprint,
   FileText,
   MapPin,
@@ -39,7 +37,6 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
     activePillarFilter,
     setActivePillarFilter,
     viewMode,
-    setViewMode,
     isTerminalOpen,
     toggleTerminal,
     godMode,
@@ -69,8 +66,8 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
       data-page={isServices ? "services" : "portfolio"}
       className="telemetry-frame min-h-svh bg-slate-950 text-slate-100"
     >
-      <a href="#main-content" className="skip-link">
-        {isServices ? "Skip to services" : "Skip to projects"}
+      <a href="#main-content" className="skip-link sr-only focus:not-sr-only">
+        Skip to main content
       </a>
       <div className="spatial-backdrop" aria-hidden="true" />
       <header ref={barRef} className="top-hud">
@@ -110,13 +107,25 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
               <Sun size={18} aria-hidden="true" />
             )}
           </button>
-          <nav className="recruiter-actions" aria-label="Contact and resume">
-            <DossierTrigger
-              className="hud-button contact-cta"
-              target="transmission"
+          <nav className="recruiter-actions" aria-label="Main navigation">
+            <a
+              href={isServices ? "/#projects" : "#projects"}
+              className="hud-button"
             >
-              <Send size={14} aria-hidden="true" />
-              <span>Get in Touch</span>
+              Projects
+            </a>
+            <a href={isServices ? "/#about" : "#about"} className="hud-button">
+              About
+            </a>
+            <DossierTrigger
+              className={cn(
+                "hud-button dossier-hud-trigger",
+                isDossierOpen && "is-active",
+              )}
+              label="Bio & Credentials"
+            >
+              <Fingerprint size={14} aria-hidden="true" />
+              <span>Bio &amp; Credentials</span>
             </DossierTrigger>
             <a
               href="/resume.pdf"
@@ -127,66 +136,31 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
               <FileText size={14} aria-hidden="true" />
               <span>Resume (PDF)</span>
             </a>
+            <DossierTrigger
+              className="hud-button contact-cta"
+              target="transmission"
+            >
+              <Send size={14} aria-hidden="true" />
+              <span>Get in Touch</span>
+            </DossierTrigger>
           </nav>
-          <DossierTrigger
-            className={cn(
-              "hud-button dossier-hud-trigger",
-              isDossierOpen && "is-active",
-            )}
-            label="Bio & Credentials"
-          >
-            <Fingerprint size={14} aria-hidden="true" />
-            <span>Bio &amp; Credentials</span>
-          </DossierTrigger>
           {!isServices && (
-            <>
-              <button
-                type="button"
-                onClick={toggleTerminal}
-                aria-pressed={isTerminalOpen}
-                aria-controls="developer-console"
-                aria-expanded={isTerminalOpen}
-                data-terminal-trigger
-                aria-keyshortcuts="` ~"
-                className={cn("hud-button", isTerminalOpen && "is-active")}
-              >
-                <Terminal size={13} aria-hidden="true" />
-                <span>CLI (~)</span>
-              </button>
-              <div
-                className="view-toggle"
-                role="group"
-                aria-label="Project view"
-              >
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "spatial"}
-                  onClick={() => setViewMode("spatial")}
-                  className={cn(
-                    "view-button",
-                    viewMode === "spatial" && "is-active",
-                  )}
-                >
-                  <Box size={12} aria-hidden="true" />
-                  <span>3D DECK</span>
-                </button>
-                <span className="text-slate-300" aria-hidden="true">
-                  /
-                </span>
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "grid"}
-                  onClick={() => setViewMode("grid")}
-                  className={cn(
-                    "view-button",
-                    viewMode === "grid" && "is-active",
-                  )}
-                >
-                  <Grid2X2 size={12} aria-hidden="true" />
-                  <span>GRID</span>
-                </button>
-              </div>
-            </>
+            <button
+              type="button"
+              onClick={toggleTerminal}
+              aria-pressed={isTerminalOpen}
+              aria-controls="developer-console"
+              aria-expanded={isTerminalOpen}
+              data-terminal-trigger
+              aria-keyshortcuts="` ~"
+              className={cn(
+                "hud-button cli-utility",
+                isTerminalOpen && "is-active",
+              )}
+            >
+              <Terminal size={13} aria-hidden="true" />
+              <span>CLI (~)</span>
+            </button>
           )}
         </div>
       </header>

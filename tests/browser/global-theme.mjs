@@ -469,8 +469,8 @@ try {
   await input.press("Escape");
   await page.locator("#developer-console").waitFor({ state: "detached" });
   await page
-    .locator(".top-hud")
-    .getByRole("button", { name: "GRID", exact: true })
+    .locator("#projects .project-toolbar")
+    .getByRole("button", { name: "Switch to Grid View", exact: true })
     .click();
   await page.locator(".project-grid").waitFor({ state: "visible" });
   await page.locator(".pillar-pill").first().click();
@@ -485,8 +485,8 @@ try {
   if (screenshots)
     await page.screenshot({ path: `${screenshots}/cleanroom-grid.png` });
   await page
-    .locator(".top-hud")
-    .getByRole("button", { name: "3D DECK", exact: true })
+    .locator("#projects .project-toolbar")
+    .getByRole("button", { name: "Switch to 3D View", exact: true })
     .click();
   await page.locator(".spatial-stage").waitFor({ state: "visible" });
   await page.keyboard.press("Home");

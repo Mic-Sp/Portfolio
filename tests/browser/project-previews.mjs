@@ -191,8 +191,8 @@ try {
       document.querySelector('[data-offset="0"]')?.dataset.nodeId === "q-split",
   );
   await page
-    .locator(".top-hud")
-    .getByRole("button", { name: "GRID", exact: true })
+    .locator("#projects .project-toolbar")
+    .getByRole("button", { name: "Switch to Grid View", exact: true })
     .click();
   await page.locator(".project-grid").waitFor({ state: "visible" });
   for (let i = 0; i < PROJECTS_REGISTRY.length; i++) {

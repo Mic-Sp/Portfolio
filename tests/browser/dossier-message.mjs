@@ -197,7 +197,10 @@ async function close(page, method = "Escape") {
       before.uplinkHeight <= 34,
       "uplinks must stay in one compact row",
     );
-    assert.ok(before.cardTop < 440, "deck must remain above the fold");
+    assert.ok(
+      before.cardTop < 500,
+      `deck must remain above the fold beneath the section eyebrow (${before.cardTop}px)`,
+    );
     for (let attempt = 0; attempt < 2; attempt++) {
       await beginTrace(page);
       await pill.click();

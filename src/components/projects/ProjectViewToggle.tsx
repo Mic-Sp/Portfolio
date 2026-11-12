@@ -10,7 +10,7 @@ export function ProjectViewToggle() {
     <button
       type="button"
       className="showcase-view-toggle"
-      aria-label="Flat grid view"
+      aria-label={spatial ? "Switch to Grid View" : "Switch to 3D View"}
       aria-pressed={!spatial}
       aria-controls="project-registry"
       onClick={() => setViewMode(spatial ? "grid" : "spatial")}
@@ -20,7 +20,7 @@ export function ProjectViewToggle() {
       ) : (
         <Box size={12} aria-hidden="true" />
       )}
-      {spatial ? "FLAT GRID VIEW" : "3D SPATIAL DECK"}
+      {spatial ? "Grid View" : "3D View"}
     </button>
   );
 }

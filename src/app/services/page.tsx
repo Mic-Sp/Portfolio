@@ -198,6 +198,7 @@ export default function ServicesPage() {
 
       <main
         id="main-content"
+        tabIndex={-1}
         className="mx-auto max-w-6xl space-y-20 px-6 py-16 sm:py-24"
       >
         {/* Hero */}

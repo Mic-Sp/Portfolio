@@ -21,7 +21,7 @@ export function ProjectShowcase() {
   return (
     <ProjectCaseStudyProvider>
       <div
-        id="project-showcase"
+        id="projects"
         className="project-showcase-anchor"
         tabIndex={-1}
         onClickCapture={(event) => {

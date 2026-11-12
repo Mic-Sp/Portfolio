@@ -165,6 +165,37 @@ async function assertFocus(page, selector) {
   );
 }
 
+async function assertSkipLink(page) {
+  const skip = page.getByRole("link", {
+    name: "Skip to main content",
+    exact: true,
+  });
+  assert.equal(await skip.getAttribute("href"), "#main-content");
+  await page.keyboard.press("Tab");
+  await assertFocus(page, ".skip-link");
+  const visible = await skip.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    const css = getComputedStyle(el);
+    return (
+      rect.width > 100 &&
+      rect.height >= 44 &&
+      rect.top >= 0 &&
+      parseFloat(css.outlineWidth) >= 2 &&
+      el.matches(":focus-visible")
+    );
+  });
+  assert.equal(visible, true, "skip link becomes visible on the first Tab");
+  await page.keyboard.press("Enter");
+  await assertFocus(page, "#main-content");
+  await page.keyboard.press("Tab");
+  assert.equal(
+    await page.evaluate(() =>
+      document.querySelector("#main-content").contains(document.activeElement),
+    ),
+    true,
+  );
+}
+
 async function assertTrap(page, modal) {
   const close = modal.locator("button").first();
   await close.focus();
@@ -217,6 +248,7 @@ try {
 
   for (const theme of ["dark", "light"]) {
     await page.goto(base, { waitUntil: "networkidle" });
+    await assertSkipLink(page);
     const toggle = page.getByRole("button", {
       name: "Toggle light mode",
       exact: true,
@@ -328,6 +360,7 @@ try {
     await page.locator("#developer-console").waitFor({ state: "detached" });
 
     await page.goto(`${base}/services`, { waitUntil: "networkidle" });
+    await assertSkipLink(page);
     await scan(page, `${theme}: services`);
     for (const selector of ["#name", "#details"]) {
       const field = page.locator(selector);
