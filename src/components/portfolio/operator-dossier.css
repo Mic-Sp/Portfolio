@@ -89,8 +89,8 @@
     background: #0f172a80;
     padding: 20px;
   }
-  .dossier-education-card h4,
-  .dossier-matrix-column h4 {
+  .dossier-education-card .dossier-item-title,
+  .dossier-matrix-column .dossier-item-title {
     color: #f8fafc;
     font-size: 18px;
     line-height: 1.4;
@@ -312,7 +312,7 @@
   .dossier-sheet .dossier-matrix-column {
     padding: 16px;
   }
-  .dossier-sheet .dossier-matrix-column h4 {
+  .dossier-sheet .dossier-matrix-column .dossier-item-title {
     font-size: 16px;
   }
   @media (min-width: 768px) {

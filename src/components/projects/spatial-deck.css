@@ -3,6 +3,7 @@
 @layer components {
   .project-toolbar {
     display: grid;
+    min-width: 0;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 20px;
@@ -330,6 +331,16 @@
     }
   }
   @media (max-width: 767px) {
+    .project-toolbar {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .project-toolbar-counter,
+    .showcase-view-toggle {
+      min-width: 0;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
     .project-toolbar .registry-title {
       grid-column: 1 / -1;
     }

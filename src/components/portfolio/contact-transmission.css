@@ -50,7 +50,7 @@
       animation: none;
     }
   }
-  .contact-transmission h4 {
+  .contact-transmission .contact-transmission-label {
     display: flex;
     align-items: center;
     gap: 8px;

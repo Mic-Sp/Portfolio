@@ -123,7 +123,7 @@ async function assertTarget(page, reducedMotion = false) {
 async function close(page, method = "Escape") {
   if (method === "button")
     await page
-      .getByRole("button", { name: "Close Bio & Credentials", exact: true })
+      .getByRole("button", { name: "Close Credentials", exact: true })
       .click();
   else await page.keyboard.press(method);
   await page.locator("#operator-dossier").waitFor({ state: "detached" });
@@ -245,7 +245,7 @@ async function close(page, method = "Escape") {
     await beginTrace(page);
     await page
       .getByRole("button", {
-        name: "OPEN BIO & CREDENTIALS MESSAGE FORM",
+        name: "OPEN CREDENTIALS MESSAGE FORM",
         exact: true,
       })
       .click();
@@ -268,7 +268,7 @@ async function close(page, method = "Escape") {
     await page
       .locator(".top-hud")
       .getByRole("button", {
-        name: "Bio & Credentials",
+        name: "Credentials",
         exact: true,
       })
       .click();
@@ -304,7 +304,7 @@ async function close(page, method = "Escape") {
       const credential = PROFILE_CONFIG.education[i];
       const card = cards.nth(i);
       assert.equal(
-        await card.locator("h4").innerText(),
+        await card.locator(".dossier-item-title").innerText(),
         credential.institution,
       );
       assert.equal(
@@ -376,7 +376,10 @@ async function close(page, method = "Escape") {
     for (let i = 0; i < expectedComms.length; i++) {
       const expected = expectedComms[i],
         card = commsCards.nth(i);
-      assert.equal(await card.locator("h4").innerText(), expected.label);
+      assert.equal(
+        await card.locator(".comms-channel-label").innerText(),
+        expected.label,
+      );
       assert.equal(
         await card.locator(".comms-channel-handle").innerText(),
         expected.handle,

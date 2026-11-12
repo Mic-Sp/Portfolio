@@ -436,7 +436,7 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
             text: "CHOOSE AN UPLINK // ",
             actions: [
               { label: "TYPE MSG IN CONSOLE", kind: "prefill", value: "msg " },
-              { label: "OPEN BIO & CREDENTIALS MESSAGE FORM", kind: "contact" },
+              { label: "OPEN CREDENTIALS MESSAGE FORM", kind: "contact" },
             ],
           },
         );

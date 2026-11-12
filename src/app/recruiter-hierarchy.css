@@ -27,8 +27,18 @@
   }
   .recruiter-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
+    min-width: 0;
+  }
+  .recruiter-actions .hud-button {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .recruiter-actions svg {
+    flex-shrink: 0;
   }
   .recruiter-actions .hud-button,
   .top-hud .dossier-hud-trigger {
@@ -140,6 +150,17 @@
     .top-hud .location-block {
       padding-right: 44px;
     }
+    .top-hud .location-block > p {
+      flex-wrap: wrap;
+      overflow-wrap: anywhere;
+    }
+    .hero-credentials .credential-pill {
+      min-width: 0;
+      max-width: 100%;
+      min-height: 44px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
     .recruiter-actions .hud-button {
       flex: 1;
       padding-inline: 8px;
@@ -161,6 +182,23 @@
     }
     .conversion-services {
       margin-left: 0;
+    }
+  }
+  /* At 200% zoom, keep tall fixed bars from covering the usable viewport. */
+  @media (max-width: 767px) and (max-height: 600px) {
+    .telemetry-frame > .top-hud {
+      position: relative;
+    }
+    .telemetry-frame > .bottom-hud {
+      position: static;
+    }
+    #main-content,
+    .project-showcase-anchor,
+    .about-section {
+      scroll-margin-top: 16px;
+    }
+    .main-content {
+      padding-bottom: 32px;
     }
   }
 }

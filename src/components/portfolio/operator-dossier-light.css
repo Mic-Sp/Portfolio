@@ -88,8 +88,8 @@
     }
     :is(
       .dossier-drawer-heading h2,
-      .dossier-education-card h4,
-      .dossier-matrix-column h4
+      .dossier-education-card .dossier-item-title,
+      .dossier-matrix-column .dossier-item-title
     ) {
       color: #0f172a;
     }
@@ -189,7 +189,7 @@
       border-color: #e2e8f0;
       color: #047857;
     }
-    .contact-transmission h4 {
+    .contact-transmission .contact-transmission-label {
       color: #0f172a;
     }
     .contact-transmission::after {
@@ -252,10 +252,10 @@
     .thm-telemetry-heading {
       border-color: #e2e8f0;
     }
-    .thm-telemetry-heading h4 {
+    .thm-telemetry-heading .thm-telemetry-label {
       color: #0f172a;
     }
-    .thm-telemetry-heading h4 svg {
+    .thm-telemetry-heading .thm-telemetry-label svg {
       color: #b45309;
     }
     .thm-league {

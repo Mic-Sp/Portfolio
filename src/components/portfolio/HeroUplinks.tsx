@@ -8,8 +8,8 @@ export function HeroUplinks() {
   const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
   return (
     <nav className="hero-uplinks" aria-label="Quick uplinks">
-      <DossierTrigger className="hero-uplink-pill" label="Bio & Credentials">
-        <Fingerprint size={13} aria-hidden="true" /> BIO &amp; CREDENTIALS
+      <DossierTrigger className="hero-uplink-pill" label="Credentials">
+        <Fingerprint size={13} aria-hidden="true" /> CREDENTIALS
       </DossierTrigger>
       <a
         className="hero-uplink-pill"

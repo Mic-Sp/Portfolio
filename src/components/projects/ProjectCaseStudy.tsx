@@ -89,7 +89,7 @@ function CaseStudyExpansion({
       >
         {BLOCKS.map(({ key, label }) => (
           <section key={key}>
-            <h4>{label}</h4>
+            <span className="case-study-label">{label}</span>
             <p>{project.caseStudy[key]}</p>
           </section>
         ))}

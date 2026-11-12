@@ -86,9 +86,9 @@ export function ContactTransmission({ prefix }: { prefix: string }) {
       aria-labelledby={`${prefix}-transmission`}
     >
       <header>
-        <h4 id={`${prefix}-transmission`}>
+        <p className="contact-transmission-label" id={`${prefix}-transmission`}>
           <Radio size={17} aria-hidden="true" /> DIRECT TRANSMISSION
-        </h4>
+        </p>
         <span>POST /api/contact // ZOD GUARDED</span>
       </header>
       <form onSubmit={submit} noValidate aria-busy={status === "pending"}>

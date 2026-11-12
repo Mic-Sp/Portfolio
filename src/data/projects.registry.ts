@@ -106,7 +106,7 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     imageAlt:
       "Huddle & Heal counseling website showing the welcome headline, consultation scheduling, and clinician portrait.",
     thumbnailClass: "object-cover origin-top scale-[1.45]",
-    hook: "A custom production website and zero-downtime domain migration built for a licensed clinical counseling practice to streamline client intake and online visibility.",
+    hook: "A custom production website and Cloudflare DNS migration built for a licensed clinical counseling practice to streamline client intake and online visibility.",
     technicalSpec:
       "End-to-end client deployment featuring automated GitHub-to-Cloudflare Pages CI/CD and a cross-registrar DNS migration (A, CNAME, and TXT record cutover).",
     caseStudy: {

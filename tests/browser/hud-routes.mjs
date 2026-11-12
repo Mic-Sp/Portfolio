@@ -255,7 +255,7 @@ async function verifyPortfolio(page) {
   assert.deepEqual(await navigation.locator("a, button").allTextContents(), [
     "Projects",
     "About",
-    "Bio & Credentials",
+    "Credentials",
     "Resume (PDF)",
     "Get in Touch",
   ]);
@@ -621,7 +621,7 @@ try {
       }, id);
       await waitForScrollIdle(page);
     }
-    for (const name of ["Bio & Credentials", "Resume (PDF)", "Get in Touch"]) {
+    for (const name of ["Credentials", "Resume (PDF)", "Get in Touch"]) {
       const control = navigation.getByRole(
         name === "Resume (PDF)" ? "link" : "button",
         { name, exact: true },

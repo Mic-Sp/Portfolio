@@ -64,7 +64,7 @@ function DossierContent({
           {PROFILE_CONFIG.education.map((item) => (
             <article className="dossier-education-card" key={item.id}>
               <div>
-                <h4>{item.institution}</h4>
+                <p className="dossier-item-title">{item.institution}</p>
                 <p className="dossier-institution-location">{item.subheader}</p>
                 <p className="dossier-qualification">{item.qualification}</p>
                 <ul>
@@ -88,9 +88,9 @@ function DossierContent({
             </article>
           ))}
         </div>
-        <h4 className="dossier-label dossier-specializations-label">
+        <p className="dossier-label dossier-specializations-label">
           CERTIFICATIONS & SPECIALIZATIONS
-        </h4>
+        </p>
         <ul className="dossier-specializations">
           {PROFILE_CONFIG.specializations.map((item) => (
             <li key={item}>{item}</li>
@@ -117,7 +117,7 @@ function DossierContent({
                     size={20}
                     aria-hidden="true"
                   />
-                  <h4>{category}</h4>
+                  <p className="dossier-item-title">{category}</p>
                   <ul>
                     {technologies.map((technology) => (
                       <li key={technology}>{technology}</li>
@@ -288,14 +288,14 @@ function DossierPanel() {
               <p className="dossier-label">
                 OPERATOR // {PROFILE_CONFIG.legalName}
               </p>
-              <h2 id="dossier-drawer-title">BIO &amp; CREDENTIALS</h2>
+              <h2 id="dossier-drawer-title">CREDENTIALS</h2>
             </div>
             <button
               ref={closeButton}
               className="dossier-close"
               type="button"
               onClick={closeDossier}
-              aria-label="Close Bio & Credentials"
+              aria-label="Close Credentials"
             >
               <X size={20} aria-hidden="true" />
             </button>
@@ -307,7 +307,7 @@ function DossierPanel() {
             />
           </div>
           <footer className="dossier-rail">
-            <span>BIO &amp; CREDENTIALS</span>
+            <span>CREDENTIALS</span>
             <span>
               <kbd>ESC</kbd> CLOSE
             </span>

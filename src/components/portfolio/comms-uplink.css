@@ -14,6 +14,20 @@
   .hero-uplinks::-webkit-scrollbar {
     display: none;
   }
+  @media (max-width: 767px) {
+    .hero-uplinks {
+      flex-wrap: wrap;
+      overflow-x: visible;
+    }
+    .hero-uplinks .hero-uplink-pill {
+      min-width: 0;
+      max-width: 100%;
+      min-height: 44px;
+      flex-shrink: 1;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
   .hero-uplinks :focus-visible {
     outline-offset: -2px;
   }
@@ -251,7 +265,7 @@
     padding: 16px 20px;
     border-bottom: 1px solid #fbbf2426;
   }
-  .thm-telemetry-heading h4 {
+  .thm-telemetry-heading .thm-telemetry-label {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -260,7 +274,7 @@
       monospace;
     color: #f1f5f9;
   }
-  .thm-telemetry-heading h4 svg {
+  .thm-telemetry-heading .thm-telemetry-label svg {
     color: #fcd34d;
     flex-shrink: 0;
   }

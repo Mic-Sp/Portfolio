@@ -122,10 +122,10 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
                 "hud-button dossier-hud-trigger",
                 isDossierOpen && "is-active",
               )}
-              label="Bio & Credentials"
+              label="Credentials"
             >
               <Fingerprint size={14} aria-hidden="true" />
-              <span>Bio &amp; Credentials</span>
+              <span>Credentials</span>
             </DossierTrigger>
             <a
               href="/resume.pdf"
@@ -164,8 +164,6 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           )}
         </div>
       </header>
-      <DropDownTerminal />
-      <OperatorDossierDrawer />
       {children}
       {!isServices && (
         <footer className="bottom-hud">
@@ -230,6 +228,8 @@ export function TelemetryFrame({ children }: { children: ReactNode }) {
           </div>
         </footer>
       )}
+      <DropDownTerminal />
+      <OperatorDossierDrawer />
     </div>
   );
 }

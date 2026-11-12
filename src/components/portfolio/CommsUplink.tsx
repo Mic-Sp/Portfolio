@@ -67,13 +67,13 @@ export function CommsUplink({
           >
             <div className="comms-channel-main">
               <header className="comms-channel-heading">
-                <h4
+                <p
                   className="comms-channel-label"
                   id={`${prefix}-channel-${channel.id}`}
                 >
                   <Icon size={16} aria-hidden="true" />{" "}
                   <span>{channel.label}</span>
-                </h4>
+                </p>
                 <span className="comms-channel-status">{channel.status}</span>
               </header>
               <div className="comms-channel-readout">
@@ -102,10 +102,10 @@ export function CommsUplink({
       <ContactTransmission prefix={prefix} />
       <article className="thm-telemetry-card" data-dossier-anchor="thm">
         <header className="thm-telemetry-heading">
-          <h4>
+          <p className="thm-telemetry-label">
             <ShieldCheck size={17} aria-hidden="true" /> TRYHACKME {"//"} LIVE
             TELEMETRY
-          </h4>
+          </p>
           <span className="thm-league">{thmTelemetry.league}</span>
         </header>
         <div className="thm-telemetry-body">

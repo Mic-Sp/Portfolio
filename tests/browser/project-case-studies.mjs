@@ -35,11 +35,10 @@ async function verifyCopy(page, project) {
       await sections.nth(index).locator("p").innerText(),
       project.caseStudy[key],
     );
-  assert.deepEqual(await sections.locator("h4").allTextContents(), [
-    "01 // PROBLEM",
-    "02 // DECISION",
-    "03 // TRADE-OFFS",
-  ]);
+  assert.deepEqual(
+    await sections.locator(".case-study-label").allTextContents(),
+    ["01 // PROBLEM", "02 // DECISION", "03 // TRADE-OFFS"],
+  );
 }
 async function beginTrace(page, id) {
   await page.evaluate((id) => {

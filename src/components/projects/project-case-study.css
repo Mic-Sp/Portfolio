@@ -49,7 +49,8 @@
     scrollbar-color: #0891b280 #0f172a;
     touch-action: pan-y;
   }
-  .case-study-content h4 {
+  .case-study-content .case-study-label {
+    display: block;
     color: #67e8f9;
     font:
       500 12px/1.5 var(--font-mono),
@@ -92,7 +93,10 @@
     border-color: #0284c780;
     scrollbar-color: #0284c780 #e2e8f0;
   }
-  :root[data-theme="light"] :where(.telemetry-frame) .case-study-content h4 {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .case-study-content
+    .case-study-label {
     color: #0369a1;
   }
   :root[data-theme="light"] :where(.telemetry-frame) .case-study-content p {

@@ -15,8 +15,262 @@ const browser = await chromium.launch({
 });
 const results = [];
 const contrastResults = [];
+const headingResults = [];
+const reflowResults = [];
 const errors = [];
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function assertHeadingHierarchy(page, state) {
+  const outline = await page.evaluate(() => {
+    const headings = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")];
+    const text = (el) => {
+      const copy = el.cloneNode(true);
+      copy
+        .querySelectorAll('[aria-hidden="true"]')
+        .forEach((node) => node.remove());
+      return copy.textContent.replace(/\s+/g, " ").trim();
+    };
+    return {
+      h1: headings.filter((el) => el.tagName === "H1").map(text),
+      projects: [
+        ...document.querySelectorAll("#projects .project-card h3"),
+      ].map(text),
+      deepHeadings: headings
+        .filter((el) => Number(el.tagName[1]) > 3)
+        .map(text),
+      accessible: headings
+        .filter((el) => !el.closest('[aria-hidden="true"], [inert]'))
+        .map((el) => ({ level: Number(el.tagName[1]), text: text(el) })),
+      sections: [...document.querySelectorAll("#main-content h2")].map(text),
+      modal: !!document.querySelector(
+        'dialog[open], [role="dialog"][aria-modal="true"]',
+      ),
+      metadataTags: [
+        ...document.querySelectorAll(
+          ".section-index, .project-number, .project-spec-label, .schematic-rail > span, .case-study-label",
+        ),
+      ].map((el) => el.tagName),
+    };
+  });
+  assert.deepEqual(outline.h1, ["Michael A. Sprague."], state);
+  assert.deepEqual(
+    outline.projects,
+    [
+      "Q-Split",
+      "Backlog Buster",
+      "Huddle & Heal Counseling & Consulting",
+      "PwndPass",
+    ],
+    state,
+  );
+  assert.deepEqual(
+    outline.deepHeadings,
+    [],
+    `${state}: metadata must not be headings`,
+  );
+  assert.ok(
+    outline.metadataTags.every((tag) => ["P", "SPAN"].includes(tag)),
+    state,
+  );
+  let previous = outline.modal ? 1 : 0;
+  for (const heading of outline.accessible) {
+    assert.ok(
+      heading.level <= previous + 1,
+      `${state}: skipped heading level before ${heading.text}`,
+    );
+    previous = heading.level;
+  }
+  if (!outline.modal) {
+    assert.deepEqual(outline.sections, ["Projects", "About Me"], state);
+  }
+  headingResults.push({ state, headings: outline.accessible });
+}
+
+async function assertReflowLayout(page, state) {
+  const layout = await page.evaluate(() => {
+    const failures = [];
+    const selectors = [
+      ".top-hud",
+      ".hero-credentials",
+      ".hero-uplinks",
+      ".project-toolbar",
+    ];
+    for (const selector of selectors) {
+      const el = document.querySelector(selector);
+      if (el.scrollWidth > el.clientWidth + 1)
+        failures.push(`${selector}: content overflows`);
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (!node.textContent.trim()) continue;
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        for (const rect of range.getClientRects()) {
+          if (rect.width && (rect.left < -1 || rect.right > innerWidth + 1))
+            failures.push(
+              `${selector}: clipped text: ${node.textContent.trim()}`,
+            );
+        }
+      }
+    }
+    for (const selector of [
+      ".top-hud .hud-button",
+      ".hero-credentials li",
+      ".hero-uplink-pill",
+      ".project-toolbar > *",
+    ]) {
+      const boxes = [...document.querySelectorAll(selector)]
+        .map((el) => el.getBoundingClientRect())
+        .filter((box) => box.width && box.height);
+      if (
+        boxes.some((a, i) =>
+          boxes
+            .slice(i + 1)
+            .some(
+              (b) =>
+                Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1 &&
+                Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1,
+            ),
+        )
+      )
+        failures.push(`${selector}: overlapping controls`);
+    }
+    return {
+      width: innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      failures,
+    };
+  });
+  assert.ok(
+    layout.documentWidth <= layout.width,
+    `${state}: horizontal page overflow`,
+  );
+  assert.deepEqual(layout.failures, [], state);
+  return layout;
+}
+
+async function assertReachable(page, control) {
+  await page.mouse.move(0, 0);
+  await control.evaluate((el) => {
+    el.scrollIntoView({
+      block: "center",
+      inline: "nearest",
+      behavior: "instant",
+    });
+    el.focus({ preventScroll: true });
+  });
+  assert.equal(
+    await control.evaluate((el) => el === document.activeElement),
+    true,
+  );
+  await control.click({ trial: true });
+  const fits = await control.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return (
+      rect.left >= -1 &&
+      rect.right <= innerWidth + 1 &&
+      el.scrollWidth <= el.clientWidth + 1
+    );
+  });
+  assert.equal(fits, true, `Control must fit: ${await control.innerText()}`);
+}
+
+async function verifyReflow() {
+  // A 1280×900 screen at 200% browser zoom has a 640×450 CSS viewport.
+  for (const theme of ["dark", "light"])
+    for (const [width, height] of [
+      [640, 450],
+      [375, 844],
+      [320, 844],
+    ]) {
+      const page = await browser.newPage({
+        viewport: { width, height },
+        colorScheme: theme,
+      });
+      page.on("pageerror", (error) => errors.push(error.message));
+      await page.route("**/api/contact", () =>
+        assert.fail("Reflow checks must not send messages"),
+      );
+      await page.route("https://tryhackme.com/**", (route) => route.abort());
+      try {
+        await page.goto(base, { waitUntil: "networkidle" });
+        await wait(700);
+        for (const mode of ["spatial", "grid"]) {
+          if (mode === "grid") {
+            await page
+              .getByRole("button", { name: "Switch to Grid View", exact: true })
+              .click();
+            await page.locator(".project-grid").waitFor();
+          }
+          const state = `${theme}: ${width}×${height}: ${mode}`;
+          const layout = await assertReflowLayout(page, state);
+          await assertHeadingHierarchy(page, state);
+          for (const control of await page
+            .locator(
+              ".top-hud .hud-button:visible, .hero-credentials button, .hero-uplinks a, .hero-uplinks button, .showcase-view-toggle",
+            )
+            .all())
+            await assertReachable(page, control);
+          const cards =
+            mode === "grid"
+              ? page.locator(".project-grid .project-card")
+              : page.locator('[data-offset="0"] .project-card');
+          for (const card of await cards.all()) {
+            const accordion = card.locator(".case-study-toggle");
+            await assertReachable(page, accordion);
+            await accordion.click();
+            const contentId = await accordion.getAttribute("aria-controls");
+            await page.locator(`#${contentId}`).waitFor();
+            await wait(300);
+            await assertHeadingHierarchy(page, `${state}: expanded case study`);
+            assert.equal(
+              await page
+                .locator(`#${contentId}`)
+                .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+              true,
+            );
+            for (const link of await card.locator(".project-links a").all())
+              await assertReachable(page, link);
+            await accordion.click();
+            await page.locator(`#${contentId}`).waitFor({ state: "detached" });
+          }
+          await assertReflowLayout(page, state);
+          console.log(
+            `${state}: headings, control reachability, and reflow passed`,
+          );
+          reflowResults.push({
+            state,
+            ...layout,
+            accordions: await cards.count(),
+          });
+        }
+        await page.locator(".dossier-hud-trigger").click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector(".dossier-slide")?.dataset.motionState ===
+            "settled",
+        );
+        await assertHeadingHierarchy(page, `${theme}: ${width}: credentials`);
+        assert.equal(
+          await page.locator(".dossier-drawer-heading h2").innerText(),
+          "CREDENTIALS",
+        );
+        assert.equal(
+          await page
+            .locator(".dossier-sheet")
+            .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+          true,
+        );
+        await assertReachable(page, page.locator(".contact-submit-row button"));
+        await page
+          .getByRole("button", { name: "Close Credentials", exact: true })
+          .click();
+        await page.locator("#operator-dossier").waitFor({ state: "detached" });
+      } finally {
+        await page.close();
+      }
+    }
+}
 
 // Axe cannot resolve translucent gradients/pseudo elements. Sample the rendered
 // backdrop with glyphs hidden and compare it with computed (un-antialiased) text.
@@ -123,6 +377,8 @@ async function checkContrast(page, selector, state) {
 
 async function scan(page, state) {
   await wait(300);
+  if (new URL(page.url()).pathname === "/")
+    await assertHeadingHierarchy(page, state);
   await page.addScriptTag({ path: axePath });
   const result = await page.evaluate(async () => {
     const { violations, incomplete } = await window.axe.run(document, {
@@ -233,6 +489,7 @@ async function tabTo(page, locator) {
 }
 
 try {
+  await verifyReflow();
   const page = await browser.newPage({
     viewport: { width: 1440, height: 1000 },
   });
@@ -501,7 +758,11 @@ try {
     .map(({ state, violations }) => ({ state, violations }));
   await writeFile(
     process.env.A11Y_REPORT || "/tmp/portfolio-accessibility-report.json",
-    JSON.stringify({ results, contrastResults, errors }, null, 2),
+    JSON.stringify(
+      { results, contrastResults, headingResults, reflowResults, errors },
+      null,
+      2,
+    ),
   );
   console.log(
     JSON.stringify(
@@ -509,6 +770,8 @@ try {
         states: results.length,
         contrastSamples: contrastResults.length,
         minimumContrast: Math.min(...contrastResults.map(({ ratio }) => ratio)),
+        headingAudits: headingResults.length,
+        reflowResults,
         violations,
         errors,
       },
