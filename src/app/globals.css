@@ -659,6 +659,22 @@
     line-height: 1.625;
     color: #cbd5e1;
   }
+  .project-technical-spec {
+    margin-top: 16px;
+  }
+  .project-spec-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--accent);
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .project-card > .project-schematic {
+    margin-top: 0;
+  }
   .tech-stack {
     display: flex;
     flex-wrap: wrap;

@@ -12,8 +12,8 @@ export interface ProjectNode {
   status:
     "ONLINE" | "PRODUCTION" | "CLIENT PROD" | "IN DEVELOPMENT" | "ARCHIVED";
   accent: ProjectAccentColor;
-  tagline: string;
-  description: string;
+  hook: string;
+  technicalSpec: string;
   architectureHighlights: string[];
   techStack: string[];
   links: { live?: string; repo?: string; docs?: string };

@@ -12,9 +12,9 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     version: "v1.1.0",
     status: "ONLINE",
     accent: "cyan",
-    tagline: "Hybrid Quantum-Classical Workload Simulator & Co-Design Profiler",
-    description:
-      "Profiles resource contention and decoherence overhead across hybrid quantum-classical workloads, modeling realistic gate constraints before running on cloud hardware.",
+    hook: "A workload simulator that tests how classical computers and quantum processors can divide complex AI tasks—and predicts when quantum hardware noise outweighs any speed advantage.",
+    technicalSpec:
+      "Hybrid quantum-classical routing engine built with FastAPI and Qiskit Aer, modeling T1/T2 idle decoherence and gate error rates alongside Gemini API orchestration.",
     architectureHighlights: [
       "Hybrid quantum-classical workload profiling",
       "T1/T2 idle decoherence & depth expansion",
@@ -45,10 +45,9 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     version: "v2.0",
     status: "PRODUCTION",
     accent: "emerald",
-    tagline:
-      "AI-Driven Video Game Library Tracker & Semantic Recommendation Engine",
-    description:
-      "Eliminates game discovery paralysis through semantic vector search and hybrid API sync, replacing manual library tracking with automated saga chronology and progression tracking.",
+    hook: "A smart game library manager that syncs your Steam account and uses AI similarity matching to recommend what to play next based on your actual playstyle and mood.",
+    technicalSpec:
+      "Full-stack recommendation platform built with Next.js, Prisma, and Neon Postgres, leveraging pgvector embeddings and Steam OpenID authentication.",
     architectureHighlights: [
       "Steam OpenID 2.0 library auto-sync",
       "pgvector semantic recommendations",
@@ -75,14 +74,13 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     featured: true,
     pillar: "Production Client Infrastructure",
     pillarShort: "EDGE // INFRASTRUCTURE",
-    title: "Huddle & Heal",
+    title: "Huddle & Heal Counseling & Consulting",
     version: "v1.0",
     status: "CLIENT PROD",
     accent: "violet",
-    tagline:
-      "Production Web Platform for Huddle & Heal Counseling & Consulting (LLC)",
-    description:
-      "Engineered for strict zero-failure accessibility and zero recurring CMS overhead, delivering an edge-cached intake platform with sub-second regional load times across all three licensed states.",
+    hook: "A custom production website and zero-downtime domain migration built for a licensed clinical counseling practice to streamline client intake and online visibility.",
+    technicalSpec:
+      "End-to-end client deployment featuring automated GitHub-to-Cloudflare Pages CI/CD and a cross-registrar DNS migration (A, CNAME, and TXT record cutover).",
     architectureHighlights: [
       "WCAG contrast & clinical copy guardrails",
       "Custom DNS migration (A/CNAME/TXT) & Cloudflare edge deploy",
@@ -111,10 +109,9 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     version: "v1.0.0",
     status: "ONLINE",
     accent: "amber",
-    tagline:
-      "Zero-Knowledge Client-Side Password Breach & Shannon Entropy Auditor",
-    description:
-      "Eliminates trust-based security assumptions by auditing password vulnerability and mathematical bit-entropy entirely in browser memory without ever transmitting user input.",
+    hook: "A privacy-first security tool that checks whether your password has appeared in known data breaches without ever transmitting your actual password over the internet.",
+    technicalSpec:
+      "Client-side credential auditor implementing k-anonymity via truncated SHA-1 hash prefixing against the HIBP API, paired with real-time Shannon entropy scoring.",
     architectureHighlights: [
       "SHA-1 k-Anonymity range queries",
       "Client-side Shannon entropy mathematics",

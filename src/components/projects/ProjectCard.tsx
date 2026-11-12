@@ -87,9 +87,11 @@ export function ProjectCard({
           <Crosshair size={20} className={cn(!selected && "opacity-45")} />
         </button>
       </div>
-      <p className="project-tagline">{project.tagline}</p>
-      <ProjectSchematic project={project} />
-      <p className="project-description">{project.description}</p>
+      <p className="project-tagline project-hook">{project.hook}</p>
+      <p className="project-description project-technical-spec">
+        <span className="project-spec-label">Technical Spec</span>
+        {project.technicalSpec}
+      </p>
       <ul
         className="tech-stack"
         aria-label={`${project.title} technology stack`}
@@ -98,6 +100,7 @@ export function ProjectCard({
           <li key={tech}>{tech}</li>
         ))}
       </ul>
+      <ProjectSchematic project={project} />
       <div className="project-card-footer">
         <div className="project-links">
           {links.map(({ key, url, label, icon: Icon }) =>
