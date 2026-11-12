@@ -110,6 +110,33 @@ async function opened(page, method = "click") {
     true,
     "3D panels must not overlap instructions or controls",
   );
+  const glass = await modal.evaluate((el) => {
+    const panel = getComputedStyle(el.querySelector(".cube-modal-panel"));
+    const scrim = getComputedStyle(el.querySelector(".cube-modal-backdrop"));
+    return {
+      theme: el.dataset.theme,
+      background: panel.backgroundColor,
+      border: panel.borderTopColor,
+      blur: panel.backdropFilter,
+      scrim: scrim.backgroundColor,
+      scrimBlur: scrim.backdropFilter,
+    };
+  });
+  assert.equal(
+    glass.background,
+    glass.theme === "light"
+      ? "rgba(248, 250, 252, 0.75)"
+      : "rgba(5, 11, 20, 0.7)",
+  );
+  assert.equal(
+    glass.border,
+    glass.theme === "light"
+      ? "rgba(15, 23, 42, 0.2)"
+      : "rgba(6, 182, 212, 0.3)",
+  );
+  assert.equal(glass.blur, "blur(12px)");
+  assert.equal(glass.scrim, "rgba(0, 0, 0, 0.55)");
+  assert.equal(glass.scrimBlur, "blur(4px)");
   return { trigger, modal };
 }
 async function closed(page, trigger, method = "Escape") {
@@ -189,15 +216,136 @@ try {
   await page
     .getByRole("button", { name: "[ RESET ORIENTATION ]", exact: true })
     .click();
-  for (const [key, expected] of [
-    ["ArrowRight", [0, 90]],
-    ["ArrowLeft", [0, 0]],
-    ["ArrowUp", [-90, 0]],
-    ["ArrowDown", [0, 0]],
+  assert.equal(
+    await page.locator(".cube-help").innerText(),
+    "Drag or hold arrow keys to rotate. Select a face or the inner core.",
+  );
+  for (const [key, axis, sign] of [
+    ["ArrowRight", 1, 1],
+    ["ArrowLeft", 1, -1],
+    ["ArrowUp", 0, -1],
+    ["ArrowDown", 0, 1],
   ]) {
+    const before = await rotation(page);
     await page.keyboard.press(key);
-    assert.deepEqual(await rotation(page), expected, key);
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".inspector-cube").dataset.keyboardMotion ===
+        "idle",
+    );
+    const after = await rotation(page);
+    const distance = (after[axis] - before[axis]) * sign;
+    assert.ok(
+      distance >= 10 && distance < 40,
+      `${key} nudges smoothly: ${distance}°`,
+    );
+    assert.ok(
+      Math.abs(after[1 - axis] - before[1 - axis]) < 0.01,
+      `${key} preserves the other axis`,
+    );
   }
+  const beforeHold = await rotation(page);
+  await page.keyboard.down("ArrowRight");
+  await page.waitForFunction(
+    (start) =>
+      Number(document.querySelector(".inspector-cube").dataset.rotateY) >
+      start + 2,
+    beforeHold[1],
+  );
+  const middle = await rotation(page);
+  await page.waitForFunction(
+    (start) =>
+      Number(document.querySelector(".inspector-cube").dataset.rotateY) >
+      start + 8,
+    middle[1],
+  );
+  const later = await rotation(page);
+  assert.ok(
+    later[1] > middle[1],
+    "holding a key advances across multiple frames",
+  );
+  await page.keyboard.up("ArrowRight");
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".inspector-cube").dataset.keyboardMotion ===
+      "idle",
+  );
+  const stopped = await rotation(page);
+  await wait(160);
+  assert.deepEqual(
+    await rotation(page),
+    stopped,
+    "releasing a key finishes its eased motion",
+  );
+  for (const tag of ["input", "textarea"]) {
+    await page.locator(".cube-control-bar").evaluate((footer, tag) => {
+      const field = document.createElement(tag);
+      field.id = "cube-keyboard-guard";
+      field.setAttribute("aria-label", "Keyboard isolation field");
+      footer.append(field);
+    }, tag);
+    await page.locator("#cube-keyboard-guard").focus();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowUp");
+    await wait(100);
+    assert.deepEqual(
+      await rotation(page),
+      stopped,
+      `${tag} retains its native arrow keys`,
+    );
+    await page.locator("#cube-keyboard-guard").evaluate((el) => el.remove());
+  }
+  await page
+    .getByRole("button", { name: "[ CLOSE // ESC ]", exact: true })
+    .focus();
+  await page.keyboard.down("ArrowRight");
+  await page.waitForFunction(
+    (start) =>
+      Number(document.querySelector(".inspector-cube").dataset.rotateY) >
+      start + 2,
+    stopped[1],
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  const blurred = await rotation(page);
+  await wait(160);
+  assert.deepEqual(
+    await rotation(page),
+    blurred,
+    "window blur clears held keys",
+  );
+  await page.keyboard.up("ArrowRight");
+  await page
+    .getByRole("button", { name: "AUTO ROTATE OFF", exact: true })
+    .click();
+  await page.keyboard.down("ArrowRight");
+  const keyboardOwnsRotation = await rotation(page);
+  await page.waitForFunction(
+    (start) =>
+      Number(document.querySelector(".inspector-cube").dataset.rotateY) >
+      start + 8,
+    keyboardOwnsRotation[1],
+  );
+  assert.ok(
+    Math.abs((await rotation(page))[0] - keyboardOwnsRotation[0]) < 0.01,
+    "idle X rotation pauses while an arrow is held",
+  );
+  await page.keyboard.up("ArrowRight");
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".inspector-cube").dataset.keyboardMotion ===
+      "idle",
+  );
+  const beforeResume = await rotation(page);
+  await page.waitForFunction(
+    (start) =>
+      Number(document.querySelector(".inspector-cube").dataset.rotateX) !==
+      start,
+    beforeResume[0],
+    { timeout: 4000 },
+  );
+  await page
+    .getByRole("button", { name: "AUTO ROTATE ON", exact: true })
+    .click();
   await page.keyboard.press("`");
   assert.equal(await page.locator("#developer-console").count(), 0);
   assert.equal(
@@ -377,7 +525,15 @@ try {
     true,
   );
   await reduced.keyboard.press("ArrowRight");
-  assert.deepEqual(await rotation(reduced), [0, 90]);
+  const reducedNudge = await rotation(reduced);
+  assert.ok(Math.abs(reducedNudge[0] - fixed[0]) < 0.01);
+  assert.ok(reducedNudge[1] > fixed[1] && reducedNudge[1] - fixed[1] <= 15);
+  await wait(120);
+  assert.deepEqual(
+    await rotation(reduced),
+    reducedNudge,
+    "reduced motion nudges without animation",
+  );
   await reduced.keyboard.press("ArrowLeft");
   const reducedCore = reduced.getByRole("button", {
     name: "Activate Inner Core",

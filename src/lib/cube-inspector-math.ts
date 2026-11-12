@@ -16,24 +16,56 @@ export const CUBE_FACE_ROTATIONS: Record<CubeFaceId, CubeRotation> = {
   bottom: { x: 90, y: 0 },
 };
 
-export function snapCubeRotation(
-  rotation: CubeRotation,
-  key: string,
-): CubeRotation | null {
-  const x = Math.round(rotation.x / 90) * 90 || 0;
-  const y = Math.round(rotation.y / 90) * 90 || 0;
+export const CUBE_KEY_NUDGE = 12;
+
+export function getCubeArrowDirection(key: string): CubeRotation | null {
   switch (key) {
     case "ArrowLeft":
-      return { x, y: y - 90 };
+      return { x: 0, y: -1 };
     case "ArrowRight":
-      return { x, y: y + 90 };
+      return { x: 0, y: 1 };
     case "ArrowUp":
-      return { x: x - 90, y };
+      return { x: -1, y: 0 };
     case "ArrowDown":
-      return { x: x + 90, y };
+      return { x: 1, y: 0 };
     default:
       return null;
   }
+}
+
+/** A tap eases toward its nudge; held keys keep advancing that target at 60°/s. */
+export function stepCubeKeyboard(
+  rotation: CubeRotation,
+  target: CubeRotation,
+  keys: ReadonlySet<string>,
+  seconds: number,
+) {
+  const dt = Math.max(
+    0,
+    Math.min(Number.isFinite(seconds) ? seconds : 0, 0.05),
+  );
+  const direction = {
+    x: Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp")),
+    y: Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft")),
+  };
+  const nextTarget = {
+    x: target.x + direction.x * 60 * dt,
+    y: target.y + direction.y * 60 * dt,
+  };
+  const follow = 1 - Math.exp(-dt / 0.08);
+  const settled =
+    keys.size === 0 &&
+    Math.hypot(nextTarget.x - rotation.x, nextTarget.y - rotation.y) < 0.01;
+  return {
+    target: nextTarget,
+    rotation: settled
+      ? nextTarget
+      : {
+          x: rotation.x + (nextTarget.x - rotation.x) * follow,
+          y: rotation.y + (nextTarget.y - rotation.y) * follow,
+        },
+    settled,
+  };
 }
 
 /** Integrate exponential damping exactly so inertia is independent of frame rate. */

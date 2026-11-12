@@ -8,7 +8,13 @@ import {
   useTransform,
   useMotionTemplate,
 } from "framer-motion";
-import { useLayoutEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { hideModalBackground } from "@/lib/modal-background";
@@ -19,7 +25,9 @@ import {
   CUBE_DRAG_THRESHOLD,
   CUBE_FACE_ROTATIONS,
   INITIAL_INSPECTOR_ROTATION,
-  snapCubeRotation,
+  CUBE_KEY_NUDGE,
+  getCubeArrowDirection,
+  stepCubeKeyboard,
   stepCubeInertia,
   type CubeRotation,
 } from "@/lib/cube-inspector-math";
@@ -55,6 +63,9 @@ export function SpatialCubeModal({
   const closeButton = useRef<HTMLButtonElement>(null);
   const drag = useRef<DragSession | null>(null);
   const velocity = useRef<CubeRotation>({ x: 0, y: 0 });
+  const heldKeys = useRef(new Set<string>());
+  const keyboardTarget = useRef<CubeRotation | null>(null);
+  const idleResumeAt = useRef(0);
   const suppressClickUntil = useRef(0);
   const backdropDown = useRef(false);
   const [dragging, setDragging] = useState(false);
@@ -65,6 +76,28 @@ export function SpatialCubeModal({
   const inverseX = useTransform(x, (value) => -value);
   const inverseY = useTransform(y, (value) => -value);
   const coreTransform = useMotionTemplate`rotateY(${inverseY}deg) rotateX(${inverseX}deg)`;
+
+  function clearKeyboard() {
+    heldKeys.current.clear();
+    keyboardTarget.current = null;
+    if (cage.current) cage.current.dataset.keyboardMotion = "idle";
+  }
+
+  useEffect(() => {
+    const releaseKeys = (event: Event) => {
+      heldKeys.current.clear();
+      keyboardTarget.current = null;
+      velocity.current = { x: 0, y: 0 };
+      idleResumeAt.current = event.timeStamp + 1000;
+      if (cage.current) cage.current.dataset.keyboardMotion = "idle";
+    };
+    window.addEventListener("blur", releaseKeys);
+    document.addEventListener("visibilitychange", releaseKeys);
+    return () => {
+      window.removeEventListener("blur", releaseKeys);
+      document.removeEventListener("visibilitychange", releaseKeys);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const panel = dialog.current;
@@ -106,11 +139,24 @@ export function SpatialCubeModal({
 
   useAnimationFrame((_, delta) => {
     if (reducedMotion || drag.current || !isPresent || document.hidden) return;
+    if (keyboardTarget.current) {
+      const step = stepCubeKeyboard(
+        { x: x.get(), y: y.get() },
+        keyboardTarget.current,
+        heldKeys.current,
+        delta / 1000,
+      );
+      keyboardTarget.current = step.settled ? null : step.target;
+      orient(step.rotation);
+      if (step.settled && cage.current)
+        cage.current.dataset.keyboardMotion = "idle";
+      return;
+    }
     const step = stepCubeInertia(
       { x: x.get(), y: y.get() },
       velocity.current,
       delta / 1000,
-      autoRotate,
+      autoRotate && performance.now() >= idleResumeAt.current,
     );
     velocity.current = step.velocity;
     if (autoRotate || Math.hypot(step.velocity.x, step.velocity.y) > 0.01)
@@ -137,6 +183,7 @@ export function SpatialCubeModal({
       suppressClickUntil.current = 0;
       return;
     }
+    clearKeyboard();
     velocity.current = { x: 0, y: 0 };
     drag.current = {
       pointerId: event.pointerId,
@@ -144,7 +191,7 @@ export function SpatialCubeModal({
       startY: event.clientY,
       lastX: event.clientX,
       lastY: event.clientY,
-      lastTime: performance.now(),
+      lastTime: event.timeStamp,
       rotation: { x: x.get(), y: y.get() },
       moved: false,
       slot:
@@ -164,7 +211,7 @@ export function SpatialCubeModal({
       dy = event.clientY - session.startY;
     session.moved ||= Math.hypot(dx, dy) >= CUBE_DRAG_THRESHOLD;
     if (!session.moved) return;
-    const now = performance.now(),
+    const now = event.timeStamp,
       seconds = Math.max(now - session.lastTime, 8) / 1000;
     const clamp = (value: number) => Math.max(-720, Math.min(720, value));
     velocity.current = {
@@ -189,12 +236,12 @@ export function SpatialCubeModal({
     if (!session || session.pointerId !== event.pointerId) return;
     drag.current = null;
     setDragging(false);
-    suppressClickUntil.current = performance.now() + 600;
+    suppressClickUntil.current = event.timeStamp + 600;
     if (
       cancelled ||
       reducedMotion ||
       !session.moved ||
-      performance.now() - session.lastTime > 100
+      event.timeStamp - session.lastTime > 100
     )
       velocity.current = { x: 0, y: 0 };
     if (event.currentTarget.hasPointerCapture(event.pointerId))
@@ -203,6 +250,7 @@ export function SpatialCubeModal({
   }
 
   function snap(rotation: CubeRotation) {
+    clearKeyboard();
     setAutoRotate(false);
     velocity.current = { x: 0, y: 0 };
     orient(rotation);
@@ -229,14 +277,33 @@ export function SpatialCubeModal({
       }}
       onKeyDown={(event) => {
         event.stopPropagation();
-        if (!(event.target as HTMLElement).closest(".cube-slot-content")) {
-          const rotation = snapCubeRotation(
-            { x: x.get(), y: y.get() },
-            event.key,
-          );
-          if (rotation) {
+        const editable = (event.target as HTMLElement).closest(
+          'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content',
+        );
+        if (!editable && !event.altKey && !event.ctrlKey && !event.metaKey) {
+          const direction = getCubeArrowDirection(event.key);
+          if (direction) {
             event.preventDefault();
-            snap(rotation);
+            idleResumeAt.current = event.timeStamp + 1000;
+            velocity.current = { x: 0, y: 0 };
+            if (reducedMotion) {
+              clearKeyboard();
+              orient({
+                x: x.get() + direction.x * CUBE_KEY_NUDGE,
+                y: y.get() + direction.y * CUBE_KEY_NUDGE,
+              });
+            } else if (!event.repeat && !heldKeys.current.has(event.key)) {
+              heldKeys.current.add(event.key);
+              const target = keyboardTarget.current ?? {
+                x: x.get(),
+                y: y.get(),
+              };
+              keyboardTarget.current = {
+                x: target.x + direction.x * CUBE_KEY_NUDGE,
+                y: target.y + direction.y * CUBE_KEY_NUDGE,
+              };
+              if (cage.current) cage.current.dataset.keyboardMotion = "held";
+            }
           }
         }
         if (event.key !== "Tab") return;
@@ -258,6 +325,26 @@ export function SpatialCubeModal({
         } else if (!event.shiftKey && document.activeElement === last) {
           event.preventDefault();
           first?.focus();
+        }
+      }}
+      onKeyUp={(event) => {
+        event.stopPropagation();
+        if (heldKeys.current.delete(event.key)) {
+          idleResumeAt.current = event.timeStamp + 1000;
+          if (cage.current)
+            cage.current.dataset.keyboardMotion = heldKeys.current.size
+              ? "held"
+              : "settling";
+        }
+      }}
+      onFocusCapture={(event) => {
+        if (
+          (event.target as HTMLElement).closest(
+            'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content',
+          )
+        ) {
+          clearKeyboard();
+          velocity.current = { x: 0, y: 0 };
         }
       }}
       onPointerDown={(event) => {
@@ -297,8 +384,7 @@ export function SpatialCubeModal({
           </span>
         </header>
         <p id="cube-inspector-help" className="cube-help">
-          Drag to rotate. Arrow keys snap 90°. Select a face label or the inner
-          core.
+          Drag or hold arrow keys to rotate. Select a face or the inner core.
         </p>
         <div
           className="cube-stage"
@@ -317,7 +403,7 @@ export function SpatialCubeModal({
           onClickCapture={(event) => {
             if (
               event.detail > 0 &&
-              performance.now() < suppressClickUntil.current
+              event.timeStamp < suppressClickUntil.current
             ) {
               event.preventDefault();
               event.stopPropagation();
@@ -330,6 +416,7 @@ export function SpatialCubeModal({
             className="inspector-cube"
             data-rotate-x={INITIAL_INSPECTOR_ROTATION.x}
             data-rotate-y={INITIAL_INSPECTOR_ROTATION.y}
+            data-keyboard-motion="idle"
             style={{ rotateX: x, rotateY: y }}
           >
             {faces.map((face) => (
@@ -424,6 +511,8 @@ export function SpatialCubeModal({
             aria-pressed={autoRotate && !reducedMotion}
             disabled={reducedMotion}
             onClick={() => {
+              clearKeyboard();
+              idleResumeAt.current = 0;
               velocity.current = { x: 0, y: 0 };
               setAutoRotate((value) => !value);
             }}
