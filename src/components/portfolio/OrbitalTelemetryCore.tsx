@@ -18,12 +18,18 @@ const INITIAL_PATH = getCubeWireframePath(
   INITIAL_CUBE_ANGLES.y,
   INITIAL_CUBE_ANGLES.z,
 );
-export function OrbitalTelemetryCore() {
+export function OrbitalTelemetryCore({
+  onInspect,
+  isInspectorOpen,
+}: {
+  onInspect: () => void;
+  isInspectorOpen: boolean;
+}) {
   const { activeIndex, activeProject, godMode } = useHud();
   const reducedMotion = useMotionPreference();
   const viewport = useDeckViewport();
   const enabled = viewport === "wide" && !reducedMotion;
-  const root = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLButtonElement>(null);
   const sweeps = useRef<SVGGElement>(null);
   const radar = useRef<SVGGElement>(null);
   const cube = useRef<SVGPathElement>(null);
@@ -39,7 +45,7 @@ export function OrbitalTelemetryCore() {
   const previousHud = useRef({ activeIndex, godMode });
   const accent = activeProject?.accent ?? "cyan";
 
-  function trackPointer(event: PointerEvent<HTMLDivElement>) {
+  function trackPointer(event: PointerEvent<HTMLButtonElement>) {
     if (!enabled || event.pointerType === "touch") return;
     const rect = event.currentTarget.getBoundingClientRect();
     const point = getPointerPosition(
@@ -234,17 +240,22 @@ export function OrbitalTelemetryCore() {
   }, [enabled]);
 
   return (
-    <div
+    <button
+      type="button"
       ref={root}
+      onClick={onInspect}
+      aria-label="Inspect 3D Spatial Cube"
+      aria-haspopup="dialog"
+      aria-controls="spatial-cube-modal"
+      aria-expanded={isInspectorOpen}
       className={cn(
-        "identity-scope orbital-core",
+        "identity-scope orbital-core cube-inspector-trigger",
         getProjectAccent(accent).scope,
       )}
       data-accent={accent}
       data-god-mode={godMode}
       data-active-index={activeIndex}
       data-motion={enabled ? "kinetic" : "static"}
-      aria-hidden="true"
       onPointerEnter={(event) => {
         trackPointer(event);
         if (enabled && event.pointerType !== "touch")
@@ -254,7 +265,12 @@ export function OrbitalTelemetryCore() {
       onPointerLeave={releasePointer}
       onPointerCancel={releasePointer}
     >
-      <svg viewBox="0 0 128 128" fill="none" focusable="false">
+      <svg
+        viewBox="0 0 128 128"
+        fill="none"
+        focusable="false"
+        aria-hidden="true"
+      >
         <path
           className="orbital-crosshair"
           d="M64 0v128M0 64h128"
@@ -337,6 +353,9 @@ export function OrbitalTelemetryCore() {
           <circle r="2" stroke="currentColor" strokeWidth=".75" />
         </g>
       </svg>
-    </div>
+      <span className="cube-trigger-caption" aria-hidden="true">
+        INSPECT 3D CUBE ↗
+      </span>
+    </button>
   );
 }

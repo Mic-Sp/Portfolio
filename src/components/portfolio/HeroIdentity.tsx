@@ -1,6 +1,6 @@
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { Fragment } from "react";
-import { OrbitalTelemetryCore } from "./OrbitalTelemetryCore";
+import { CubeInspector } from "@/components/cube/CubeInspector";
 import { DossierTrigger } from "./DossierTrigger";
 import { HeroUplinks } from "./HeroUplinks";
 
@@ -53,7 +53,7 @@ export function HeroIdentity() {
           </ul>
           <HeroUplinks />
         </div>
-        <OrbitalTelemetryCore />
+        <CubeInspector />
       </div>
     </section>
   );

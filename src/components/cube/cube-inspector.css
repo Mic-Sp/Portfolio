@@ -1,0 +1,382 @@
+@layer theme, base, components, utilities;
+
+@layer components {
+  .spatial-cube-modal {
+    --cube-accent: #67e8f9;
+    --cube-text: #f1f5f9;
+    --cube-muted: #cbd5e1;
+    --cube-border: #475569;
+    --cube-glass: #67e8f904;
+    --cube-wire: #67e8f955;
+    --cube-panel: #070e1cf7;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 16px;
+    border: 0;
+    background: transparent;
+    color: var(--cube-text);
+    color-scheme: dark;
+    overscroll-behavior: contain;
+  }
+  .spatial-cube-modal[open] {
+    display: grid;
+    place-items: center;
+  }
+  .spatial-cube-modal::backdrop {
+    background: transparent;
+  }
+  .cube-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #020617cc;
+    backdrop-filter: blur(8px);
+  }
+  .cube-modal-panel {
+    position: relative;
+    width: min(900px, 100%);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid var(--cube-wire);
+    background: var(--cube-panel);
+    box-shadow:
+      0 32px 120px #0008,
+      inset 0 1px 0 #ffffff0a;
+  }
+  .cube-modal-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 24px 28px 12px;
+  }
+  .cube-eyebrow,
+  .cube-session-label,
+  .cube-face-label,
+  .cube-core-index {
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    letter-spacing: 0.05em;
+  }
+  .cube-eyebrow {
+    color: var(--cube-accent);
+  }
+  .cube-modal-heading h2 {
+    margin-top: 6px;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .cube-session-label {
+    color: var(--cube-muted);
+  }
+  .cube-help {
+    padding: 0 28px;
+    color: var(--cube-muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .cube-stage {
+    --cube-size: min(320px, 48vw, 34dvh);
+    --cube-depth: calc(var(--cube-size) / 2);
+    position: relative;
+    height: clamp(230px, 62dvh, 580px);
+    display: grid;
+    place-items: center;
+    perspective: 1100px;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+  }
+  .cube-stage[data-dragging="true"] {
+    cursor: grabbing;
+  }
+  .cube-stage-grid {
+    position: absolute;
+    inset: 16px;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--cube-glass) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cube-glass) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse, #000, transparent 70%);
+  }
+  .inspector-cube {
+    position: relative;
+    width: var(--cube-size);
+    height: var(--cube-size);
+    transform-style: preserve-3d;
+  }
+  .cube-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border: 1px solid var(--cube-wire);
+    background: var(--cube-glass);
+    box-shadow:
+      inset 0 0 24px #22d3ee04,
+      0 0 12px #22d3ee08;
+    backface-visibility: visible;
+    pointer-events: none;
+  }
+  .cube-face-glass {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(2px);
+    clip-path: polygon(
+      evenodd,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 0,
+      15% 15%,
+      15% 85%,
+      85% 85%,
+      85% 15%,
+      15% 15%
+    );
+    pointer-events: none;
+  }
+  .cube-face-front {
+    transform: translateZ(var(--cube-depth));
+  }
+  .cube-face-back {
+    transform: rotateY(180deg) translateZ(var(--cube-depth));
+  }
+  .cube-face-right {
+    transform: rotateY(90deg) translateZ(var(--cube-depth));
+  }
+  .cube-face-left {
+    transform: rotateY(-90deg) translateZ(var(--cube-depth));
+  }
+  .cube-face-top {
+    transform: rotateX(90deg) translateZ(var(--cube-depth));
+  }
+  .cube-face-bottom {
+    transform: rotateX(-90deg) translateZ(var(--cube-depth));
+  }
+  .cube-face::before,
+  .cube-face::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: var(--cube-accent);
+    pointer-events: none;
+  }
+  .cube-face::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid var(--cube-accent);
+    border-left: 2px solid var(--cube-accent);
+  }
+  .cube-face::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid var(--cube-accent);
+    border-right: 2px solid var(--cube-accent);
+  }
+  .cube-face-label {
+    justify-self: start;
+    min-height: 44px;
+    max-width: 100%;
+    padding: 10px 12px;
+    color: var(--cube-accent);
+    pointer-events: auto;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .cube-face-wireframe {
+    position: absolute;
+    inset: 25%;
+    border: 1px dashed var(--cube-wire);
+    pointer-events: none;
+  }
+  .cube-face-wireframe span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    border: 1px solid var(--cube-wire);
+    transform: translate(-50%, -50%);
+  }
+  .cube-face-wireframe span:nth-child(2) {
+    width: 28px;
+    height: 1px;
+    border: 0;
+    background: var(--cube-wire);
+  }
+  .cube-face-wireframe span:nth-child(3) {
+    height: 28px;
+    width: 1px;
+    border: 0;
+    background: var(--cube-wire);
+  }
+  .cube-slot-content {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    padding: 12px;
+    pointer-events: auto;
+    user-select: text;
+    overflow-wrap: anywhere;
+  }
+  .cube-inner-core {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transform-style: preserve-3d;
+    pointer-events: none;
+  }
+  .cube-core-billboard {
+    width: 108px;
+    pointer-events: auto;
+  }
+  .cube-core-button {
+    display: grid;
+    gap: 5px;
+    justify-items: center;
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 6px;
+    border: 1px solid var(--cube-wire);
+    color: var(--cube-text);
+    background: var(--cube-panel);
+    box-shadow:
+      0 0 30px #22d3ee33,
+      inset 0 0 22px #22d3ee0a;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+  }
+  .cube-core-glyph {
+    font-size: 30px;
+    line-height: 1;
+    color: var(--cube-accent);
+    text-shadow: 0 0 14px #22d3ee80;
+  }
+  .cube-core-index {
+    color: var(--cube-muted);
+    font-size: 12px;
+  }
+  .cube-face-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 24px;
+  }
+  .cube-face-nav button,
+  .cube-control-bar button {
+    min-height: 44px;
+    border: 1px solid var(--cube-border);
+    padding: 9px 12px;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+    color: var(--cube-text);
+  }
+  .cube-face-nav button:hover,
+  .cube-control-bar button:hover:not(:disabled),
+  .cube-face-label:hover,
+  .cube-core-button:hover {
+    color: var(--cube-accent);
+    border-color: var(--cube-accent);
+  }
+  .cube-selection {
+    min-height: 24px;
+    margin: 12px 24px 16px;
+    color: var(--cube-muted);
+    text-align: center;
+    font:
+      500 12px/1.5 var(--font-mono),
+      monospace;
+  }
+  .cube-control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    border-top: 1px solid var(--cube-border);
+    padding: 16px 24px;
+  }
+  .cube-control-bar button[aria-pressed="true"] {
+    border-color: var(--cube-wire);
+    color: var(--cube-accent);
+  }
+  .spatial-cube-modal :focus-visible {
+    outline: 2px solid var(--cube-accent);
+    outline-offset: 3px;
+  }
+  .cube-slot-content :focus-visible {
+    outline-offset: -2px;
+  }
+  .spatial-cube-modal[data-theme="light"] {
+    --cube-accent: #0369a1;
+    --cube-text: #0f172a;
+    --cube-muted: #475569;
+    --cube-border: #cbd5e1;
+    --cube-glass: #0369a104;
+    --cube-wire: #0369a159;
+    --cube-panel: #f8fafcf7;
+    color-scheme: light;
+  }
+  .spatial-cube-modal[data-theme="light"] .cube-modal-backdrop {
+    background: #0f172a99;
+  }
+  @media (max-width: 639px) {
+    .spatial-cube-modal {
+      padding: 12px;
+    }
+    .cube-modal-panel {
+      max-height: calc(100dvh - 24px);
+    }
+    .cube-modal-heading {
+      padding: 20px 16px 10px;
+    }
+    .cube-session-label {
+      display: none;
+    }
+    .cube-help {
+      padding-inline: 16px;
+      font-size: 13px;
+    }
+    .cube-stage {
+      height: clamp(260px, 86vw, 350px);
+    }
+    .cube-face-label {
+      padding: 8px;
+      font-size: 12px;
+    }
+    .cube-face-nav {
+      padding-inline: 16px;
+    }
+    .cube-face-nav button {
+      flex: 1 0 26%;
+    }
+    .cube-control-bar {
+      padding: 12px 16px;
+    }
+    .cube-control-bar button {
+      flex: 1 1 auto;
+    }
+    .cube-core-billboard {
+      width: 88px;
+    }
+    .cube-core-button {
+      min-height: 88px;
+      padding: 8px 4px;
+    }
+  }
+}
