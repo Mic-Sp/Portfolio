@@ -24,7 +24,7 @@
       border-color 200ms ease,
       box-shadow 200ms ease;
   }
-  .telemetry-frame[data-theme="light"] > header.top-hud {
+  :root[data-theme="light"] :where(.telemetry-frame) > header.top-hud {
     color-scheme: light;
     background: #ffffffd9;
     border-color: #cbd5e1;
@@ -32,57 +32,73 @@
     box-shadow: 0 1px 3px #0f172a0a;
     backdrop-filter: blur(12px);
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     > .top-hud
     :is(.location-block > p, .telemetry-clock, .system-status > p) {
     color: #334155;
     text-shadow: none;
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     > .top-hud
     :is(.clock-divider, .node-count, .text-slate-300) {
     color: #64748b;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .location-block svg {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    > .top-hud
+    .location-block
+    svg {
     color: #059669;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .status-dot {
+  :root[data-theme="light"] :where(.telemetry-frame) > .top-hud .status-dot {
     background: #10b981;
     box-shadow: 0 0 8px #10b98126;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .hud-button {
+  :root[data-theme="light"] :where(.telemetry-frame) > .top-hud .hud-button {
     color: #1e293b;
     border-color: #cbd5e1;
     background: #f1f5f9;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .hud-button.is-active {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    > .top-hud
+    .hud-button.is-active {
     color: #047857;
     border-color: #05966966;
     background: #ecfdf5;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .hud-button:hover {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    > .top-hud
+    .hud-button:hover {
     background: #e2e8f0;
     color: #1e293b;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .hud-button:focus-visible {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    > .top-hud
+    .hud-button:focus-visible {
     outline-color: #059669;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .system-status {
+  :root[data-theme="light"] :where(.telemetry-frame) > .top-hud .system-status {
     border-color: #cbd5e1;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .view-toggle {
+  :root[data-theme="light"] :where(.telemetry-frame) > .top-hud .view-toggle {
     background: #f1f5f9;
     border-color: #cbd5e1;
   }
-  .telemetry-frame[data-theme="light"] > .top-hud .view-button {
+  :root[data-theme="light"] :where(.telemetry-frame) > .top-hud .view-button {
     color: #475569;
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     > .top-hud
     .view-button:is(.is-active, :hover) {
     color: #0369a1;
   }
-  .telemetry-frame[data-theme="light"] > .bottom-hud {
+  :root[data-theme="light"] :where(.telemetry-frame) > .bottom-hud {
     color-scheme: light;
     background: #ffffffd9;
     border-color: #cbd5e1;
@@ -90,39 +106,47 @@
     backdrop-filter: blur(12px);
     box-shadow: 0 -1px 3px #0f172a0a;
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     > .bottom-hud
     :is(.pillar-label, .text-slate-300, .legend-divider) {
     color: #475569;
   }
-  .telemetry-frame[data-theme="light"] > .bottom-hud kbd {
+  :root[data-theme="light"] :where(.telemetry-frame) > .bottom-hud kbd {
     color: #475569;
     border-color: #cbd5e1;
     background: #f8fafc;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill {
+  :root[data-theme="light"] :where(.telemetry-frame) .pillar-pill {
     color: #475569;
     background: #f1f5f9;
     border-color: #cbd5e1;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill:hover {
+  :root[data-theme="light"] :where(.telemetry-frame) .pillar-pill:hover {
     background: #e2e8f0;
     color: #0f172a;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill[aria-pressed="true"] {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .pillar-pill[aria-pressed="true"] {
     color: #075985;
     background: #f0f9ff;
     border-color: #0284c7;
     font-weight: 600;
     box-shadow: 0 1px 2px #0f172a0a;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill > span:not(:first-child) {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .pillar-pill
+    > span:not(:first-child) {
     color: inherit;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill > .h-1 {
+  :root[data-theme="light"] :where(.telemetry-frame) .pillar-pill > .h-1 {
     background: #0284c7;
   }
-  .telemetry-frame[data-theme="light"] .pillar-pill:focus-visible {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .pillar-pill:focus-visible {
     outline-color: #0284c7;
   }
   @media (prefers-reduced-motion: reduce) {

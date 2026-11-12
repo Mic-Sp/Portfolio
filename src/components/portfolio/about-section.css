@@ -150,7 +150,7 @@
 }
 
 @layer utilities {
-  .telemetry-frame[data-theme="light"] .about-skills-index {
+  :root[data-theme="light"] :where(.telemetry-frame) .about-skills-index {
     border-color: #cbd5e1;
   }
 }

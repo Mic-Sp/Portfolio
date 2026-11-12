@@ -103,6 +103,7 @@ async function close(page, trigger, method = "Escape") {
 try {
   if (screenshots) await mkdir(screenshots, { recursive: true });
   const page = await browser.newPage({
+    colorScheme: "dark",
     viewport: { width: 1440, height: 900 },
   });
   const errors = [],

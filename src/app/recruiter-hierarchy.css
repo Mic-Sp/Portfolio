@@ -9,7 +9,7 @@
     --conversion-border: #47556980;
     --conversion-surface: #0f172a66;
   }
-  .telemetry-frame[data-theme="light"] {
+  :root[data-theme="light"] :where(.telemetry-frame) {
     --contact-accent: #0369a1;
     --contact-accent-hover: #075985;
     --contact-on-accent: #fff;

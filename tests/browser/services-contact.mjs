@@ -20,6 +20,7 @@ const browser = await chromium.launch({
 });
 try {
   const page = await browser.newPage({
+    colorScheme: "dark",
     viewport: { width: 1440, height: 900 },
   });
   const errors = [],

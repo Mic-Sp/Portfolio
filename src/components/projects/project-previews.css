@@ -224,53 +224,61 @@
 }
 
 @layer utilities {
-  .telemetry-frame[data-theme="light"] .project-preview-trigger {
+  :root[data-theme="light"] :where(.telemetry-frame) .project-preview-trigger {
     color: #475569;
     border-color: #cbd5e1;
     background: #ffffffcc;
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     .project-preview-trigger:hover:not(:disabled) {
     color: var(--accent);
     border-color: var(--accent);
   }
-  .telemetry-frame[data-theme="light"] .project-thumbnail {
+  :root[data-theme="light"] :where(.telemetry-frame) .project-thumbnail {
     border-color: #0891b233;
   }
-  .telemetry-frame[data-theme="light"] .thumbnail-corner {
+  :root[data-theme="light"] :where(.telemetry-frame) .thumbnail-corner {
     color: #0369a1;
   }
-  .project-lightbox[data-theme="light"] {
+  :root[data-theme="light"] :where(.project-lightbox) {
     color: #0f172a;
     color-scheme: light;
   }
-  .project-lightbox[data-theme="light"] .project-lightbox-backdrop {
+  :root[data-theme="light"]
+    :where(.project-lightbox)
+    .project-lightbox-backdrop {
     background: #0f172a99;
   }
-  .project-lightbox[data-theme="light"] .project-lightbox-panel {
+  :root[data-theme="light"] :where(.project-lightbox) .project-lightbox-panel {
     background: #f8fafcf7;
     border-color: #cbd5e1;
     box-shadow:
       0 30px 90px #0f172a40,
       inset 0 1px 0 #fff;
   }
-  .project-lightbox[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.project-lightbox)
     :is(.project-lightbox-header, .project-lightbox-footer) {
     border-color: #cbd5e1;
   }
-  .project-lightbox[data-theme="light"] .project-lightbox-media {
+  :root[data-theme="light"] :where(.project-lightbox) .project-lightbox-media {
     background: #e2e8f0;
   }
-  .project-lightbox[data-theme="light"] .project-lightbox-footer > p {
+  :root[data-theme="light"]
+    :where(.project-lightbox)
+    .project-lightbox-footer
+    > p {
     color: #475569;
   }
-  .project-lightbox[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.project-lightbox)
     :is(.project-lightbox-close, .project-lightbox-footer a) {
     color: #334155;
     border-color: #cbd5e1;
     background: #fff;
   }
-  .project-lightbox[data-theme="light"] :is(a, button):hover {
+  :root[data-theme="light"] :where(.project-lightbox) :is(a, button):hover {
     color: var(--accent);
     border-color: var(--accent);
   }

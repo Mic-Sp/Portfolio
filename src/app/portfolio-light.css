@@ -8,8 +8,9 @@
 }
 
 @layer utilities {
+  /* Resolve from the pre-paint root; :where keeps component specificity unchanged. */
   /* Surface overrides only: the deck's transform hierarchy and motion values stay intact. */
-  .telemetry-frame[data-theme="light"] {
+  :root[data-theme="light"] :where(.telemetry-frame) {
     background: #f1f5f9;
     color: #0f172a;
 
@@ -325,7 +326,7 @@
   }
 
   /* Golden overdrive remains legible on the cleanroom canvas. */
-  .telemetry-frame[data-theme="light"][data-god-mode="true"] {
+  :root[data-theme="light"] :where(.telemetry-frame)[data-god-mode="true"] {
     :is(.top-hud, .bottom-hud) {
       background: #fffbebeb;
       border-color: #d9770680;

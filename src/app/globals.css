@@ -60,7 +60,7 @@
     position: relative;
     isolation: isolate;
   }
-  .telemetry-frame[data-theme="light"] {
+  :root[data-theme="light"] :where(.telemetry-frame) {
     --focus-accent: #0369a1;
   }
   .spatial-backdrop {

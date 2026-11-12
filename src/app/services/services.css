@@ -3,6 +3,8 @@
 @layer components {
   /* Page tokens stay local; the shared provider also updates the Services HUD. */
   .services-page {
+    background-color: var(--color-slate-950);
+    color: var(--color-slate-100);
     color-scheme: dark;
     --services-border: #1e293b;
     --services-surface: #0f172a66;
@@ -25,7 +27,9 @@
     --services-proof-badge: #022c2266;
     --services-primary-hover: #34d399;
   }
-  .services-page[data-services-theme="light"] {
+  :root[data-theme="light"] :where(.services-page) {
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-900);
     color-scheme: light;
     --services-border: #e2e8f0;
     --services-surface: #fff;
@@ -159,7 +163,7 @@
   .services-page .services-error {
     color: #fda4af;
   }
-  .services-page[data-services-theme="light"] .services-error {
+  :root[data-theme="light"] :where(.services-page) .services-error {
     color: #be123c;
   }
   .services-page .services-feedback a {
@@ -170,7 +174,8 @@
   .services-page .services-input[aria-invalid="true"] {
     border-color: #fb7185;
   }
-  .services-page[data-services-theme="light"]
+  :root[data-theme="light"]
+    :where(.services-page)
     .services-input[aria-invalid="true"] {
     border-color: #be123c;
   }

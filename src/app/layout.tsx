@@ -5,6 +5,7 @@ import { HudProvider } from "@/context/HudContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { SITE_URL } from "@/lib/site-url";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 import "./portfolio-light.css";
 import "./recruiter-hierarchy.css";
@@ -63,8 +64,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
+      <head>
+        <script
+          id="portfolio-theme-init"
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
+      </head>
       <body className="antialiased">
         <HudProvider>
           <ThemeProvider>

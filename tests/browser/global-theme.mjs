@@ -115,9 +115,238 @@ async function swipe(page, touch = false) {
   await wait(900);
 }
 
+async function configureThemePage(page, errors) {
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (/hydration|did not match/i.test(message.text()))
+      errors.push(message.text());
+  });
+  await page.route("**/api/contact", () =>
+    assert.fail("Theme checks must not send email"),
+  );
+  await page.route("https://tryhackme.com/**", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: "window.__micspBadgeUnavailable?.();",
+    }),
+  );
+}
+
+async function assertResolvedTheme(page, theme) {
+  await waitForTheme(page, theme);
+  // A modal intentionally hides the HUD from the accessibility tree; its stored
+  // button state must still follow OS changes while the drawer is open.
+  const toggle = page.locator(".theme-toggle");
+  assert.equal(await toggle.getAttribute("aria-label"), "Toggle light mode");
+  assert.equal(
+    await toggle.getAttribute("aria-pressed"),
+    String(theme === "light"),
+  );
+  assert.equal(
+    await toggle.getAttribute("title"),
+    `Switch to ${theme === "light" ? "dark" : "light"} mode`,
+  );
+  const services = page.locator(".services-page:visible");
+  if (await services.count())
+    assert.equal(await services.getAttribute("data-services-theme"), theme);
+}
+
+async function verifyThemeResolution(errors) {
+  const cases = [];
+  for (const path of ["/", "/services"]) {
+    for (const system of ["dark", "light"]) {
+      const opposite = system === "dark" ? "light" : "dark";
+      // With client bundles blocked, only SSR markup, CSS and the head script run.
+      // This catches a light body flashing behind a still-dark React frame.
+      for (const saved of [null, opposite]) {
+        const page = await browser.newPage({
+          colorScheme: system,
+          viewport: { width: 1440, height: 900 },
+        });
+        await configureThemePage(page, errors);
+        await page.route("**/_next/**/*.js*", (route) => route.abort());
+        if (saved)
+          await page.addInitScript(
+            (saved) => localStorage.setItem("portfolio-theme", saved),
+            saved,
+          );
+        await page.goto(base + path, { waitUntil: "networkidle" });
+        const expected = saved || system;
+        const initial = await page.evaluate(() => {
+          const frame = document.querySelector(".telemetry-frame");
+          const surface = document.querySelector(".services-page") || frame;
+          const css = getComputedStyle(surface);
+          const canvas = document.createElement("canvas");
+          canvas.width = canvas.height = 1;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = css.backgroundColor;
+          ctx.fillRect(0, 0, 1, 1);
+          return {
+            theme: document.documentElement.dataset.theme,
+            scheme: getComputedStyle(document.documentElement).colorScheme,
+            background: Array.from(ctx.getImageData(0, 0, 1, 1).data).slice(
+              0,
+              3,
+            ),
+            stored: localStorage.getItem("portfolio-theme"),
+            serverFrame: frame.dataset.theme,
+          };
+        });
+        assert.equal(initial.theme, expected);
+        assert.equal(initial.scheme, expected);
+        assert.equal(initial.stored, saved);
+        assert.equal(
+          initial.serverFrame,
+          "dark",
+          "client bundles must remain blocked",
+        );
+        assert.deepEqual(
+          initial.background,
+          expected === "dark"
+            ? [2, 6, 24]
+            : path === "/"
+              ? [241, 245, 249]
+              : [248, 250, 252],
+        );
+        cases.push({
+          phase: "before hydration",
+          path,
+          system,
+          saved,
+          ...initial,
+        });
+        await page.close();
+      }
+
+      const page = await browser.newPage({
+        colorScheme: system,
+        viewport: { width: 1440, height: 900 },
+      });
+      await configureThemePage(page, errors);
+      await page.goto(base + path, { waitUntil: "networkidle" });
+      await assertResolvedTheme(page, system);
+      assert.equal(
+        await page.evaluate(() => localStorage.getItem("portfolio-theme")),
+        null,
+      );
+      await page.emulateMedia({ colorScheme: opposite });
+      await assertResolvedTheme(page, opposite);
+      assert.equal(
+        await page.evaluate(() => localStorage.getItem("portfolio-theme")),
+        null,
+      );
+      await page.locator(".dossier-hud-trigger").click();
+      await page.locator("#operator-dossier").waitFor();
+      await page.emulateMedia({ colorScheme: system });
+      await assertResolvedTheme(page, system);
+      assert.equal(
+        await page
+          .locator("#operator-dossier")
+          .getAttribute("data-dossier-theme"),
+        system,
+      );
+      await page.keyboard.press("Escape");
+      await page.locator("#operator-dossier").waitFor({ state: "detached" });
+      await page
+        .getByRole("button", { name: "Toggle light mode", exact: true })
+        .click();
+      await assertResolvedTheme(page, opposite);
+      assert.equal(
+        await page.evaluate(() => localStorage.getItem("portfolio-theme")),
+        opposite,
+      );
+      await page.emulateMedia({ colorScheme: opposite });
+      await page.emulateMedia({ colorScheme: system });
+      await assertResolvedTheme(page, opposite);
+      await page.reload({ waitUntil: "networkidle" });
+      await assertResolvedTheme(page, opposite);
+      if (path === "/") {
+        await page.locator(".conversion-services").click();
+        await page.waitForURL(base + "/services");
+      } else {
+        await page.getByRole("link", { name: /Developer Portfolio/ }).click();
+        await page.waitForURL(base + "/");
+      }
+      await assertResolvedTheme(page, opposite);
+      cases.push({
+        phase: "hydrated OS sync and persistent override",
+        path,
+        system,
+      });
+      await page.close();
+    }
+  }
+
+  for (const system of ["dark", "light"]) {
+    const page = await browser.newPage({ colorScheme: system });
+    await configureThemePage(page, errors);
+    await page.addInitScript(() => {
+      Storage.prototype.getItem = Storage.prototype.setItem = () => {
+        throw new Error("Storage blocked");
+      };
+    });
+    await page.goto(base, { waitUntil: "networkidle" });
+    await assertResolvedTheme(page, system);
+    const opposite = system === "dark" ? "light" : "dark";
+    await page.emulateMedia({ colorScheme: opposite });
+    await assertResolvedTheme(page, opposite);
+    await page
+      .getByRole("button", { name: "Toggle light mode", exact: true })
+      .click();
+    await assertResolvedTheme(page, system);
+    await page.emulateMedia({ colorScheme: system });
+    await page.emulateMedia({ colorScheme: opposite });
+    await assertResolvedTheme(page, system);
+    cases.push({
+      phase: "blocked storage, OS sync and in-memory override",
+      system,
+    });
+    await page.close();
+  }
+
+  const invalid = await browser.newPage({ colorScheme: "light" });
+  await configureThemePage(invalid, errors);
+  await invalid.addInitScript(() =>
+    localStorage.setItem("portfolio-theme", "invalid"),
+  );
+  await invalid.goto(base, { waitUntil: "networkidle" });
+  await assertResolvedTheme(invalid, "light");
+  await invalid.emulateMedia({ colorScheme: "dark" });
+  await assertResolvedTheme(invalid, "dark");
+  assert.equal(
+    await invalid.evaluate(() => localStorage.getItem("portfolio-theme")),
+    "invalid",
+  );
+  await invalid.close();
+  cases.push({ phase: "invalid preference follows the OS" });
+
+  const context = await browser.newContext({ colorScheme: "light" });
+  const first = await context.newPage(),
+    second = await context.newPage();
+  await configureThemePage(first, errors);
+  await configureThemePage(second, errors);
+  await Promise.all([
+    first.goto(base, { waitUntil: "networkidle" }),
+    second.goto(base + "/services", { waitUntil: "networkidle" }),
+  ]);
+  await assertResolvedTheme(first, "light");
+  await second
+    .getByRole("button", { name: "Toggle light mode", exact: true })
+    .click();
+  await assertResolvedTheme(first, "dark");
+  await second.evaluate(() => localStorage.removeItem("portfolio-theme"));
+  await assertResolvedTheme(first, "light");
+  await first.emulateMedia({ colorScheme: "dark" });
+  await assertResolvedTheme(first, "dark");
+  await context.close();
+  cases.push({ phase: "cross-tab override and return to OS sync" });
+  return cases;
+}
+
 try {
   if (screenshots) await mkdir(screenshots, { recursive: true });
   const page = await browser.newPage({
+    colorScheme: "dark",
     viewport: { width: 1440, height: 900 },
   });
   const errors = [],
@@ -365,6 +594,7 @@ try {
   await swipe(mobile, true);
   assert.equal(await selected(mobile), "backlog-buster");
   await mobile.close();
+  const initialization = await verifyThemeResolution(errors);
   assert.deepEqual(errors, []);
   console.log(
     JSON.stringify(
@@ -373,8 +603,11 @@ try {
         dark,
         light,
         results,
+        initialization,
         checks: [
           "global persistence and legacy preference migration",
+          "OS defaults and saved overrides before hydration on both routes",
+          "live OS sync, manual overrides, blocked storage and cross-tab changes",
           "no hydration errors",
           "light shaders and unchanged 3D transforms",
           "unchanged card position above the fold",

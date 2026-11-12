@@ -70,32 +70,37 @@
 }
 
 @layer utilities {
-  .telemetry-frame[data-theme="light"] .case-study-toggle {
+  :root[data-theme="light"] :where(.telemetry-frame) .case-study-toggle {
     background: #f0f9ff80;
     border-color: #0891b24d;
     color: #0369a1;
   }
-  .telemetry-frame[data-theme="light"]
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
     .case-study-toggle[aria-expanded="true"] {
     border-color: #0284c799;
     background: #e0f2fe80;
     color: #075985;
   }
-  .telemetry-frame[data-theme="light"] .case-study-toggle:hover:not(:disabled) {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .case-study-toggle:hover:not(:disabled) {
     border-color: #0284c7;
     color: #075985;
   }
-  .telemetry-frame[data-theme="light"] .case-study-content {
+  :root[data-theme="light"] :where(.telemetry-frame) .case-study-content {
     border-color: #0284c780;
     scrollbar-color: #0284c780 #e2e8f0;
   }
-  .telemetry-frame[data-theme="light"] .case-study-content h4 {
+  :root[data-theme="light"] :where(.telemetry-frame) .case-study-content h4 {
     color: #0369a1;
   }
-  .telemetry-frame[data-theme="light"] .case-study-content p {
+  :root[data-theme="light"] :where(.telemetry-frame) .case-study-content p {
     color: #475569;
   }
-  .telemetry-frame[data-theme="light"] .case-study-content:focus-visible {
+  :root[data-theme="light"]
+    :where(.telemetry-frame)
+    .case-study-content:focus-visible {
     outline-color: #0284c7;
   }
 }

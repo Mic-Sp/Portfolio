@@ -2,55 +2,34 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
+import {
+  getServerThemeSnapshot,
+  getThemeSnapshot,
+  subscribeToTheme,
+  toggleThemePreference,
+} from "@/lib/theme";
 
 const ThemeContext = createContext<{
   isLight: boolean;
   toggleTheme: () => void;
 } | null>(null);
 
-/** Start dark on the server and during hydration; restore the saved global preference after mount. */
+/** Share the pre-paint theme, following the OS until an explicit manual choice. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isLight, setIsLight] = useState(false);
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      try {
-        const saved = localStorage.getItem("portfolio-theme");
-        const legacy =
-          saved === null ? localStorage.getItem("services-theme") : null;
-        const preference = saved ?? legacy;
-        setIsLight(preference === "light");
-        if (saved === null && legacy !== null)
-          localStorage.setItem("portfolio-theme", legacy);
-      } catch {
-        // Keep dark as the default when browser storage is unavailable.
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = isLight ? "light" : "dark";
-  }, [isLight]);
-
-  const toggleTheme = useCallback(() => {
-    const next = !isLight;
-    setIsLight(next);
-    try {
-      localStorage.setItem("portfolio-theme", next ? "light" : "dark");
-    } catch {
-      // All routes still update together when persistent storage is unavailable.
-    }
-  }, [isLight]);
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
+  const isLight = theme === "light";
   const value = useMemo(
-    () => ({ isLight, toggleTheme }),
-    [isLight, toggleTheme],
+    () => ({ isLight, toggleTheme: toggleThemePreference }),
+    [isLight],
   );
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

@@ -333,6 +333,7 @@ const browser = await chromium.launch({
 });
 try {
   const page = await browser.newPage({
+    colorScheme: "dark",
     viewport: { width: 1440, height: 900 },
   });
   const errors = [],
@@ -488,6 +489,7 @@ try {
   assert.deepEqual(errors, []);
   // Storage restrictions must not break the local in-memory fallback.
   const blocked = await browser.newPage({
+    colorScheme: "dark",
     viewport: { width: 1440, height: 900 },
   });
   blocked.on("pageerror", (error) => errors.push(error.message));

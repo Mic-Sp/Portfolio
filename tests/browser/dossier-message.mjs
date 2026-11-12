@@ -141,6 +141,7 @@ async function close(page, method = "Escape") {
   });
   try {
     const page = await browser.newPage({
+      colorScheme: "dark",
       viewport: { width: 1440, height: 900 },
       deviceScaleFactor: 1,
     });

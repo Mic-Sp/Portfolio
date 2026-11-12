@@ -168,7 +168,7 @@ export default function ServicesPage() {
   return (
     <div
       data-services-theme={isLight ? "light" : "dark"}
-      className={`services-page min-h-screen ${isLight ? "bg-slate-50 text-slate-900" : "bg-slate-950 text-slate-100"}`}
+      className="services-page min-h-screen"
     >
       <nav
         aria-label="Services navigation"

@@ -1,8 +1,8 @@
 @layer theme, base, components, utilities;
 
 @layer components {
-  /* All overrides require the Services light theme. Dark rules stay in their source files. */
-  .operator-dossier-dialog[data-dossier-theme="light"] {
+  /* The pre-paint root theme also controls the drawer on either route. */
+  :root[data-theme="light"] :where(.operator-dossier-dialog) {
     color-scheme: light;
     color: #0f172a;
 
