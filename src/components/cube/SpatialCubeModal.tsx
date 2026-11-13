@@ -32,6 +32,13 @@ import {
   type CubeRotation,
 } from "@/lib/cube-inspector-math";
 import type { CubeCoreSlot, CubeFaceSlot } from "@/data/cube-config";
+import { WORLDLINE } from "@/data/worldline.config";
+import {
+  CubeFaceDetails,
+  CubeFacePreview,
+  getCubeFaceTitle,
+} from "./CubeFaceContent";
+import { CubeFaceArtwork } from "./CubeFaceArtwork";
 import "./cube-inspector.css";
 
 interface DragSession {
@@ -50,10 +57,12 @@ export function SpatialCubeModal({
   faces,
   core,
   onClose,
+  onWorldline,
 }: {
   faces: readonly CubeFaceSlot[];
   core: CubeCoreSlot;
   onClose: () => void;
+  onWorldline: () => void;
 }) {
   const { isLight } = useTheme();
   const reducedMotion = useMotionPreference();
@@ -61,6 +70,8 @@ export function SpatialCubeModal({
   const dialog = useRef<HTMLDialogElement>(null);
   const cage = useRef<HTMLDivElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const videoCloseButton = useRef<HTMLButtonElement>(null);
+  const videoReturnFocus = useRef<{ id: string; faceId: string } | null>(null);
   const drag = useRef<DragSession | null>(null);
   const velocity = useRef<CubeRotation>({ x: 0, y: 0 });
   const heldKeys = useRef(new Set<string>());
@@ -68,14 +79,46 @@ export function SpatialCubeModal({
   const idleResumeAt = useRef(0);
   const suppressClickUntil = useRef(0);
   const backdropDown = useRef(false);
+  const activeFaceRef = useRef("front");
+  const worldlineScheduled = useRef(false);
   const [dragging, setDragging] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
+  const [activeFaceId, setActiveFaceId] = useState("front");
+  const [amberMode, setAmberMode] = useState(false);
+  const [worldlinePending, setWorldlinePending] = useState(false);
+  const [videoFace, setVideoFace] = useState<CubeFaceSlot | null>(null);
   const [selection, setSelection] = useState("Six faces. One inner core.");
   const x = useMotionValue(INITIAL_INSPECTOR_ROTATION.x);
   const y = useMotionValue(INITIAL_INSPECTOR_ROTATION.y);
   const inverseX = useTransform(x, (value) => -value);
   const inverseY = useTransform(y, (value) => -value);
   const coreTransform = useMotionTemplate`rotateY(${inverseY}deg) rotateX(${inverseX}deg)`;
+  const activeFace = faces.find((face) => face.id === activeFaceId) ?? faces[0];
+  const detailFace = videoFace ?? activeFace;
+
+  useLayoutEffect(() => {
+    if (videoFace) {
+      videoCloseButton.current?.focus({ preventScroll: true });
+      videoCloseButton.current
+        ?.closest(".cube-face-detail")
+        ?.scrollIntoView({ block: "center", behavior: "instant" });
+    } else if (videoReturnFocus.current) {
+      const { id, faceId } = videoReturnFocus.current;
+      const trigger = document.getElementById(id);
+      const fallback = dialog.current?.querySelector<HTMLButtonElement>(
+        `[data-inspect-face="${faceId}"]`,
+      );
+      if (trigger && !trigger.closest("[inert]")) trigger.focus();
+      else fallback?.focus();
+      videoReturnFocus.current = null;
+    }
+  }, [videoFace]);
+
+  useEffect(() => {
+    if (!worldlinePending) return;
+    const timer = window.setTimeout(onWorldline, reducedMotion ? 0 : 220);
+    return () => window.clearTimeout(timer);
+  }, [worldlinePending, reducedMotion, onWorldline]);
 
   function clearKeyboard() {
     heldKeys.current.clear();
@@ -128,6 +171,10 @@ export function SpatialCubeModal({
       cage.current.dataset.rotateY = rotation.y.toFixed(3);
       // Rich content is keyboard-accessible only on the face nearest the viewer.
       const nearest = getCubeFrontFace(rotation);
+      if (activeFaceRef.current !== nearest) {
+        activeFaceRef.current = nearest;
+        setActiveFaceId(nearest);
+      }
       for (const content of cage.current.querySelectorAll<HTMLElement>(
         "[data-face-content]",
       )) {
@@ -138,7 +185,14 @@ export function SpatialCubeModal({
   }
 
   useAnimationFrame((_, delta) => {
-    if (reducedMotion || drag.current || !isPresent || document.hidden) return;
+    if (
+      reducedMotion ||
+      drag.current ||
+      !isPresent ||
+      document.hidden ||
+      worldlinePending
+    )
+      return;
     if (keyboardTarget.current) {
       const step = stepCubeKeyboard(
         { x: x.get(), y: y.get() },
@@ -163,14 +217,34 @@ export function SpatialCubeModal({
       orient(step.rotation);
   });
 
+  function beginWorldline() {
+    if (worldlineScheduled.current) return;
+    worldlineScheduled.current = true;
+    clearKeyboard();
+    velocity.current = { x: 0, y: 0 };
+    setAutoRotate(false);
+    setWorldlinePending(true);
+  }
+
+  function watchDemo(face: CubeFaceSlot, trigger: HTMLButtonElement) {
+    if (!face.project?.videoDemoUrl) return;
+    clearKeyboard();
+    velocity.current = { x: 0, y: 0 };
+    setAutoRotate(false);
+    videoReturnFocus.current = { id: trigger.id, faceId: face.id };
+    setVideoFace(face);
+  }
+
   function activate(id: string) {
     if (id === "core") {
-      setSelection(`${core.label} selected`);
+      setAmberMode((value) => !value);
+      setSelection("Core accent toggled");
       core.onActivate?.();
     } else {
       const face = faces.find((slot) => slot.id === id);
       if (face) {
         setSelection(`${face.label} face selected`);
+        if (face.kind === "worldline") beginWorldline();
         face.onActivate?.();
       }
     }
@@ -263,6 +337,8 @@ export function SpatialCubeModal({
       className="spatial-cube-modal"
       data-theme={isLight ? "light" : "dark"}
       data-motion={reducedMotion ? "reduced" : "full"}
+      data-worldline-mode={amberMode ? "amber" : "cyan"}
+      data-worldline-pulse={worldlinePending}
       role="dialog"
       aria-modal="true"
       aria-labelledby="cube-inspector-heading"
@@ -273,12 +349,13 @@ export function SpatialCubeModal({
       transition={getHudDrawerTransition(reducedMotion)}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (videoFace) setVideoFace(null);
+        else onClose();
       }}
       onKeyDown={(event) => {
         event.stopPropagation();
         const editable = (event.target as HTMLElement).closest(
-          'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content',
+          'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content,.cube-face-detail',
         );
         if (!editable && !event.altKey && !event.ctrlKey && !event.metaKey) {
           const direction = getCubeArrowDirection(event.key);
@@ -309,7 +386,7 @@ export function SpatialCubeModal({
         if (event.key !== "Tab") return;
         const controls = [
           ...event.currentTarget.querySelectorAll<HTMLElement>(
-            "button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]",
+            "button:not([disabled]),a[href],iframe,input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]",
           ),
         ].filter(
           (el) =>
@@ -340,7 +417,7 @@ export function SpatialCubeModal({
       onFocusCapture={(event) => {
         if (
           (event.target as HTMLElement).closest(
-            'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content',
+            'input,textarea,select,[role="textbox"],[contenteditable]:not([contenteditable="false"]),.cube-slot-content,.cube-face-detail',
           )
         ) {
           clearKeyboard();
@@ -374,6 +451,15 @@ export function SpatialCubeModal({
         exit={{ scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 8 }}
         transition={getHudDrawerTransition(reducedMotion)}
       >
+        {worldlinePending && !reducedMotion && (
+          <motion.div
+            className="cube-worldline-pulse"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.4, 0] }}
+            transition={{ duration: 0.22 }}
+          />
+        )}
         <header className="cube-modal-heading">
           <div>
             <span className="cube-eyebrow">SPATIAL LAB // 6 + 1</span>
@@ -426,31 +512,54 @@ export function SpatialCubeModal({
                 data-face={face.id}
               >
                 <div className="cube-face-glass" aria-hidden="true" />
+                {face.previewImage && (
+                  <CubeFaceArtwork
+                    key={face.previewImage.src}
+                    image={face.previewImage}
+                  />
+                )}
                 <button
                   type="button"
                   tabIndex={-1}
                   className="cube-face-label"
                   data-cube-slot={face.id}
+                  data-facing={face.id === activeFaceId}
+                  aria-hidden={face.id !== activeFaceId}
                   aria-label={`Activate ${face.label} face`}
                   onClick={(event) => {
                     if (event.detail === 0) activate(face.id);
                   }}
                 >
-                  {face.eyebrow ?? face.label}
+                  <span>{face.eyebrow ?? face.label}</span>
+                  {face.kind && (
+                    <span className="cube-face-caption">
+                      {getCubeFaceTitle(face)}
+                    </span>
+                  )}
                 </button>
                 <div className="cube-face-wireframe" aria-hidden="true">
                   <span />
                   <span />
                   <span />
                 </div>
-                {face.content && (
+                {(face.content || face.kind) && (
                   <div
                     className="cube-slot-content"
                     data-face-content={face.id}
-                    inert={face.id !== "front"}
-                    aria-hidden={face.id !== "front"}
+                    data-lab-preview={!!face.kind}
+                    inert={face.id !== activeFaceId}
+                    aria-hidden={face.id !== activeFaceId}
                   >
-                    {face.content}
+                    {face.kind ? (
+                      <CubeFacePreview
+                        face={face}
+                        onWorldline={beginWorldline}
+                        onWatchDemo={watchDemo}
+                        pending={worldlinePending}
+                      />
+                    ) : (
+                      face.content
+                    )}
                   </div>
                 )}
               </div>
@@ -470,14 +579,15 @@ export function SpatialCubeModal({
                   onClick={(event) => {
                     if (event.detail === 0) activate("core");
                   }}
-                  aria-label={`Activate ${core.label}`}
+                  aria-label="Toggle Amber Worldline Mode"
+                  aria-pressed={amberMode}
                 >
                   <span className="cube-core-glyph" aria-hidden="true">
                     ◇
                   </span>
                   <span>{core.label}</span>
                   <span className="cube-core-index" aria-hidden="true">
-                    00 // CORE
+                    {amberMode ? "AMBER" : "CYAN"}
                   </span>
                 </button>
                 {core.content && (
@@ -494,9 +604,10 @@ export function SpatialCubeModal({
               type="button"
               onClick={() => {
                 snap(CUBE_FACE_ROTATIONS[face.id]);
-                activate(face.id);
+                setSelection(`${face.label} face selected`);
               }}
               aria-label={`Inspect ${face.label} face`}
+              data-inspect-face={face.id}
             >
               {face.label}
             </button>
@@ -504,6 +615,57 @@ export function SpatialCubeModal({
         </nav>
         <p className="cube-selection" role="status" aria-live="polite">
           {selection}
+        </p>
+        {detailFace?.kind && (
+          <section
+            className="cube-face-detail"
+            aria-label={`${detailFace.label} face details`}
+            onPointerEnter={() => {
+              clearKeyboard();
+              velocity.current = { x: 0, y: 0 };
+              setAutoRotate(false);
+            }}
+            onFocusCapture={() => {
+              clearKeyboard();
+              velocity.current = { x: 0, y: 0 };
+              setAutoRotate(false);
+            }}
+          >
+            {videoFace?.project?.videoDemoUrl ? (
+              <div className="cube-video-player">
+                <div className="cube-video-heading">
+                  <h3>{videoFace.project.title} — Tech Demo</h3>
+                  <button
+                    ref={videoCloseButton}
+                    type="button"
+                    onClick={() => setVideoFace(null)}
+                  >
+                    [ CLOSE VIDEO ]
+                  </button>
+                </div>
+                <iframe
+                  className="cube-video-frame"
+                  src={videoFace.project.videoDemoUrl}
+                  title={`${videoFace.project.title} — Tech Demo`}
+                  allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                  allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+            ) : (
+              <CubeFaceDetails
+                face={detailFace}
+                onWorldline={beginWorldline}
+                onWatchDemo={watchDemo}
+                pending={worldlinePending}
+              />
+            )}
+          </section>
+        )}
+        <p className="cube-worldline-state">
+          WORLDLINE: {WORLDLINE}
+          {" // "}
+          {amberMode ? "AMBER" : "CYAN"}
         </p>
         <footer className="cube-control-bar">
           <button

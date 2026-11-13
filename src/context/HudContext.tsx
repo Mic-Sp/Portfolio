@@ -34,6 +34,8 @@ interface HudContextValue {
   setViewMode: (mode: ViewMode) => void;
   isTerminalOpen: boolean;
   toggleTerminal: () => void;
+  openWorldlineTerminal: () => void;
+  worldlineRequestId: number;
   closeTerminal: () => void;
   isDossierOpen: boolean;
   dossierSection: DossierSection;
@@ -63,6 +65,7 @@ export function HudProvider({
   const [activePillarFilter, setPillarFilter] = useState<string | "ALL">("ALL");
   const [viewMode, setMode] = useState<ViewMode>("spatial");
   const [isTerminalOpen, setTerminalOpen] = useState(false);
+  const [worldlineRequestId, setWorldlineRequestId] = useState(0);
   const [isDossierOpen, setDossierOpen] = useState(false);
   const [dossierSection, setDossierSection] =
     useState<DossierSection>("overview");
@@ -93,6 +96,11 @@ export function HudProvider({
   const toggleTerminal = useCallback(() => {
     setDossierOpen(false);
     setTerminalOpen((open) => !open);
+  }, []);
+  const openWorldlineTerminal = useCallback(() => {
+    setDossierOpen(false);
+    setWorldlineRequestId((id) => id + 1);
+    setTerminalOpen(true);
   }, []);
   const closeTerminal = useCallback(() => setTerminalOpen(false), []);
   const openDossier = useCallback((section: DossierSection = "overview") => {
@@ -164,6 +172,8 @@ export function HudProvider({
         setViewMode,
         isTerminalOpen,
         toggleTerminal,
+        openWorldlineTerminal,
+        worldlineRequestId,
         closeTerminal,
         isDossierOpen,
         dossierSection,

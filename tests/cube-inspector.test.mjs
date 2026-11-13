@@ -114,3 +114,49 @@ test("inertia damps smoothly and travels the same distance at 30 and 120 FPS", (
     { x: 1, y: 2 },
   );
 });
+
+test("lab entries fill front/right/back/left without modifying the selected-project registry", async () => {
+  const { labProjects, getLabFaceSlots, CUBE_FACES } =
+    await import("../src/data/cube-config.ts");
+  const { PROJECTS_REGISTRY } =
+    await import("../src/data/projects.registry.ts");
+  const slots = getLabFaceSlots();
+  assert.deepEqual(
+    slots.map(({ id }) => id),
+    ["front", "right", "back", "left"],
+  );
+  assert.equal(slots[0].project.title, "Vivi's Dream");
+  assert.deepEqual(slots[0].previewImage, labProjects[0].previewImage);
+  assert.equal(
+    slots[0].previewImage.src,
+    "/images/lab/vivis-dream-preview.png",
+  );
+  assert.ok(slots[0].previewImage.alt.length > 0);
+  assert.equal(
+    slots[0].project.videoDemoUrl,
+    "https://www.youtube-nocookie.com/embed/OFzxl3kdh3c?autoplay=1&rel=0",
+  );
+  assert.ok(
+    slots
+      .slice(1)
+      .every((slot) => !slot.previewImage && !slot.project?.videoDemoUrl),
+  );
+  assert.equal(
+    slots[0].project.liveUrl,
+    "https://mic-sp.github.io/NC-Project-Week1/",
+  );
+  assert.equal(slots.filter(({ kind }) => kind === "queue").length, 3);
+  const future = { ...labProjects[0], id: "second-lab", title: "Second Lab" };
+  const expanded = getLabFaceSlots([...labProjects, future]);
+  assert.equal(expanded[1].project, future);
+  assert.equal(expanded[1].eyebrow, "02 // LAB BUILD");
+  assert.equal(expanded[2].eyebrow, "03 // R&D QUEUE");
+  assert.deepEqual(
+    CUBE_FACES.map(({ id }) => id),
+    ["front", "right", "back", "left", "top", "bottom"],
+  );
+  assert.equal(
+    PROJECTS_REGISTRY.some(({ id }) => id === "vivis-dream"),
+    false,
+  );
+});

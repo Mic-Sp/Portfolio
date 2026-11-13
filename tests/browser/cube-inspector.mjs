@@ -1,6 +1,7 @@
 // Uses the same production preview, Playwright, and axe-core overrides as accessibility.mjs.
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
+import { checkRenderedTextContrast } from "./helpers/contrast.mjs";
 const { chromium } = await import(
   process.env.PLAYWRIGHT_MODULE || "playwright"
 );
@@ -10,6 +11,7 @@ const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH,
   args: ["--no-sandbox"],
 });
+const contrastResults = [];
 const errors = [],
   results = [];
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -125,17 +127,20 @@ async function opened(page, method = "click") {
   assert.equal(
     glass.background,
     glass.theme === "light"
-      ? "rgba(248, 250, 252, 0.75)"
+      ? "rgba(248, 250, 252, 0.68)"
       : "rgba(5, 11, 20, 0.7)",
   );
   assert.equal(
     glass.border,
     glass.theme === "light"
-      ? "rgba(15, 23, 42, 0.2)"
+      ? "rgba(15, 23, 42, 0.15)"
       : "rgba(6, 182, 212, 0.3)",
   );
   assert.equal(glass.blur, "blur(12px)");
-  assert.equal(glass.scrim, "rgba(0, 0, 0, 0.55)");
+  assert.equal(
+    glass.scrim,
+    glass.theme === "light" ? "rgba(15, 23, 42, 0.25)" : "rgba(0, 0, 0, 0.55)",
+  );
   assert.equal(glass.scrimBlur, "blur(4px)");
   return { trigger, modal };
 }
@@ -376,25 +381,67 @@ try {
     "Front face selected",
   );
   const core = page.getByRole("button", {
-    name: "Activate Inner Core",
+    name: "Toggle Amber Worldline Mode",
     exact: true,
   });
   await core.click();
   assert.equal(
     await modal.getByRole("status").innerText(),
-    "Inner Core selected",
+    "Core accent toggled",
   );
   await page
     .getByRole("button", { name: "Inspect Front face", exact: true })
     .click();
+  await core.scrollIntoViewIfNeeded();
   const box = await core.boundingBox();
+  // Observe the release in-page so a protocol round trip cannot pause the flick.
+  await page.locator(".cube-stage").evaluate((el) => {
+    el.addEventListener(
+      "pointerdown",
+      (event) => {
+        window.cubePointerId = event.pointerId;
+      },
+      { capture: true, once: true },
+    );
+    el.addEventListener(
+      "pointerup",
+      () => {
+        const cube = document.querySelector(".inspector-cube");
+        window.cubeReleaseRotation = [
+          Number(cube.dataset.rotateX),
+          Number(cube.dataset.rotateY),
+        ];
+      },
+      { capture: true, once: true },
+    );
+  });
   const cx = box.x + box.width / 2,
     cy = box.y + box.height / 2;
   await page.mouse.move(cx, cy);
   await page.mouse.down();
   await page.mouse.move(cx + 100, cy - 25, { steps: 12 });
-  const during = await rotation(page);
+  // Keep the final flick and release in the same browser task. A slow raster or
+  // protocol round trip otherwise turns this into a deliberate >100ms hold.
+  await page.locator(".cube-stage").evaluate(
+    (el, { cx, cy }) => {
+      const options = {
+        bubbles: true,
+        pointerId: window.cubePointerId,
+        isPrimary: true,
+        clientX: cx + 110,
+        clientY: cy - 25,
+      };
+      el.dispatchEvent(
+        new PointerEvent("pointermove", { ...options, buttons: 1 }),
+      );
+      el.dispatchEvent(
+        new PointerEvent("pointerup", { ...options, buttons: 0 }),
+      );
+    },
+    { cx, cy },
+  );
   await page.mouse.up();
+  const during = await page.evaluate(() => window.cubeReleaseRotation);
   await page.waitForFunction(
     (during) =>
       Number(document.querySelector(".inspector-cube").dataset.rotateY) !==
@@ -415,6 +462,7 @@ try {
   await page
     .getByRole("button", { name: "Inspect Front face", exact: true })
     .click();
+  await core.scrollIntoViewIfNeeded();
   const jitter = await core.boundingBox();
   await page.mouse.move(
     jitter.x + jitter.width / 2,
@@ -428,10 +476,10 @@ try {
   await page.mouse.up();
   assert.equal(
     await modal.getByRole("status").innerText(),
-    "Inner Core selected",
+    "Core accent toggled",
     "less than 5px is a click",
   );
-  // Tab wraps from the final control to the core, and back again.
+  // Tab wraps from the final control to the front-face link, and back again.
   const close = page.getByRole("button", {
     name: "[ CLOSE // ESC ]",
     exact: true,
@@ -439,7 +487,9 @@ try {
   await close.focus();
   await page.keyboard.press("Tab");
   assert.equal(
-    await core.evaluate((el) => el === document.activeElement),
+    await page
+      .locator(".cube-face-front .cube-face-actions a")
+      .evaluate((el) => el === document.activeElement),
     true,
   );
   await page.keyboard.press("Shift+Tab");
@@ -495,6 +545,22 @@ try {
     assert.equal(fits.face, "blur(2px)");
     assert.equal(fits.theme, theme);
     await scan(small, `${width}px ${theme} inspector`);
+    if (theme === "light") {
+      const samples = await checkRenderedTextContrast(
+        small,
+        ".cube-modal-heading h2, .cube-eyebrow, .cube-help, .cube-face-label > span, .cube-core-button > span:not([aria-hidden]), .cube-core-index, .cube-face-nav button, .cube-control-bar button, .cube-selection",
+        `${width}px light inspector`,
+      );
+      assert.ok(
+        samples.some(({ text }) => text.includes("LAB BUILD")),
+        "wireframe label contrast must be sampled",
+      );
+      assert.ok(
+        samples.some(({ text }) => text.includes("CLOSE")),
+        "bottom control contrast must be sampled",
+      );
+      contrastResults.push(...samples);
+    }
     if (process.env.PORTFOLIO_SCREENSHOT_DIR)
       await small.screenshot({
         path: `${process.env.PORTFOLIO_SCREENSHOT_DIR}/cube-${theme}-${width}.png`,
@@ -536,7 +602,7 @@ try {
   );
   await reduced.keyboard.press("ArrowLeft");
   const reducedCore = reduced.getByRole("button", {
-    name: "Activate Inner Core",
+    name: "Toggle Amber Worldline Mode",
     exact: true,
   });
   const rb = await reducedCore.boundingBox();
@@ -602,7 +668,17 @@ try {
   assert.deepEqual(errors, []);
   console.log(
     JSON.stringify(
-      { passed: true, results, reducedMotion: true, touchDrag: true, errors },
+      {
+        passed: true,
+        results,
+        minimumLightContrast: Math.min(
+          ...contrastResults.map(({ ratio }) => ratio),
+        ),
+        lightContrastSamples: contrastResults.length,
+        reducedMotion: true,
+        touchDrag: true,
+        errors,
+      },
       null,
       2,
     ),

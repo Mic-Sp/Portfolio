@@ -241,7 +241,9 @@ test("iddqd and godmode toggle shared state both ways; view, clear, close use re
 test("help is registry-driven; secret input never enters echo, history, completion, or output", async () => {
   const { context } = environment();
   const help = output(await runCliCommand("help", context));
-  CLI_COMMANDS.forEach((command) => assert.ok(help.includes(command.syntax)));
+  CLI_COMMANDS.filter((command) => !command.hidden).forEach((command) =>
+    assert.ok(help.includes(command.syntax)),
+  );
   for (const raw of [
     "pwnd Unique_Secret_123",
     "entropy --redact Unique_Secret_123",
@@ -265,4 +267,16 @@ test("help is registry-driven; secret input never enters echo, history, completi
   assert.equal(audit.includes("Unique_Secret_123"), false);
   assert.equal(getHistoryCommand("ls"), "ls");
   assert.equal(getAutocomplete("ins").value, "inspect ");
+});
+
+test("worldline aliases share an exact readout while staying out of help and autocomplete", async () => {
+  const { context } = environment();
+  const expected =
+    "[SYS // FGL-01]: Worldline 1.048596 (Steins Gate) confirmed. El Psy Kongroo.";
+  for (const command of ["divergence", "elpsykongroo", "ELPSYKONGROO"])
+    assert.equal(output(await runCliCommand(command, context)), expected);
+  const help = output(await runCliCommand("help", context));
+  assert.doesNotMatch(help, /divergence|elpsykongroo/);
+  assert.equal(getAutocomplete("diver").value, "diver");
+  assert.equal(getAutocomplete("elpsy").value, "elpsy");
 });

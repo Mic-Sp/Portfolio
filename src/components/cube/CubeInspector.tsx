@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useHud } from "@/context/HudContext";
 import { createPortal } from "react-dom";
 import {
   CUBE_CORE,
@@ -22,7 +23,13 @@ export function CubeInspector({
   faces = CUBE_FACES,
   core = CUBE_CORE,
 }: CubeInspectorProps) {
+  const { openWorldlineTerminal } = useHud();
   const [open, setOpen] = useState(false);
+  const launchTerminalAfterExit = useRef(false);
+  const handOffWorldline = useCallback(() => {
+    launchTerminalAfterExit.current = true;
+    setOpen(false);
+  }, []);
   const [hasOpened, setHasOpened] = useState(false);
   return (
     <>
@@ -35,12 +42,20 @@ export function CubeInspector({
       />
       {hasOpened &&
         createPortal(
-          <AnimatePresence>
+          <AnimatePresence
+            onExitComplete={() => {
+              if (launchTerminalAfterExit.current) {
+                launchTerminalAfterExit.current = false;
+                openWorldlineTerminal();
+              }
+            }}
+          >
             {open && (
               <SpatialCubeModal
                 faces={faces}
                 core={core}
                 onClose={() => setOpen(false)}
+                onWorldline={handOffWorldline}
               />
             )}
           </AnimatePresence>,

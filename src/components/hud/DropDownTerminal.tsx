@@ -14,6 +14,7 @@ import { useMotionPreference } from "@/hooks/useMotionPreference";
 import { PROJECTS_REGISTRY } from "@/data/projects.registry";
 import { getHudDrawerTransition } from "@/lib/hud-motion";
 import {
+  getWorldlineReadout,
   getAutocomplete,
   getCommandEcho,
   getHistoryCommand,
@@ -37,11 +38,30 @@ const BOOT_ENTRY: TerminalEntry = {
 };
 
 export function DropDownTerminal() {
-  const { isTerminalOpen } = useHud();
+  const { isTerminalOpen, worldlineRequestId } = useHud();
   const reducedMotion = useMotionPreference();
   const [entries, setEntries] = useState<TerminalEntry[]>([BOOT_ENTRY]);
   const [history, setHistory] = useState<string[]>([]);
   const sequence = useRef(0);
+  const lastWorldlineRequest = useRef(0);
+  useEffect(() => {
+    if (
+      !worldlineRequestId ||
+      worldlineRequestId === lastWorldlineRequest.current
+    )
+      return;
+    const frame = requestAnimationFrame(() => {
+      if (worldlineRequestId === lastWorldlineRequest.current) return;
+      lastWorldlineRequest.current = worldlineRequestId;
+      const entry: TerminalEntry = {
+        id: ++sequence.current,
+        prompt: "",
+        lines: getWorldlineReadout().lines,
+      };
+      setEntries((current) => [...current.slice(-99), entry]);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [worldlineRequestId]);
 
   function addEntry(prompt: string) {
     const id = ++sequence.current;

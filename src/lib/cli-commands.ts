@@ -1,3 +1,4 @@
+import { WORLDLINE_CONFIRMATION } from "../data/worldline.config.ts";
 import { PROJECTS_REGISTRY } from "../data/projects.registry.ts";
 import { PROFILE_CONFIG } from "../data/profile.config.ts";
 import {
@@ -43,6 +44,7 @@ export interface CliContext {
   onProgress?: (lines: CliLine[]) => void;
 }
 export interface CliCommand {
+  hidden?: boolean;
   name: string;
   aliases?: readonly string[];
   syntax: string;
@@ -211,6 +213,10 @@ function entropyLines(audit: EntropyAudit): CliLine[] {
   ];
 }
 
+export function getWorldlineReadout(): CliResult {
+  return result(text(WORLDLINE_CONFIRMATION, "warning"));
+}
+
 export const CLI_COMMANDS: readonly CliCommand[] = [
   {
     name: "help",
@@ -219,7 +225,7 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
     execute: () =>
       result(
         text("AVAILABLE COMMANDS", "accent"),
-        ...CLI_COMMANDS.map((command) =>
+        ...CLI_COMMANDS.filter((command) => !command.hidden).map((command) =>
           text(
             `${command.syntax.padEnd(34)} ${command.description}${command.aliases?.length ? ` [${command.aliases.join(", ")}]` : ""}`,
           ),
@@ -602,6 +608,14 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
     },
   },
   {
+    name: "divergence",
+    aliases: ["elpsykongroo"],
+    hidden: true,
+    syntax: "divergence",
+    description: "Confirm the current worldline",
+    execute: () => getWorldlineReadout(),
+  },
+  {
     name: "clear",
     syntax: "clear",
     description: "Clear terminal scrollback",
@@ -648,10 +662,9 @@ export function getAutocomplete(
   const parts = trimmed.split(/\s+/);
   let candidates: string[];
   if (parts.length === 1)
-    candidates = CLI_COMMANDS.flatMap((command) => [
-      command.name,
-      ...(command.aliases ?? []),
-    ]);
+    candidates = CLI_COMMANDS.filter((command) => !command.hidden).flatMap(
+      (command) => [command.name, ...(command.aliases ?? [])],
+    );
   else if (
     parts.length === 2 &&
     ["inspect", "cat", "select", "open"].includes(parts[0].toLowerCase())
