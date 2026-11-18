@@ -59,7 +59,7 @@ test("contact aliases, help and completion expose configured contact actions", a
       thmTelemetry.profileUrl,
     ],
   );
-  assert.equal(links[2].label, "mic.sprague@gmail.com");
+  assert.equal(links[2].label, "contact@michaelsprague.dev");
   for (const alias of ["uplink", "socials"])
     assert.deepEqual(await runCliCommand(alias, context), contact);
   assert.equal(getAutocomplete("cont").value, "contact ");

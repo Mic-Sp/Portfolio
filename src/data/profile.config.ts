@@ -44,8 +44,8 @@ const COMMS_AND_TELEMETRY = {
       description: "Professional network, architecture updates & experience",
     },
     email: {
-      address: "mic.sprague@gmail.com",
-      href: "mailto:mic.sprague@gmail.com",
+      address: "contact@michaelsprague.dev",
+      href: "mailto:contact@michaelsprague.dev",
       description: "Primary encrypted inbox for engineering & consulting",
     },
   },

@@ -37,7 +37,7 @@ Copy `.env.example` to `.env.local` for development, or set its variables in Ver
 
 - `RESEND_API_KEY`: server-only Resend API key with sending access. Never use a `NEXT_PUBLIC_` variable.
 - `CONTACT_FROM_EMAIL`: sender on a [verified Resend domain](https://resend.com/docs/send-with-nextjs). The default `Portfolio Uplink <onboarding@resend.dev>` is for Resend's restricted test-sender flow; configure a verified sender for production.
-- `CONTACT_TO_EMAIL`: fixed server-controlled destination, default `mic.sprague@gmail.com`. Visitors cannot override the recipient or sender.
+- `CONTACT_TO_EMAIL`: fixed server-controlled destination, default `contact@michaelsprague.dev`. Visitors cannot override the recipient or sender.
 
 Without a key the route returns a clean `503 RELAY_UNAVAILABLE`; the site still builds. A successful submission means Resend accepted the message for delivery, rather than proving inbox delivery. The provider request times out after ten seconds. Private payloads and provider errors are never logged, and the client never automatically retries a submission with an uncertain outcome.
 

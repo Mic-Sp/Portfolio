@@ -53,7 +53,7 @@ export function formatContactEmail(
   ].join("\n");
   return {
     from: env.from ?? "Portfolio Uplink <onboarding@resend.dev>",
-    to: env.to ?? "mic.sprague@gmail.com",
+    to: env.to ?? "contact@michaelsprague.dev",
     replyTo: data.senderEmail,
     subject: `[PORTFOLIO // ${data.origin}] ${data.subject} — from ${data.senderName}`,
     text,

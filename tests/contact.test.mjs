@@ -172,7 +172,7 @@ test("handler escapes untrusted angle brackets and quotes rather than treating t
     calls[0].email.html,
     /2 &lt; 3 &amp; &quot;quoted&quot; with &#39;apostrophes&#39;/,
   );
-  assert.equal(calls[0].email.to, "mic.sprague@gmail.com");
+  assert.equal(calls[0].email.to, "contact@michaelsprague.dev");
   assert.equal(calls[0].email.from, "Portfolio Uplink <onboarding@resend.dev>");
 });
 
