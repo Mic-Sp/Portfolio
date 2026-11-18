@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PROFILE_CONFIG } from "@/data/profile.config";
+import { SITE_NAME, SOCIAL_IMAGE } from "@/lib/social-metadata";
 
 const title = `Web Applications & AI Services | ${PROFILE_CONFIG.legalName}`;
 const description =
@@ -13,16 +14,16 @@ export const metadata: Metadata = {
     title,
     description,
     url: "/services",
-    siteName: `${PROFILE_CONFIG.legalName} | Portfolio`,
+    siteName: SITE_NAME,
     type: "website",
     locale: "en_US",
-    images: ["/opengraph-image.png"],
+    images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: ["/opengraph-image.png"],
+    images: [SOCIAL_IMAGE],
   },
 };
 

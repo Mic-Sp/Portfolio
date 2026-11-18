@@ -5,6 +5,7 @@ import { HudProvider } from "@/context/HudContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 import { SITE_URL } from "@/lib/site-url";
+import { SITE_NAME, SOCIAL_IMAGE } from "@/lib/social-metadata";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 import "./portfolio-light.css";
@@ -24,13 +25,6 @@ const jetbrainsMono = JetBrains_Mono({
 const title = `${PROFILE_CONFIG.legalName} | AI & Full-Stack Software Engineer`;
 const description =
   "AI & Full-Stack Software Engineer open to full-time roles. Explore Michael Sprague's applied AI, TypeScript, React, and Next.js projects, resume, and experience.";
-const socialImage = {
-  url: "/opengraph-image.png",
-  width: 1200,
-  height: 621,
-  alt: "Michael Anthony Sprague's software engineering portfolio and selected projects",
-};
-
 export const metadata: Metadata = {
   metadataBase: SITE_URL,
   title,
@@ -44,17 +38,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: `${PROFILE_CONFIG.legalName} | Portfolio`,
+    siteName: SITE_NAME,
     url: "/",
     title,
     description,
-    images: [socialImage],
+    images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: [socialImage],
+    images: [SOCIAL_IMAGE],
   },
 };
 
