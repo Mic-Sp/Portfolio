@@ -9,16 +9,16 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
     pillar: "Applied AI & Quantum Systems",
     pillarShort: "AI // QUANTUM",
     title: "Q-Split",
-    version: "v1.1.0",
+    version: "v2.0.0",
     status: "ONLINE",
     accent: "cyan",
     image: "/projects/q-split-preview.png",
     imageAlt:
       "Q-Split workload simulator showing hardware profiles, quantum decoherence telemetry, and the execution pipeline.",
     thumbnailClass: "object-cover object-top scale-100",
-    hook: "A workload simulator that tests how classical computers and quantum processors can divide complex AI tasks—and predicts when quantum hardware noise outweighs any speed advantage.",
+    hook: "A workload simulator that tests how classical computers and quantum processors divide complex HPC and AI tasks, predicting when hardware noise or classical bottlenecks outweigh any speed advantage.",
     technicalSpec:
-      "Hybrid quantum-classical routing engine built with FastAPI and Qiskit Aer, modeling T1/T2 idle decoherence and gate error rates alongside Gemini API orchestration.",
+      "Hybrid quantum-classical routing engine built with FastAPI and Qiskit Aer, modeling T1/T2 idle decoherence, gate error rates, Krylov subspace sampling (SKQD), and generative quantum eigensolver (GQE) loops alongside Gemini API diagnostics.",
     caseStudy: {
       problem:
         "Quantum circuit simulations often assume idealized hardware or require manual parameter tuning, making it hard to see where NISQ-era decoherence and gate errors outweigh theoretical speedups in hybrid AI pipelines.",
@@ -28,9 +28,10 @@ export const PROJECTS_REGISTRY: ProjectNode[] = [
         "Full density-matrix noise modeling (T1/T2 relaxation) scales expensively with qubit depth; bounded interactive circuit depth and pre-computed baseline hardware profiles to keep cloud inference responsive.",
     },
     architectureHighlights: [
-      "Hybrid quantum-classical workload profiling",
+      "Hybrid workload profiling (Shor, MIPS, SKQD & GQE)",
       "T1/T2 idle decoherence & depth expansion",
       "QPU repetition-rate telemetry",
+      "Classical subspace & transformer bottleneck modeling",
     ],
     techStack: [
       "Next.js",
