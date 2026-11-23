@@ -66,13 +66,17 @@ test("contact aliases, help and completion expose configured contact actions", a
   assert.equal(getAutocomplete("th").value, "thm ");
 });
 
-test("thm supplies operator identity and live verification without topic lists or fabricated metrics", async () => {
+test("thm supplies configured standing and a live verification link without fabricated metrics", async () => {
   const { context } = environment();
   const { thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const { league, topPercent } = PROFILE_CONFIG.tryHackMeStats;
   const thm = await runCliCommand("thm", context);
   const body = output(thm);
   assert.ok(body.includes(thmTelemetry.handle));
-  assert.ok(body.includes(thmTelemetry.league));
+  assert.equal(
+    thm.lines[0].text,
+    `TRYHACKME // ${thmTelemetry.handle} // ${league} // ${topPercent}`,
+  );
   assert.doesNotMatch(
     body,
     /STRIDE|MITRE ATLAS|Web App Pentesting|RSA Crypto|Ghidra/,
@@ -81,7 +85,7 @@ test("thm supplies operator identity and live verification without topic lists o
     thm.lines.flatMap((line) => line.links ?? [])[0].href,
     thmTelemetry.profileUrl,
   );
-  assert.doesNotMatch(body, /\d+\s*(rooms|days|%)|top\s*\d/i);
+  assert.doesNotMatch(body, /\d+\s*(rooms|days)/i);
 });
 
 test("whois and stack expose the complete shared dossier profile", async () => {

@@ -6,6 +6,7 @@ import "./comms-uplink.css";
 
 export function HeroUplinks() {
   const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const { league, topPercent } = PROFILE_CONFIG.tryHackMeStats;
   return (
     <nav className="hero-uplinks" aria-label="Quick uplinks">
       <DossierTrigger className="hero-uplink-pill" label="Credentials">
@@ -37,7 +38,7 @@ export function HeroUplinks() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        THM {"//"} {thmTelemetry.league}{" "}
+        THM {"//"} {league} {topPercent}{" "}
         <ArrowUpRight size={13} aria-hidden="true" />
       </a>
     </nav>

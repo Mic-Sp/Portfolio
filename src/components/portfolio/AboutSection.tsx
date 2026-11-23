@@ -2,6 +2,7 @@ import "./about-section.css";
 import { PROFILE_CONFIG } from "@/data/profile.config";
 
 export function AboutSection() {
+  const { league, topPercent } = PROFILE_CONFIG.tryHackMeStats;
   return (
     <section
       id="about"
@@ -26,7 +27,9 @@ export function AboutSection() {
           >
             <li>Columbia PAISE</li>
             <li>Next Chapter</li>
-            <li>TryHackMe Gold League Top 7%</li>
+            <li>
+              TryHackMe {league} {topPercent}
+            </li>
           </ul>
           <dl
             className="about-skills-index"
@@ -59,7 +62,7 @@ export function AboutSection() {
             architecting a hybrid quantum-classical workload simulator, building
             vector-search recommendation engines, or deploying a zero-downtime
             production site for a licensed counseling practice, I build with an
-            AppSec-first mindset backed by Top 7% (Gold League) standing on
+            AppSec-first mindset backed by {topPercent} ({league}) standing on
             TryHackMe.
           </p>
         </div>

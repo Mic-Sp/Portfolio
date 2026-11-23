@@ -22,6 +22,7 @@ export function CommsUplink({
   telemetryActive?: boolean;
 }) {
   const { directChannels, thmTelemetry } = PROFILE_CONFIG.commsAndTelemetry;
+  const { league } = PROFILE_CONFIG.tryHackMeStats;
   const channels = [
     {
       ...directChannels.github,
@@ -106,7 +107,7 @@ export function CommsUplink({
             <ShieldCheck size={17} aria-hidden="true" /> TRYHACKME {"//"} LIVE
             TELEMETRY
           </p>
-          <span className="thm-league">{thmTelemetry.league}</span>
+          <span className="thm-league">{league.toUpperCase()}</span>
         </header>
         <div className="thm-telemetry-body">
           <div className="thm-badge-column">

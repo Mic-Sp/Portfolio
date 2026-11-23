@@ -500,9 +500,10 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
     description: "TryHackMe operator profile and live verification",
     execute: () => {
       const telemetry = PROFILE_CONFIG.commsAndTelemetry.thmTelemetry;
+      const { league, topPercent } = PROFILE_CONFIG.tryHackMeStats;
       return result(
         text(
-          `TRYHACKME // ${telemetry.handle} // ${telemetry.league}`,
+          `TRYHACKME // ${telemetry.handle} // ${league} // ${topPercent}`,
           "accent",
         ),
         {
@@ -510,7 +511,7 @@ export const CLI_COMMANDS: readonly CliCommand[] = [
           links: [{ label: telemetry.profileUrl, href: telemetry.profileUrl }],
         },
         text(
-          "Rank, streak and room counts are supplied live by TryHackMe.",
+          "Verify current rank, streak and room counts on the linked profile.",
           "muted",
         ),
       );

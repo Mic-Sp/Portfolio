@@ -15,6 +15,17 @@ interface DirectChannel {
   description: string;
 }
 
+interface TryHackMeStats {
+  readonly league: `${string} League`;
+  readonly topPercent: `Top ${number}%`;
+}
+
+// Update this standing here; every portfolio and console display derives from it.
+const TRY_HACK_ME_STATS = {
+  league: "Platinum League",
+  topPercent: "Top 6%",
+} as const satisfies TryHackMeStats;
+
 export interface CommsAndTelemetry {
   directChannels: {
     github: DirectChannel;
@@ -25,7 +36,6 @@ export interface CommsAndTelemetry {
     handle: string;
     profileUrl: `https://${string}`;
     badgeScriptUrl: `https://${string}`;
-    league: string;
   };
 }
 
@@ -54,7 +64,6 @@ const COMMS_AND_TELEMETRY = {
     profileUrl: "https://tryhackme.com/p/mic.drop",
     badgeScriptUrl:
       "https://tryhackme.com/badge/t/3174f380b77c1bd0c7336280c2fbd30c06221c5f6e9c4250ae8d5352dae1b64f3fc37c020cdbb4ee0a8f98d5dab9ad4d?theme=dark",
-    league: "GOLD LEAGUE",
   },
 } as const satisfies CommsAndTelemetry;
 
@@ -119,6 +128,7 @@ export const PROFILE_CONFIG = {
     "AI & Full-Stack Software Engineer building intelligent automated workflows, production web applications, and custom developer tools, engineered from the ground up with an application-security mindset.",
   education: EDUCATION,
   commsAndTelemetry: COMMS_AND_TELEMETRY,
+  tryHackMeStats: TRY_HACK_ME_STATS,
   skillsIndex: [
     {
       label: "LANGUAGES",
@@ -153,7 +163,7 @@ export const PROFILE_CONFIG = {
       values: [
         "Columbia University PAISE",
         "NVIDIA AI Infrastructure",
-        "TryHackMe Gold League (Top 7%)",
+        `TryHackMe ${TRY_HACK_ME_STATS.league} (${TRY_HACK_ME_STATS.topPercent})`,
       ],
     },
   ],
