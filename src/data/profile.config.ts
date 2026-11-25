@@ -23,7 +23,7 @@ interface TryHackMeStats {
 // Update this standing here; every portfolio and console display derives from it.
 const TRY_HACK_ME_STATS = {
   league: "Platinum League",
-  topPercent: "Top 6%",
+  topPercent: "Top 5%",
 } as const satisfies TryHackMeStats;
 
 export interface CommsAndTelemetry {
